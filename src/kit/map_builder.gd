@@ -62,6 +62,8 @@ static func build(parent: Node, rows: Array, opts: Dictionary = {}) -> Dictionar
 
 	var is_wall := func(ch: String) -> bool:
 		return ch == "#" or walls.has(ch)
+	var is_open := func(ch: String) -> bool:
+		return ch == "D" or ch == "O"
 	var is_floor := func(ch: String) -> bool:
 		return ch != " " and not is_wall.call(ch)
 	var get := func(c: int, r: int) -> String:
@@ -113,9 +115,9 @@ static func build(parent: Node, rows: Array, opts: Dictionary = {}) -> Dictionar
 			elif floors.has(ch):
 				ft = String(floors[ch])
 			var fy := y0 - (0.6 if ch == "~" else 0.0)
-			add_quad.call("floor:" + ft, ft, "floor", _face(Vector3(x0, fy, z1), Vector3(x1, fy, z1), Vector3(x1, fy, z0), Vector3(x0, fy, z0), Vector2(x0 / tile, z1 / tile), Vector2(x1 / tile, z1 / tile), Vector2(x1 / tile, z0 / tile), Vector2(x0 / tile, z0 / tile), Vector3.UP))
+			add_quad.call("floor:" + ft, ft, "floor", _face(Vector3(x0, fy, z0), Vector3(x1, fy, z0), Vector3(x1, fy, z1), Vector3(x0, fy, z1), Vector2(x0 / tile, z0 / tile), Vector2(x1 / tile, z0 / tile), Vector2(x1 / tile, z1 / tile), Vector2(x0 / tile, z1 / tile), Vector3.UP))
 			if ceil_tex != "" and not open_above:
-				add_quad.call("ceil:" + ceil_tex, ceil_tex, "ceil", _face(Vector3(x0, y0 + height, z0), Vector3(x1, y0 + height, z0), Vector3(x1, y0 + height, z1), Vector3(x0, y0 + height, z1), Vector2(x0 / tile, z0 / tile), Vector2(x1 / tile, z0 / tile), Vector2(x1 / tile, z1 / tile), Vector2(x0 / tile, z1 / tile), Vector3.DOWN))
+				add_quad.call("ceil:" + ceil_tex, ceil_tex, "ceil", _face(Vector3(x0, y0 + height, z1), Vector3(x1, y0 + height, z1), Vector3(x1, y0 + height, z0), Vector3(x0, y0 + height, z0), Vector2(x0 / tile, z1 / tile), Vector2(x1 / tile, z1 / tile), Vector2(x1 / tile, z0 / tile), Vector2(x0 / tile, z0 / tile), Vector3.DOWN))
 			if ch == "D":
 				# lintel: block above the door opening
 				var ly0 := y0 + door_h
@@ -123,19 +125,27 @@ static func build(parent: Node, rows: Array, opts: Dictionary = {}) -> Dictionar
 				for q in lq:
 					add_quad.call("wall:" + wall_tex, wall_tex, "wall", q)
 				shapes.append([Vector3(cx, (ly0 + y0 + height) * 0.5, cz), Vector3(cell, y0 + height - ly0, cell), Kit.surface_of(wall_tex)])
-			if ch != "." and ch != "~" and ch != ":" and ch != "D":
+			if ch != "." and ch != "~" and ch != ":" and ch != "D" and ch != "O":
 				if not markers.has(ch):
 					markers[ch] = []
 				markers[ch].append(origin + Vector3(cx, y0, cz))
-			# edge walls beside void
+			# edge walls beside void (thin, sitting just outside the floor edge).
+			# Doorway cells only wall their sides (perpendicular to the way through).
 			if not open_edges:
+				var axis_ns := false
+				if is_open.call(ch):
+					axis_ns = is_floor.call(get.call(c, r - 1)) or is_floor.call(get.call(c, r + 1))
 				for d in dirs:
 					var nch: String = get.call(c + d.x, r + d.y)
+					if is_open.call(ch):
+						var perpendicular: bool = (d.y == 0) if axis_ns else (d.x == 0)
+						if not perpendicular:
+							continue
 					if nch == " ":
 						var q := _wall_face(x0 + d.x * cell, x1 + d.x * cell, z0 + d.y * cell, z1 + d.y * cell, y0, y0 + height, -d, tile)
 						add_quad.call("wall:" + wall_tex, wall_tex, "wall", q)
-						var wc := Vector3(cx + d.x * cell, y0 + height * 0.5, cz + d.y * cell)
-						shapes.append([wc, Vector3(cell if d.x == 0 else 0.3, height, cell if d.y == 0 else 0.3) , Kit.surface_of(wall_tex)])
+						var wc := Vector3(cx + d.x * (cell * 0.5 + 0.15), y0 + height * 0.5, cz + d.y * (cell * 0.5 + 0.15))
+						shapes.append([wc, Vector3(cell if d.x == 0 else 0.3, height, cell if d.y == 0 else 0.3), Kit.surface_of(wall_tex)])
 
 	# commit meshes
 	for key in buckets:
@@ -204,7 +214,7 @@ static func _wall_face(x0: float, x1: float, z0: float, z1: float, y0: float, y1
 
 
 static func _top_face(x0: float, x1: float, z0: float, z1: float, y: float, tile: float) -> Array:
-	return _face(Vector3(x0, y, z1), Vector3(x1, y, z1), Vector3(x1, y, z0), Vector3(x0, y, z0), Vector2(x0 / tile, z1 / tile), Vector2(x1 / tile, z1 / tile), Vector2(x1 / tile, z0 / tile), Vector2(x0 / tile, z0 / tile), Vector3.UP)
+	return _face(Vector3(x0, y, z0), Vector3(x1, y, z0), Vector3(x1, y, z1), Vector3(x0, y, z1), Vector2(x0 / tile, z0 / tile), Vector2(x1 / tile, z0 / tile), Vector2(x1 / tile, z1 / tile), Vector2(x0 / tile, z1 / tile), Vector3.UP)
 
 
 ## Mirror a map horizontally (the Nowhere House on its second visit).

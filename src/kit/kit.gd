@@ -310,11 +310,11 @@ static func box_quads(c: Vector3, s: Vector3, tile: float, faces: Array = [], uv
 		out.append(_face(Vector3(x0, y0, z0), Vector3(x0, y0, z1), Vector3(x0, y1, z1), Vector3(x0, y1, z0),
 			Vector2((z0 - o.z) * t, (y1 - y0) * t), Vector2((z1 - o.z) * t, (y1 - y0) * t), Vector2((z1 - o.z) * t, 0), Vector2((z0 - o.z) * t, 0), Vector3(-1, 0, 0)))
 	if faces.is_empty() or "py" in faces:
-		out.append(_face(Vector3(x0, y1, z1), Vector3(x1, y1, z1), Vector3(x1, y1, z0), Vector3(x0, y1, z0),
-			Vector2((x0 - o.x) * t, (z1 - o.z) * t), Vector2((x1 - o.x) * t, (z1 - o.z) * t), Vector2((x1 - o.x) * t, (z0 - o.z) * t), Vector2((x0 - o.x) * t, (z0 - o.z) * t), Vector3(0, 1, 0)))
+		out.append(_face(Vector3(x0, y1, z0), Vector3(x1, y1, z0), Vector3(x1, y1, z1), Vector3(x0, y1, z1),
+			Vector2((x0 - o.x) * t, (z0 - o.z) * t), Vector2((x1 - o.x) * t, (z0 - o.z) * t), Vector2((x1 - o.x) * t, (z1 - o.z) * t), Vector2((x0 - o.x) * t, (z1 - o.z) * t), Vector3(0, 1, 0)))
 	if faces.is_empty() or "ny" in faces:
-		out.append(_face(Vector3(x0, y0, z0), Vector3(x1, y0, z0), Vector3(x1, y0, z1), Vector3(x0, y0, z1),
-			Vector2((x0 - o.x) * t, (z0 - o.z) * t), Vector2((x1 - o.x) * t, (z0 - o.z) * t), Vector2((x1 - o.x) * t, (z1 - o.z) * t), Vector2((x0 - o.x) * t, (z1 - o.z) * t), Vector3(0, -1, 0)))
+		out.append(_face(Vector3(x0, y0, z1), Vector3(x1, y0, z1), Vector3(x1, y0, z0), Vector3(x0, y0, z0),
+			Vector2((x0 - o.x) * t, (z1 - o.z) * t), Vector2((x1 - o.x) * t, (z1 - o.z) * t), Vector2((x1 - o.x) * t, (z0 - o.z) * t), Vector2((x0 - o.x) * t, (z0 - o.z) * t), Vector3(0, -1, 0)))
 	return out
 
 
@@ -382,7 +382,8 @@ static func wall(parent: Node, from: Vector3, to: Vector3, height: float, tex_na
 	return add_mesh(parent, mesh, material, mid, o)
 
 
-## A single quad (CCW). Useful for signs, floors of odd shapes, portal planes.
+## A single quad. Godot front faces are CLOCKWISE as seen from the front, so pass
+## a, b, c, d going clockwise when looking at the visible side.
 static func quad(parent: Node, a: Vector3, b: Vector3, c: Vector3, d: Vector3, tex_name: String, opts: Dictionary = {}) -> MeshInstance3D:
 	var n := (b - a).cross(c - a).normalized()
 	var uvs: Array = opts.get("uvs", [Vector2(0, 1), Vector2(1, 1), Vector2(1, 0), Vector2(0, 0)])
@@ -403,7 +404,8 @@ static func sign(parent: Node, tex_name: String, pos: Vector3, yaw_deg: float, s
 	var o := opts.duplicate()
 	if not o.has("solid"):
 		o["solid"] = false
-	o["yaw"] = yaw_deg
+	# QuadMesh faces +Z; the Kit's yaw convention faces -Z.
+	o["yaw"] = yaw_deg + 180.0
 	var mo := _mat_opts(opts)
 	if not mo.has("double"):
 		mo["double"] = true
@@ -456,12 +458,15 @@ static func stairs(parent: Node, pos: Vector3, yaw_deg: float, width: float, ste
 	root.rotation.y = deg_to_rad(yaw_deg)
 	root.name = String(opts.get("name", "Stairs"))
 	parent.add_child(root)
+	# step_h < 0 builds a descending flight (each tread is a box down to below the lowest step)
+	var lo := (step_h * steps - 0.3) if step_h < 0.0 else 0.0
 	for i in steps:
-		var h := step_h * (i + 1)
-		var c := Vector3(0, h * 0.5, -(i + 0.5) * step_d)
+		var top := step_h * (i + 1)
+		var hgt := top - lo
+		var c := Vector3(0, (top + lo) * 0.5, -(i + 0.5) * step_d)
 		var o := opts.duplicate()
 		o.erase("name")
-		box(root, c, Vector3(width, h, step_d), tex_name, o)
+		box(root, c, Vector3(width, hgt, step_d), tex_name, o)
 	return root
 
 
@@ -475,11 +480,11 @@ static func ramp(parent: Node, pos: Vector3, yaw_deg: float, width: float, lengt
 	var tile := float(opts.get("tile", default_tile))
 	var slope_len := Vector2(length, rise).length()
 	var quads := [
-		_face(a, b, c, d, Vector2(0, 0), Vector2(width / tile, 0), Vector2(width / tile, slope_len / tile), Vector2(0, slope_len / tile), (b - a).cross(d - a).normalized()),
-		_face(a + Vector3(0, -thick, 0), d + Vector3(0, -thick, 0), c + Vector3(0, -thick, 0), b + Vector3(0, -thick, 0), Vector2(0, 0), Vector2(0, 1), Vector2(1, 1), Vector2(1, 0), Vector3(0, -1, 0)),
+		_face(a, d, c, b, Vector2(0, 0), Vector2(0, slope_len / tile), Vector2(width / tile, slope_len / tile), Vector2(width / tile, 0), (b - a).cross(d - a).normalized()),
+		_face(a + Vector3(0, -thick, 0), b + Vector3(0, -thick, 0), c + Vector3(0, -thick, 0), d + Vector3(0, -thick, 0), Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(0, 1), Vector3(0, -1, 0)),
 		_face(a, d, d + Vector3(0, -thick, 0), a + Vector3(0, -thick, 0), Vector2(0, 0), Vector2(slope_len / tile, 0), Vector2(slope_len / tile, thick / tile), Vector2(0, thick / tile), Vector3(-1, 0, 0)),
 		_face(b, b + Vector3(0, -thick, 0), c + Vector3(0, -thick, 0), c, Vector2(0, 0), Vector2(0, thick / tile), Vector2(slope_len / tile, thick / tile), Vector2(slope_len / tile, 0), Vector3(1, 0, 0)),
-		_face(d, c, c + Vector3(0, -thick, 0), d + Vector3(0, -thick, 0), Vector2(0, 0), Vector2(width / tile, 0), Vector2(width / tile, thick / tile), Vector2(0, thick / tile), Vector3(0, 0, -1)),
+		_face(c, d, d + Vector3(0, -thick, 0), c + Vector3(0, -thick, 0), Vector2(0, 0), Vector2(width / tile, 0), Vector2(width / tile, thick / tile), Vector2(0, thick / tile), Vector3(0, 0, -1)),
 	]
 	var mesh := mesh_from_quads(quads)
 	var o := opts.duplicate()
@@ -630,7 +635,8 @@ static func label(parent: Node, text: String, pos: Vector3, yaw_deg: float, size
 	l.font_size = size
 	l.modulate = color
 	l.position = pos
-	l.rotation.y = deg_to_rad(yaw_deg)
+	# Label3D faces +Z; the Kit's yaw convention faces -Z.
+	l.rotation.y = deg_to_rad(yaw_deg + 180.0)
 	l.pixel_size = float(opts.get("pixel_size", 0.01))
 	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED if opts.get("billboard", false) else BaseMaterial3D.BILLBOARD_DISABLED
 	l.shaded = false
@@ -844,3 +850,69 @@ static func mouse_gap(parent: Node, pos: Vector3, yaw_deg: float, size: Vector2 
 	var b := blocker(root, Vector3(0, size.y * 0.5, 0), Vector3(size.x, size.y, 0.3), L_BIG_ONLY)
 	b.name = "BigOnlyBlocker"
 	return root
+
+
+# --- round rooms -------------------------------------------------------------
+
+## A flat ring (or disc when r_in is 0) facing up (or down with opts.down). Collision: trimesh.
+static func ring(parent: Node, pos: Vector3, r_in: float, r_out: float, segments: int, tex_name: String, opts: Dictionary = {}) -> MeshInstance3D:
+	var tile := float(opts.get("tile", default_tile))
+	var down := bool(opts.get("down", false))
+	var quads: Array = []
+	for i in segments:
+		var a0 := TAU * i / segments
+		var a1 := TAU * (i + 1) / segments
+		var p0 := Vector3(cos(a0) * r_in, 0, sin(a0) * r_in)
+		var p1 := Vector3(cos(a0) * r_out, 0, sin(a0) * r_out)
+		var p2 := Vector3(cos(a1) * r_out, 0, sin(a1) * r_out)
+		var p3 := Vector3(cos(a1) * r_in, 0, sin(a1) * r_in)
+		var uv := func(p: Vector3) -> Vector2:
+			return Vector2((p.x + pos.x) / tile, (p.z + pos.z) / tile)
+		if down:
+			quads.append(_face(p0, p3, p2, p1, uv.call(p0), uv.call(p3), uv.call(p2), uv.call(p1), Vector3.DOWN))
+		else:
+			quads.append(_face(p0, p1, p2, p3, uv.call(p0), uv.call(p1), uv.call(p2), uv.call(p3), Vector3.UP))
+	var mesh := mesh_from_quads(quads)
+	var o := opts.duplicate()
+	o["shape"] = "trimesh"
+	if not o.has("surface"):
+		o["surface"] = surface_of(tex_name)
+	return add_mesh(parent, mesh, opts.get("mat", mat(tex_name, _mat_opts(opts))), pos, o)
+
+
+## A circular wall of `segments` flat panels facing inward. opts.gaps: Array of
+## [angle_deg, width_deg] openings; opts.outward: also draw outward faces.
+static func round_wall(parent: Node, pos: Vector3, radius: float, height: float, segments: int, tex_name: String, opts: Dictionary = {}) -> Node3D:
+	var root := Node3D.new()
+	root.position = pos
+	root.name = String(opts.get("name", "RoundWall"))
+	parent.add_child(root)
+	var gaps: Array = opts.get("gaps", [])
+	var o := opts.duplicate()
+	o.erase("name")
+	o.erase("gaps")
+	for i in segments:
+		var a_mid := 360.0 * (i + 0.5) / segments
+		var skip := false
+		for g in gaps:
+			var diff := absf(wrapf(a_mid - float(g[0]), -180.0, 180.0))
+			if diff < float(g[1]) * 0.5:
+				skip = true
+		if skip:
+			continue
+		var a0 := deg_to_rad(360.0 * i / segments)
+		var a1 := deg_to_rad(360.0 * (i + 1) / segments)
+		var p0 := Vector3(cos(a0) * radius, 0, sin(a0) * radius)
+		var p1 := Vector3(cos(a1) * radius, 0, sin(a1) * radius)
+		wall(root, p1, p0, height, tex_name, o)
+	return root
+
+
+## Polar helper: a point on a circle in the XZ plane. angle_deg 0 = +X, 90 = +Z.
+static func polar(radius: float, angle_deg: float, y: float = 0.0) -> Vector3:
+	return Vector3(cos(deg_to_rad(angle_deg)) * radius, y, sin(deg_to_rad(angle_deg)) * radius)
+
+
+## Yaw (in Kit convention, 0 = facing -Z) that looks from a point on a circle toward its centre.
+static func yaw_to_center(angle_deg: float) -> float:
+	return dir_to_yaw(-polar(1.0, angle_deg))
