@@ -1,0 +1,1220 @@
+{
+ "brick/dark": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "brick/pale": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "brick/red": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "common/checker": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "common/noise_soft": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "common/stars": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "common/static": {
+  "alpha": false,
+  "h": 64,
+  "surface": "metal",
+  "w": 64
+ },
+ "common/void": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "common/white": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "fabric/banner_eye": {
+  "alpha": false,
+  "h": 64,
+  "surface": "carpet",
+  "w": 64
+ },
+ "fabric/banner_key": {
+  "alpha": false,
+  "h": 64,
+  "surface": "carpet",
+  "w": 64
+ },
+ "fabric/cloth_red": {
+  "alpha": false,
+  "h": 64,
+  "surface": "carpet",
+  "w": 64
+ },
+ "fabric/coat": {
+  "alpha": false,
+  "h": 64,
+  "surface": "carpet",
+  "w": 64
+ },
+ "fabric/curtain": {
+  "alpha": false,
+  "h": 64,
+  "surface": "carpet",
+  "w": 64
+ },
+ "fabric/dog_fur": {
+  "alpha": false,
+  "h": 64,
+  "surface": "carpet",
+  "w": 64
+ },
+ "fabric/mattress": {
+  "alpha": false,
+  "h": 64,
+  "surface": "carpet",
+  "w": 64
+ },
+ "fabric/sheet": {
+  "alpha": false,
+  "h": 64,
+  "surface": "carpet",
+  "w": 64
+ },
+ "fabric/skin": {
+  "alpha": false,
+  "h": 64,
+  "surface": "flesh",
+  "w": 64
+ },
+ "fabric/sofa": {
+  "alpha": false,
+  "h": 64,
+  "surface": "carpet",
+  "w": 64
+ },
+ "fabric/tapestry": {
+  "alpha": false,
+  "h": 128,
+  "surface": "carpet",
+  "w": 64
+ },
+ "fabric/velvet": {
+  "alpha": false,
+  "h": 64,
+  "surface": "carpet",
+  "w": 64
+ },
+ "faces/dog": {
+  "alpha": true,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "faces/king": {
+  "alpha": true,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "faces/moon": {
+  "alpha": true,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "faces/patron": {
+  "alpha": true,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "faces/sea_awake": {
+  "alpha": true,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "faces/sea_sad": {
+  "alpha": true,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "faces/sea_sleep": {
+  "alpha": true,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "faces/usher": {
+  "alpha": true,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "ground/ash": {
+  "alpha": false,
+  "h": 64,
+  "surface": "sand",
+  "w": 64
+ },
+ "ground/dirt": {
+  "alpha": false,
+  "h": 64,
+  "surface": "grass",
+  "w": 64
+ },
+ "ground/gravel": {
+  "alpha": false,
+  "h": 64,
+  "surface": "gravel",
+  "w": 64
+ },
+ "ground/lava": {
+  "alpha": false,
+  "h": 64,
+  "surface": "flesh",
+  "w": 64
+ },
+ "ground/mud": {
+  "alpha": false,
+  "h": 64,
+  "surface": "water",
+  "w": 64
+ },
+ "ground/sand": {
+  "alpha": false,
+  "h": 64,
+  "surface": "sand",
+  "w": 64
+ },
+ "ground/snow": {
+  "alpha": false,
+  "h": 64,
+  "surface": "snow",
+  "w": 64
+ },
+ "metal/bars": {
+  "alpha": true,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "metal/brass": {
+  "alpha": false,
+  "h": 64,
+  "surface": "metal",
+  "w": 64
+ },
+ "metal/chain": {
+  "alpha": true,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "metal/clock_face": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "metal/gear": {
+  "alpha": true,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "metal/grate": {
+  "alpha": true,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "metal/iron": {
+  "alpha": false,
+  "h": 64,
+  "surface": "metal",
+  "w": 64
+ },
+ "metal/plate": {
+  "alpha": false,
+  "h": 64,
+  "surface": "metal",
+  "w": 64
+ },
+ "metal/rust": {
+  "alpha": false,
+  "h": 64,
+  "surface": "metal",
+  "w": 64
+ },
+ "nature/bark_dead": {
+  "alpha": false,
+  "h": 64,
+  "surface": "wood",
+  "w": 64
+ },
+ "nature/bark_oak": {
+  "alpha": false,
+  "h": 64,
+  "surface": "wood",
+  "w": 64
+ },
+ "nature/bark_pine": {
+  "alpha": false,
+  "h": 64,
+  "surface": "wood",
+  "w": 64
+ },
+ "nature/fern": {
+  "alpha": true,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "nature/grass_dark": {
+  "alpha": false,
+  "h": 64,
+  "surface": "grass",
+  "w": 64
+ },
+ "nature/grass_moss": {
+  "alpha": false,
+  "h": 64,
+  "surface": "grass",
+  "w": 64
+ },
+ "nature/grass_pale": {
+  "alpha": false,
+  "h": 64,
+  "surface": "grass",
+  "w": 64
+ },
+ "nature/leaves_autumn": {
+  "alpha": true,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "nature/leaves_dark": {
+  "alpha": true,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "nature/leaves_pale": {
+  "alpha": true,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "nature/leaves_purple": {
+  "alpha": true,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "nature/mushroom_glow": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "nature/mushroom_pale": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "nature/mushroom_red": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "nature/roots": {
+  "alpha": false,
+  "h": 64,
+  "surface": "wood",
+  "w": 64
+ },
+ "nature/stone_rune": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 64
+ },
+ "nature/water_blood": {
+  "alpha": false,
+  "h": 64,
+  "surface": "water",
+  "w": 64
+ },
+ "nature/water_cistern": {
+  "alpha": false,
+  "h": 64,
+  "surface": "water",
+  "w": 64
+ },
+ "nature/water_dark": {
+  "alpha": false,
+  "h": 64,
+  "surface": "water",
+  "w": 64
+ },
+ "nature/water_sea": {
+  "alpha": false,
+  "h": 64,
+  "surface": "water",
+  "w": 64
+ },
+ "organic/bones": {
+  "alpha": false,
+  "h": 64,
+  "surface": "bone",
+  "w": 64
+ },
+ "organic/eye": {
+  "alpha": true,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "organic/flesh": {
+  "alpha": false,
+  "h": 64,
+  "surface": "flesh",
+  "w": 64
+ },
+ "organic/flesh_dark": {
+  "alpha": false,
+  "h": 64,
+  "surface": "flesh",
+  "w": 64
+ },
+ "props/calendar": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "props/grave_annis": {
+  "alpha": false,
+  "h": 96,
+  "surface": "stone",
+  "w": 64
+ },
+ "props/grave_blank": {
+  "alpha": false,
+  "h": 96,
+  "surface": "stone",
+  "w": 64
+ },
+ "props/grave_elspeth": {
+  "alpha": false,
+  "h": 96,
+  "surface": "stone",
+  "w": 64
+ },
+ "props/grave_halden": {
+  "alpha": false,
+  "h": 96,
+  "surface": "stone",
+  "w": 64
+ },
+ "props/grave_morrow": {
+  "alpha": false,
+  "h": 96,
+  "surface": "stone",
+  "w": 64
+ },
+ "props/grave_you": {
+  "alpha": false,
+  "h": 96,
+  "surface": "stone",
+  "w": 64
+ },
+ "props/keypad": {
+  "alpha": false,
+  "h": 64,
+  "surface": "metal",
+  "w": 64
+ },
+ "props/map_scrap": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "props/mirror": {
+  "alpha": false,
+  "h": 64,
+  "surface": "tile",
+  "w": 64
+ },
+ "props/painting_door": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "props/painting_house": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "props/painting_landscape": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "props/painting_portrait": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "props/photo_0": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "props/photo_1": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "props/photo_2": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "props/photo_3": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "props/photo_4": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "props/rune_ring": {
+  "alpha": true,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "props/rune_ring_floor": {
+  "alpha": true,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "props/tv_face": {
+  "alpha": false,
+  "h": 64,
+  "surface": "metal",
+  "w": 64
+ },
+ "props/tv_static": {
+  "alpha": false,
+  "h": 64,
+  "surface": "metal",
+  "w": 64
+ },
+ "props/window_lit": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "props/window_night": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "signs/book_cover": {
+  "alpha": false,
+  "h": 96,
+  "surface": "stone",
+  "w": 64
+ },
+ "signs/book_cover_2": {
+  "alpha": false,
+  "h": 96,
+  "surface": "stone",
+  "w": 64
+ },
+ "signs/exit": {
+  "alpha": false,
+  "h": 40,
+  "surface": "stone",
+  "w": 96
+ },
+ "signs/exit_wrong": {
+  "alpha": false,
+  "h": 40,
+  "surface": "stone",
+  "w": 96
+ },
+ "signs/five_half": {
+  "alpha": false,
+  "h": 48,
+  "surface": "stone",
+  "w": 48
+ },
+ "signs/graffiti_door": {
+  "alpha": true,
+  "h": 32,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/graffiti_wake": {
+  "alpha": true,
+  "h": 40,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/halden_arms": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/king_asleep": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/label_moonlight": {
+  "alpha": false,
+  "h": 48,
+  "surface": "stone",
+  "w": 64
+ },
+ "signs/last_lamp": {
+  "alpha": false,
+  "h": 48,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/menu": {
+  "alpha": false,
+  "h": 96,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/no_vacancy": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/note_apartment": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/note_hallway": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/note_house": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/note_king": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/note_offices": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/note_tavern": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/now_serving": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/plaque_anteroom": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/plaque_mirror": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/take_a_number": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/your_call": {
+  "alpha": false,
+  "h": 96,
+  "surface": "stone",
+  "w": 128
+ },
+ "sky/castle": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 256
+ },
+ "sky/cistern": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 256
+ },
+ "sky/city": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 256
+ },
+ "sky/dawn": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 256
+ },
+ "sky/forest": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 256
+ },
+ "sky/furnace": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 256
+ },
+ "sky/house": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 256
+ },
+ "sky/nexus": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 256
+ },
+ "sky/night": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 256
+ },
+ "sky/sea": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 256
+ },
+ "sky/static": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 256
+ },
+ "stone/blocks_castle": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "stone/blocks_city": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "stone/blocks_clocktower": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "stone/blocks_dark": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "stone/blocks_furnace": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "stone/blocks_grey": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "stone/blocks_nexus": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "stone/blocks_sea": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "stone/cobble_city": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "stone/cobble_grey": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "stone/cobble_mossy": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "stone/flagstone": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "stone/flagstone_castle": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "stone/marble_black": {
+  "alpha": false,
+  "h": 64,
+  "surface": "tile",
+  "w": 64
+ },
+ "stone/marble_white": {
+  "alpha": false,
+  "h": 64,
+  "surface": "tile",
+  "w": 64
+ },
+ "stone/smooth_grey": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "stone/smooth_pale": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "stone/statue": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "ui/cursor": {
+  "alpha": true,
+  "h": 16,
+  "surface": "stone",
+  "w": 16
+ },
+ "ui/keepsake_bell": {
+  "alpha": true,
+  "h": 32,
+  "surface": "stone",
+  "w": 32
+ },
+ "ui/keepsake_crown": {
+  "alpha": true,
+  "h": 32,
+  "surface": "stone",
+  "w": 32
+ },
+ "ui/keepsake_hourglass": {
+  "alpha": true,
+  "h": 32,
+  "surface": "stone",
+  "w": 32
+ },
+ "ui/keepsake_knife": {
+  "alpha": true,
+  "h": 32,
+  "surface": "stone",
+  "w": 32
+ },
+ "ui/keepsake_lantern": {
+  "alpha": true,
+  "h": 32,
+  "surface": "stone",
+  "w": 32
+ },
+ "ui/keepsake_mouse": {
+  "alpha": true,
+  "h": 32,
+  "surface": "stone",
+  "w": 32
+ },
+ "ui/keepsake_shard": {
+  "alpha": true,
+  "h": 32,
+  "surface": "stone",
+  "w": 32
+ },
+ "ui/keepsake_umbrella": {
+  "alpha": true,
+  "h": 32,
+  "surface": "stone",
+  "w": 32
+ },
+ "ui/keepsake_wings": {
+  "alpha": true,
+  "h": 32,
+  "surface": "stone",
+  "w": 32
+ },
+ "wall/carpet_apartment": {
+  "alpha": false,
+  "h": 64,
+  "surface": "carpet",
+  "w": 64
+ },
+ "wall/carpet_house": {
+  "alpha": false,
+  "h": 64,
+  "surface": "carpet",
+  "w": 64
+ },
+ "wall/carpet_office": {
+  "alpha": false,
+  "h": 64,
+  "surface": "carpet",
+  "w": 64
+ },
+ "wall/carpet_red": {
+  "alpha": false,
+  "h": 64,
+  "surface": "carpet",
+  "w": 64
+ },
+ "wall/carpet_tavern": {
+  "alpha": false,
+  "h": 64,
+  "surface": "carpet",
+  "w": 64
+ },
+ "wall/ceiling_plaster": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "wall/ceiling_tile": {
+  "alpha": false,
+  "h": 64,
+  "surface": "tile",
+  "w": 64
+ },
+ "wall/concrete": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "wall/concrete_dark": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "wall/hallway_black": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "wall/hallway_grey": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "wall/paper": {
+  "alpha": false,
+  "h": 64,
+  "surface": "carpet",
+  "w": 64
+ },
+ "wall/plaster_cream": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "wall/plaster_green": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "wall/plaster_house": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "wall/plaster_tavern": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "wall/plaster_white": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "wall/plaster_yellow": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "wall/tile_bath": {
+  "alpha": false,
+  "h": 64,
+  "surface": "tile",
+  "w": 64
+ },
+ "wall/tile_black": {
+  "alpha": false,
+  "h": 64,
+  "surface": "tile",
+  "w": 64
+ },
+ "wall/tile_checker": {
+  "alpha": false,
+  "h": 64,
+  "surface": "tile",
+  "w": 64
+ },
+ "wall/tile_cyan": {
+  "alpha": false,
+  "h": 64,
+  "surface": "tile",
+  "w": 64
+ },
+ "wall/tile_terracotta": {
+  "alpha": false,
+  "h": 64,
+  "surface": "tile",
+  "w": 64
+ },
+ "wall/tile_white": {
+  "alpha": false,
+  "h": 64,
+  "surface": "tile",
+  "w": 64
+ },
+ "wall/wallpaper_brown": {
+  "alpha": false,
+  "h": 64,
+  "surface": "carpet",
+  "w": 64
+ },
+ "wall/wallpaper_damask": {
+  "alpha": false,
+  "h": 64,
+  "surface": "carpet",
+  "w": 64
+ },
+ "wall/wallpaper_damask_red": {
+  "alpha": false,
+  "h": 64,
+  "surface": "carpet",
+  "w": 64
+ },
+ "wall/wallpaper_floral": {
+  "alpha": false,
+  "h": 64,
+  "surface": "carpet",
+  "w": 64
+ },
+ "wall/wallpaper_office": {
+  "alpha": false,
+  "h": 64,
+  "surface": "carpet",
+  "w": 64
+ },
+ "wall/wallpaper_stripe": {
+  "alpha": false,
+  "h": 64,
+  "surface": "carpet",
+  "w": 64
+ },
+ "wood/bar_counter": {
+  "alpha": false,
+  "h": 64,
+  "surface": "wood",
+  "w": 64
+ },
+ "wood/book_spines": {
+  "alpha": false,
+  "h": 64,
+  "surface": "wood",
+  "w": 64
+ },
+ "wood/crate": {
+  "alpha": false,
+  "h": 64,
+  "surface": "wood",
+  "w": 64
+ },
+ "wood/door": {
+  "alpha": false,
+  "h": 128,
+  "surface": "wood",
+  "w": 64
+ },
+ "wood/door_dark": {
+  "alpha": false,
+  "h": 128,
+  "surface": "wood",
+  "w": 64
+ },
+ "wood/door_iron": {
+  "alpha": false,
+  "h": 128,
+  "surface": "metal",
+  "w": 64
+ },
+ "wood/door_red": {
+  "alpha": false,
+  "h": 128,
+  "surface": "wood",
+  "w": 64
+ },
+ "wood/door_white": {
+  "alpha": false,
+  "h": 128,
+  "surface": "wood",
+  "w": 64
+ },
+ "wood/planks_dark": {
+  "alpha": false,
+  "h": 64,
+  "surface": "wood",
+  "w": 64
+ },
+ "wood/planks_grey": {
+  "alpha": false,
+  "h": 64,
+  "surface": "wood",
+  "w": 64
+ },
+ "wood/planks_house": {
+  "alpha": false,
+  "h": 64,
+  "surface": "wood",
+  "w": 64
+ },
+ "wood/planks_wall": {
+  "alpha": false,
+  "h": 64,
+  "surface": "wood",
+  "w": 64
+ },
+ "wood/planks_warm": {
+  "alpha": false,
+  "h": 64,
+  "surface": "wood",
+  "w": 64
+ },
+ "wood/planks_white": {
+  "alpha": false,
+  "h": 64,
+  "surface": "wood",
+  "w": 64
+ },
+ "wood/table": {
+  "alpha": false,
+  "h": 64,
+  "surface": "wood",
+  "w": 64
+ },
+ "wood/thatch": {
+  "alpha": false,
+  "h": 64,
+  "surface": "grass",
+  "w": 64
+ }
+}

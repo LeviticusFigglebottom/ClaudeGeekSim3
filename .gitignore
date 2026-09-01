@@ -1,0 +1,12 @@
+# Godot
+.godot/
+*.import.bak
+export/
+*.tmp
+# Local Godot binaries / scratch
+.bin/
+screenshots/*.png
+# Python
+__pycache__/
+*.pyc
+.venv/
