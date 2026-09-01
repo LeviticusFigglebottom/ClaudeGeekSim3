@@ -26,4 +26,10 @@ set +e
 "$GODOT" --headless --path . res://tools/verify.tscn -- "$@" 2>&1 | filter
 STATUS=${PIPESTATUS[0]}
 set -e
+if [ "$STATUS" -ne 0 ]; then exit "$STATUS"; fi
+echo "== playtest (input-driven smoke test) =="
+set +e
+timeout 180 "$GODOT" --headless --path . -- --area=apartment --spawn=bed --playtest 2>&1 | filter | grep -E "playtest|SCRIPT ERROR|^\s+at:"
+STATUS=${PIPESTATUS[0]}
+set -e
 exit "$STATUS"

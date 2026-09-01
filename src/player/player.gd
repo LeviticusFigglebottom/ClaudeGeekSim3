@@ -88,26 +88,36 @@ func _ready() -> void:
 
 # --- look ---------------------------------------------------------------
 
-func _unhandled_input(event: InputEvent) -> void:
-	if frozen or input_locked:
+## Actions are polled rather than received as events: the Player lives inside
+## Main's SubViewport, and polling works no matter how (or whether) the
+## container forwards events. Mouse motion arrives from the HUD (root viewport).
+func _poll_actions() -> void:
+	if frozen or input_locked or not _in_play():
 		return
-	if event is InputEventMouseMotion:
-		if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
-			rotate_look(-event.relative.x * MOUSE_SENS, -event.relative.y * MOUSE_SENS)
-		return
-	if event.is_action_pressed("interact"):
-		if event is InputEventMouseButton and Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED:
-			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-			return
+	if Input.is_action_just_pressed("interact"):
 		try_interact()
-	elif event.is_action_pressed("use_keepsake"):
+	elif Input.is_action_just_pressed("use_keepsake"):
 		use_keepsake()
-	elif event.is_action_pressed("keepsake_next"):
+	elif Input.is_action_just_pressed("keepsake_next"):
 		Game.cycle_keepsake(1)
-	elif event.is_action_pressed("keepsake_prev"):
+	elif Input.is_action_just_pressed("keepsake_prev"):
 		Game.cycle_keepsake(-1)
-	elif event.is_action_pressed("crouch"):
+	elif Input.is_action_just_pressed("crouch"):
 		_toggle_crouch()
+
+
+## Called by the HUD's _input for every mouse motion event.
+func on_mouse_motion(relative: Vector2) -> void:
+	if frozen or input_locked or not _in_play():
+		return
+	rotate_look(-relative.x * MOUSE_SENS, -relative.y * MOUSE_SENS)
+
+
+func _in_play() -> bool:
+	var hud = World.hud
+	if hud == null:
+		return true
+	return not (hud.title_open or hud.paused or hud.journal_open or hud.dialogue_active)
 
 
 func rotate_look(dyaw: float, dpitch: float) -> void:
@@ -173,6 +183,7 @@ func _physics_process(delta: float) -> void:
 	if frozen:
 		return
 	_update_focus()
+	_poll_actions()
 	_handle_wake(delta)
 	if noclip:
 		_noclip_move(delta)

@@ -47,6 +47,11 @@ func _ready() -> void:
 			_shot_path = a.trim_prefix("--shot=")
 		elif a.begins_with("--shot-frames="):
 			_shot_frames = int(a.trim_prefix("--shot-frames="))
+		elif a == "--playtest":
+			var pt := Node.new()
+			pt.name = "Playtest"
+			pt.set_script(load("res://tools/playtest.gd"))
+			add_child(pt)
 		elif a.begins_with("--look="):
 			var parts := a.trim_prefix("--look=").split(",")
 			if parts.size() >= 2:
@@ -89,6 +94,11 @@ func _build_postfx() -> void:
 	mat.set_shader_parameter("pixel_size", float(container.stretch_shrink))
 	postfx_rect.material = mat
 	postfx.add_child(postfx_rect)
+
+
+func _exit_tree() -> void:
+	Kit.clear_caches()
+	Props.clear_caches()
 
 
 func _on_area_changed(_area_id: String, _spawn_id: String) -> void:

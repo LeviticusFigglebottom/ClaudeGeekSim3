@@ -12,6 +12,11 @@ static var _cache: Dictionary = {}
 static var _missing: Dictionary = {}
 
 
+static func clear_caches() -> void:
+	_cache.clear()
+	_missing.clear()
+
+
 static func exists(model: String) -> bool:
 	return ResourceLoader.exists(MODEL_ROOT + model + ".glb")
 

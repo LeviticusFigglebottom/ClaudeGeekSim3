@@ -74,15 +74,20 @@ func build() -> void:
 	Kit.box(self, Vector3(lx, 1.2, W * 0.5 + 0.05), Vector3(1.8, 2.4, 0.1), "metal/plate", {"name": "LiftDoors"})
 	Interactable.make(self, Vector3(lx, 0, W * 0.5 - 0.3), Vector3(1.8, 2.4, 0.6), "Call the lift", _on_lift, {"name": "Lift"})
 	Kit.sign(self, "signs/now_serving", Vector3(lx, 2.55, W * 0.5 - 0.02), 0.0, Vector2(0.8, 0.4), {"unshaded": true})
+	var lift_door := Door.create(self, Vector3(lx, 0, W * 0.5 - 0.16), 0.0, "static", "lift", {"kind": "none", "label": "Get in the lift", "name": "LiftDoor", "fade_color": Color.WHITE, "fade_duration": 0.3, "sound": "static_burst", "requires_flag": "lift_open", "locked_text": "The lift is not here yet."})
+	lift_door.add_box(Vector3(1.6, 2.3, 0.6), Vector3(0, 1.15, 0))
 	if Game.has_flag("lift_open"):
-		var lift_door := Door.create(self, Vector3(lx, 0, W * 0.5 - 0.16), 0.0, "static", "lift", {"kind": "none", "label": "Get in the lift", "name": "LiftDoor", "fade_color": Color.WHITE, "fade_duration": 0.3, "sound": "static_burst"})
-		lift_door.add_box(Vector3(1.6, 2.3, 0.6), Vector3(0, 1.15, 0))
 		var q := QuadMesh.new()
 		q.size = Vector2(1.6, 2.3)
 		Kit.add_mesh(lift_door, q, Kit.static_mat({"brightness": 0.5}), Vector3(0, 1.15, 0.1), {"solid": false, "rotation": Vector3(0, 180, 0)})
 		var ld := get_node_or_null("LiftDoors")
 		if ld:
 			ld.queue_free()
+	else:
+		lift_door.enabled = false
+		var lift_it := get_node_or_null("Lift")
+		if lift_it:
+			lift_it.move_to_front()
 	# graffiti, a window at the far end, and the loop
 	Kit.sign(self, "signs/graffiti_door", Vector3(29.0, 1.5, W * 0.5 - 0.02), 0.0, Vector2(1.6, 0.4))
 	Props.place(self, "window_night", Vector3(-3.9, 1.5, 0), -90.0, 1.0, {"collision": "none"})

@@ -54,5 +54,7 @@ static func key_hint(action: String) -> String:
 		if ev is InputEventKey:
 			var k: InputEventKey = ev
 			var code: Key = k.physical_keycode if k.physical_keycode != KEY_NONE else k.keycode
-			return OS.get_keycode_string(DisplayServer.keyboard_get_keycode_from_physical(code) if k.physical_keycode != KEY_NONE else code)
+			if k.physical_keycode != KEY_NONE and DisplayServer.get_name() != "headless":
+				code = DisplayServer.keyboard_get_keycode_from_physical(code)
+			return OS.get_keycode_string(code)
 	return "?"

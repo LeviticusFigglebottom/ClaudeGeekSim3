@@ -192,13 +192,20 @@ func _check_graph_targets() -> void:
 # --- 4. route solver ----------------------------------------------------------
 
 func _solve_routes() -> void:
-	var reachable := {AreaRegistry.STARTING_AREA: true}
-	var have := {}   # "keepsake:x", "item:x", "flag:x"
+	# falling out of any dream lands in the Static, so it is always reachable
+	var reachable := {AreaRegistry.STARTING_AREA: true, "static": true}
+	# axioms: waking is always possible from a dream (sets has_woken); every
+	# reachable area sets visited_<id> when entered.
+	var have := {"flag:has_woken": "axiom"}
 	var changed := true
 	var steps := 0
 	while changed and steps < 200:
 		changed = false
 		steps += 1
+		for id in reachable.keys():
+			if not have.has("flag:visited_" + id):
+				have["flag:visited_" + id] = id
+				changed = true
 		for id in reachable.keys():
 			var e: Dictionary = graph.get(id, {})
 			if e.is_empty():

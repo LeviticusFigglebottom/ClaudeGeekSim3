@@ -36,6 +36,13 @@ static var _white: Texture2D = null
 
 # --- textures & materials -------------------------------------------------
 
+## Drop cached resources (called when the game quits so nothing leaks at exit).
+static func clear_caches() -> void:
+	_tex_cache.clear()
+	_mat_cache.clear()
+	_shaders.clear()
+	_white = null
+
 static func manifest() -> Dictionary:
 	if not _manifest_loaded:
 		_manifest_loaded = true

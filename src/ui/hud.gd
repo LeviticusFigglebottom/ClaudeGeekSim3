@@ -312,6 +312,18 @@ func _process(delta: float) -> void:
 			_typing = false
 
 
+func _input(event: InputEvent) -> void:
+	# Mouse look is forwarded from here (the root viewport) so it never depends
+	# on events propagating into the SubViewport. Clicking while the cursor is
+	# free re-captures it.
+	if event is InputEventMouseMotion and not title_open and not paused and Game.player:
+		# screen_relative is unaffected by the window stretch, so sensitivity is stable
+		Game.player.on_mouse_motion(event.screen_relative)
+	elif event is InputEventMouseButton and event.pressed and not title_open and not paused and not journal_open:
+		if Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED:
+			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if title_open:
 		return

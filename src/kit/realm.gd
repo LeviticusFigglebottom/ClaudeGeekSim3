@@ -21,7 +21,7 @@ const PRESETS := {
 	"cistern": {"bg": "#0a2a2c", "ambient": "#8fc7c2", "ambient_energy": 1.08, "fog": "#2f8f95", "fog_density": 0.034, "sun": null, "sky": "sky/cistern"},
 	"offices": {"bg": "#d8c26a", "ambient": "#e8dca0", "ambient_energy": 1.22, "fog": "#c4ad55", "fog_density": 0.038, "sun": null, "sky": ""},
 	"clocktower": {"bg": "#0c0a18", "ambient": "#6a5a40", "ambient_energy": 0.74, "fog": "#1a1410", "fog_density": 0.022, "sun": [-40, 50, "#b58a3c", 0.35], "sky": "sky/castle"},
-	"static": {"bg": "#6a6a6a", "ambient": "#9a9a9a", "ambient_energy": 1.35, "fog": "#8a8a8a", "fog_density": 0.045, "sun": null, "sky": "sky/static"},
+	"static": {"bg": "#5a5a5a", "ambient": "#9a9a9a", "ambient_energy": 1.35, "fog": "#7a7a7a", "fog_density": 0.015, "sun": null, "sky": "sky/static"},
 	"mirror": {"bg": "#0a1818", "ambient": "#4a7070", "ambient_energy": 0.94, "fog": "#0e2424", "fog_density": 0.026, "sun": [-60, 200, "#86c0c0", 0.2], "sky": "sky/nexus"},
 }
 
