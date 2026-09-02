@@ -58,7 +58,7 @@ func build() -> void:
 			Kit.box(self, Vector3(0, (prev_h + h) * 0.5, z0), Vector3(w, h - prev_h, 0.2), wall_tex, {"tile": 3.0})
 		# a cold dim light in every segment, so it is never quite black: you can
 		# always see the floor and the walls, just not what is written on them
-		Kit.light(self, Vector3(0, minf(h - 0.5, 3.2), (z0 + z1) * 0.5), Color(0.55, 0.6, 0.8), 0.75 if i % 2 == 0 else 0.5, w + 7.0)
+		Kit.light(self, Vector3(0, minf(h - 0.5, 3.2), (z0 + z1) * 0.5), Color(0.6, 0.65, 0.85), 1.3 if i % 2 == 0 else 0.9, w + 9.0)
 		prev_w = w
 		prev_h = h
 		z = z1
@@ -101,7 +101,8 @@ func build() -> void:
 	Kit.wall(self, Vector3(7, 0, end_z), Vector3(lw * 0.5, 0, end_z), 9.5, wall_tex, {"tile": 3.0})
 	Kit.wall(self, Vector3(-7, 0, landing_z - 6.0), Vector3(7, 0, landing_z - 6.0), 9.5, wall_tex, {"tile": 3.0})
 	var big := Door.create(self, Vector3(0, 0, landing_z - 5.85), 0.0, "nexus", "from_hallway", {"kind": "big", "label": "A door far too large for a flat", "name": "BigDoor", "sets_flag": "hallway_end", "fade_duration": 1.4})
-	Kit.light(self, Vector3(0, 4.0, landing_z - 4.0), Color(0.5, 0.55, 0.9), 0.9, 10.0)
+	Kit.light(self, Vector3(0, 4.0, landing_z - 4.0), Color(0.5, 0.55, 0.9), 1.5, 14.0)
+	Kit.light(self, Vector3(-5.0, 2.5, landing_z - 2.0), Color(0.7, 0.65, 0.5), 1.2, 9.0)
 	add_spawn("end", Vector3(0, 0.1, landing_z - 4.0), 180.0)
 	Kit.label(self, "you are late", Vector3(0, 5.2, landing_z - 5.8), 0.0, 44, Color(0.5, 0.5, 0.6), "display", {"pixel_size": 0.012})
 	# the stair that goes down forever (three times)
@@ -128,7 +129,8 @@ func _build_stair(pos: Vector3, wall_tex: String, floor_tex: String) -> void:
 	Kit.stairs(shaft, Vector3(0.6 - size * 0.5, -3.0, -size), 180.0, 1.2, 12, -0.25, 0.33, floor_tex, {"name": "FlightB"})
 	Kit.floor(shaft, Vector3(-size * 0.5 + 0.6, -3.0, -size + 0.6), Vector2(1.2, 1.2), floor_tex)
 	Kit.floor(shaft, Vector3(size * 0.5 - 0.6, -6.0, -0.6), Vector2(1.2, 1.2), floor_tex)
-	Kit.light(shaft, Vector3(0, -2.0, -size * 0.5), Color(0.5, 0.55, 0.7), 0.5, 7.0)
+	Kit.light(shaft, Vector3(0, -2.0, -size * 0.5), Color(0.6, 0.6, 0.75), 1.1, 9.0)
+	Kit.light(shaft, Vector3(0, -5.5, -size * 0.5), Color(0.6, 0.55, 0.7), 0.9, 8.0)
 	# bottom → top seam (looks the same: the shaft repeats)
 	stair_seam = SeamlessTeleport.create(shaft, Vector3(size * 0.5 - 0.6, -6.0, -0.6), 0.0, Vector3(size * 0.5 - 0.6, 0.0, 0.6), 0.0, Vector3(1.4, 2.5, 0.5), {"name": "StairSeam", "count_flag": "stairs_loops", "one_way": false, "on_teleport": _on_stair_loop})
 	if Game.count("stairs_loops") >= 3:

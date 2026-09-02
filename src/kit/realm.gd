@@ -8,7 +8,7 @@ class_name Realm
 const PRESETS := {
 	"waking": {"bg": "#0d0c12", "ambient": "#6a6058", "ambient_energy": 0.74, "fog": "#141216", "fog_density": 0.022, "sun": [-35, 40, "#b8a888", 0.25], "sky": "sky/night"},
 	"corridor": {"bg": "#0a0b0e", "ambient": "#6e7a6e", "ambient_energy": 0.68, "fog": "#0c0e10", "fog_density": 0.038, "sun": null, "sky": ""},
-	"hallway": {"bg": "#000000", "ambient": "#565a68", "ambient_energy": 0.95, "fog": "#020204", "fog_density": 0.030, "sun": null, "sky": ""},
+	"hallway": {"bg": "#000000", "ambient": "#8a8ea0", "ambient_energy": 1.4, "fog": "#020204", "fog_density": 0.022, "sun": null, "sky": ""},
 	"nexus": {"bg": "#0b0a18", "ambient": "#4a4870", "ambient_energy": 0.94, "fog": "#100e24", "fog_density": 0.026, "sun": [-60, 20, "#8a86c0", 0.2], "sky": "sky/nexus"},
 	"forest": {"bg": "#061a18", "ambient": "#3a6a5e", "ambient_energy": 0.94, "fog": "#0f2a25", "fog_density": 0.034, "sun": [-50, -30, "#8fd0bc", 0.35], "sky": "sky/forest"},
 	"city": {"bg": "#2a2f3a", "ambient": "#7a8090", "ambient_energy": 1.01, "fog": "#4a5060", "fog_density": 0.022, "sun": [-30, 60, "#c9c2b0", 0.6], "sky": "sky/city"},

@@ -35,6 +35,18 @@ roughly in order of value:
 * A `tools/gen_assets/README` with a gallery contact sheet regenerated in CI.
 
 ## Known rough edges
+* The sleeping faces of the Slow Sea are flat cards with a square backing;
+  from above they read as slabs. A lathed head would sell them.
+* `Clockwork.add_shape` only makes boxes; round riding platforms (the Sea's
+  drifting discs, the Clocktower's gears) use a box approximation.
+* Riding moving platforms and climbing the Clocktower spiral are validated
+  numerically (gap/rise) but not by the headless playtest, which only walks
+  the flat, the Anteroom and the bed.
+* The Furnace's small iron door (behind the cut gallows rope) opens onto
+  stairs that are "not finished being dreamt": a hook for a way up into the
+  Last Lamp's cellar.
+* The Waiting Halls' number display is a Label3D over a small prop; a proper
+  seven-segment texture would read better at pixel scale 3.
 * Areas rebuild on every visit; large realms take ~100 ms under software GL.
   Fine on hardware; could cache.
 * Under llvmpipe the frame rate is low (it is a verification path, not a play
