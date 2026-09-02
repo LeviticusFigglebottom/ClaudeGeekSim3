@@ -53,6 +53,11 @@ roughly in order of value:
   logic, but change it if visits should only count from the Anteroom gate.
   Hooks left in comments: chapel bells starting the great clock, the Steward,
   the "king woken" ending.
+* The Drowned City's wrapping street uses 40 m phantom copies past each seam
+  that end in a dark cap wall, faintly visible through fog; a third-visit
+  flood of the main street and the umbrella reversing the fountain are TODOs.
+* `Kit.particles(..., "fog")` renders as crisp translucent rectangles under
+  software GL; the fog kind wants a softer sprite.
 * Areas rebuild on every visit; large realms take ~100 ms under software GL.
   Fine on hardware; could cache.
 * Under llvmpipe the frame rate is low (it is a verification path, not a play

@@ -138,10 +138,7 @@ func _row(specs: Array, side: int, ox: float, phantom: bool, lo: float, hi: floa
 				_stub(x0, x1, side)
 			continue
 		if tex == "palace":
-			if phantom:
-				_building(x0, x1, SH, SH + DEPTH, 12.0, "stone/blocks_city", "n", opts)
-			else:
-				_palace_front()
+			_palace_front(ox, phantom)
 			continue
 		var faces := ("s" if side < 0 else "n") + String(spec[4])
 		if side < 0:
@@ -545,24 +542,24 @@ func _crypt() -> void:
 	Kit.ceiling(self, Vector3(6.25, 3.2, -37.5), Vector2(3.5, 3.0), DARK, {"thick": 0.8, "all_faces": true, "tile": 1.0})
 	for zz in [-39.15, -35.85]:
 		Kit.box(self, Vector3(1.25, -1.2, zz), Vector3(13.5, 8.8, 0.3), DARK, {"tile": 2.0})
-	Kit.stairs(self, Vector3(4.5, 0, -37.5), 90.0, 3.0, 15, -0.35, 0.5, "stone/flagstone", {"name": "CryptStairs", "tile": 1.0})
-	for i in range(0, 15, 2):
-		Kit.ceiling(self, Vector3(4.5 - (i + 1) * 0.5, 3.2 - 0.35 * (i + 1), -37.5), Vector2(1.0, 3.0), DARK, {"thick": 0.8, "all_faces": true, "tile": 1.0})
-	Kit.floor(self, Vector3(-4.25, CRYPT_Y - 0.01, -37.5), Vector2(2.5, 3.0), "stone/flagstone", {"tile": 1.0})
-	Kit.ceiling(self, Vector3(-4.25, CRYPT_Y + 3.2, -37.5), Vector2(2.6, 3.0), DARK, {"thick": 0.8, "all_faces": true, "tile": 1.0})
+	Kit.stairs(self, Vector3(4.5, 0, -37.5), 90.0, 3.0, 21, -0.25, 0.4, "stone/flagstone", {"name": "CryptStairs", "tile": 1.0})
+	for i in range(0, 21, 2):
+		Kit.ceiling(self, Vector3(4.5 - (i + 1) * 0.4, 3.2 - 0.25 * (i + 1), -37.5), Vector2(1.0, 3.0), DARK, {"thick": 0.8, "all_faces": true, "tile": 1.0})
+	Kit.floor(self, Vector3(-4.7, CRYPT_Y - 0.01, -37.5), Vector2(1.6, 3.0), "stone/flagstone", {"tile": 1.0})
+	Kit.ceiling(self, Vector3(-4.6, CRYPT_Y + 3.2, -37.5), Vector2(1.9, 3.0), DARK, {"thick": 0.8, "all_faces": true, "tile": 1.0})
 	Kit.box(self, Vector3(-5.3, CRYPT_Y + 3.85, -37.5), Vector3(0.5, 1.5, 4.8), DARK, {"tile": 1.0})
 	var e0 := CRYPT_C + Kit.polar(CRYPT_R, -22.5)
 	var e1 := CRYPT_C + Kit.polar(CRYPT_R, 22.5)
 	Kit.wall(self, e0, Vector3(e0.x, CRYPT_Y, -39.0), 4.5, DARK)
 	Kit.wall(self, Vector3(e1.x, CRYPT_Y, -36.0), e1, 4.5, DARK)
 	Kit.light(self, Vector3(6.2, 2.6, -37.5), CANDLE, 0.8, 5.0)
-	_torch(Vector3(0.5, -1.9, -38.98), 180.0)
+	_torch(Vector3(0.5, -1.0, -38.98), 180.0)
 	Kit.light(self, Vector3(2.0, 0.4, -37.5), CANDLE, 0.9, 6.0)
 	Kit.light(self, Vector3(-2.0, -2.4, -37.5), CANDLE, 0.9, 6.0)
-	Props.place(self, "candle_cluster", Vector3(2.0, -1.75, -38.7), 0.0, 1.0, {"collision": "none"})
-	Props.place(self, "candle_cluster", Vector3(-1.5, -4.2, -36.3), 0.0, 1.0, {"collision": "none"})
+	Props.place(self, "candle_cluster", Vector3(2.0, -1.5, -38.7), 0.0, 1.0, {"collision": "none"})
+	Props.place(self, "candle_cluster", Vector3(-1.5, -3.75, -36.3), 0.0, 1.0, {"collision": "none"})
 	Props.place(self, "candle_cluster", Vector3(7.4, 0, -38.6), 0.0, 1.0, {"collision": "none"})
-	Props.place(self, "rubble_pile", Vector3(-4.6, CRYPT_Y, -36.5), 30.0, 0.5, {"collision": "none"})
+	Props.place(self, "rubble_pile", Vector3(-5.0, CRYPT_Y, -36.3), 30.0, 0.5, {"collision": "none"})
 	Readable.create(self, Vector3(6.2, 1.4, -36.05), 0.0, "Read the lintel", [
 		"Cut over the stair, in a hand that had run out of patience:",
 		"FOUR ABOVE. ONE BELOW. THEY WILL NOT GIVE IT UP FOR ANY OTHER ORDER.",
@@ -672,22 +669,28 @@ func _palace() -> void:
 	Puzzle.declare(self, "palace_knights", "", ["keepsake:crown"], "the stone knights admit the crowned", {"item": "tower_key"})
 
 
-## The palace's street face above the map's walls, and what stands in front of it.
-func _palace_front() -> void:
-	Kit.box(self, Vector3(-18.0, 9.5, 8.5), Vector3(14.0, 5.0, 8.0), "stone/blocks_city", {"tile": 2.0})
-	Kit.box(self, Vector3(-18.0, 12.2, 8.5), Vector3(14.5, 0.4, 8.5), DARK, {"solid": false, "tile": 1.0})
+## The palace's street face: above the map's walls when real, the whole front
+## when it is a phantom copy past a seam. What stands in front of it, either way.
+func _palace_front(ox: float, phantom: bool) -> void:
+	var px := ox - 18.0
+	if phantom:
+		Kit.box(self, Vector3(px, 6.0, 8.5), Vector3(14.0, 12.0, 8.0), "stone/blocks_city", {"tile": 2.0})
+		Kit.sign(self, "common/void", Vector3(px, 2.0, SH - 0.03), 0.0, Vector2(2.0, 4.0))
+	else:
+		Kit.box(self, Vector3(px, 9.5, 8.5), Vector3(14.0, 5.0, 8.0), "stone/blocks_city", {"tile": 2.0})
+	Kit.box(self, Vector3(px, 12.2, 8.5), Vector3(14.5, 0.4, 8.5), DARK, {"solid": false, "tile": 1.0})
 	for k in 7:
-		Kit.box(self, Vector3(-24.6 + k * 2.2, 12.9, 4.95), Vector3(0.9, 1.2, 0.9), "stone/blocks_city", {"tile": 1.0})
-	for xx in [-23.0, -20.5, -15.5, -13.0]:
-		Props.place(self, "window_night", Vector3(xx, 9.3, SH - 0.07), 0.0, 1.0, {"collision": "none"})
-	Props.place(self, "window_lit", Vector3(-18.0, 9.6, SH - 0.07), 0.0, 1.3, {"collision": "none"})
-	Kit.light(self, Vector3(-18.0, 9.6, 3.6), WARM, 0.6, 5.0)
+		Kit.box(self, Vector3(px - 6.6 + k * 2.2, 12.9, 4.95), Vector3(0.9, 1.2, 0.9), "stone/blocks_city", {"tile": 1.0})
+	for dx in [-5.0, -2.5, 2.5, 5.0]:
+		Props.place(self, "window_night", Vector3(px + dx, 9.3, SH - 0.07), 0.0, 1.0, {"collision": "none"})
+	Props.place(self, "window_lit", Vector3(px, 9.6, SH - 0.07), 0.0, 1.3, {"collision": "none"})
+	Kit.light(self, Vector3(px, 9.6, 3.6), WARM, 0.6, 5.0)
 	for sx in [-1.0, 1.0]:
-		Props.place(self, "banner_eye", Vector3(-18.0 + sx * 2.6, 6.6, SH - 0.15), 0.0, 1.0, {"collision": "none"})
-		_torch(Vector3(-18.0 + sx * 1.9, 2.8, SH - 0.12), 0.0)
-		Props.place(self, "statue_knight", Vector3(-18.0 + sx * 4.2, 0, 3.5), 0.0, 0.9, {"collision": "box"})
-	Props.place(self, "portcullis", Vector3(-18.0, 3.3, 4.95), 0.0, 0.8, {"collision": "none"})
-	Kit.label(self, "THE PALACE", Vector3(-18.0, 5.4, SH - 0.08), 0.0, 30, Color(0.8, 0.75, 0.6), "display", {"pixel_size": 0.012})
+		Props.place(self, "banner_eye", Vector3(px + sx * 2.6, 6.6, SH - 0.15), 0.0, 1.0, {"collision": "none"})
+		_torch(Vector3(px + sx * 1.9, 2.8, SH - 0.12), 0.0)
+		Props.place(self, "statue_knight", Vector3(px + sx * 4.2, 0, 3.5), 0.0, 0.9, {"collision": "box"})
+	Props.place(self, "portcullis", Vector3(px, 3.3, 4.42 if phantom else 4.95), 0.0, 0.8, {"collision": "none"})
+	Kit.label(self, "THE PALACE", Vector3(px, 5.4, SH - 0.08), 0.0, 30, Color(0.8, 0.75, 0.6), "display", {"pixel_size": 0.012})
 
 
 # --- the alley (the tavern's back door lands here) --------------------------------
