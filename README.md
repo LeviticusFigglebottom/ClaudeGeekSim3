@@ -34,6 +34,29 @@ godot --path .
 godot --path . -- --area=forest --spawn=from_nexus --no-postfx
 ```
 
+## The realms
+
+Seventeen areas, each built in code from the same kit (see `docs/WORLD.md`
+for the full graph and `docs/AREA_AUTHORING.md` for how to add one):
+
+| | |
+|---|---|
+| **Flat 5½** and **the Halden Arms** | the waking world: a small flat, a corridor that goes round, a lift that is not a lift |
+| **The Hallway** | the closet that measures wrong (House of Leaves) |
+| **The Anteroom** | twelve doors, a plaque, a bell, a well that counts what you carry |
+| **The Hollow Wood** | giant trees, standing stones, a hermit with a lantern |
+| **The Drowned City** | streets that wrap, a cathedral with four bells, a palace of stone knights |
+| **The Last Lamp** | a tavern with a riddle, a bard, and a back door that goes somewhere different every time |
+| **The Nowhere House** | a different house each visit (myhouse.wad): mirrored, then bigger, then wrong |
+| **The Keep of Hours** | a sleeping king, rooms that turn, a library with no end |
+| **The Slow Sea** | a pastel shore under a colour-shifting sky, sleeping faces, platforms that drift |
+| **The Ossuary** | skull corridors, a reflecting pool, paths only the lantern shows |
+| **The Furnace** | below the below: a pit of slow fire, a chained giant, a choir of shadows |
+| **The Cistern** | poolrooms: white tile, cyan tile, knee-deep water, a voice reading aloud |
+| **The Waiting Halls** | a yellow office where your number is never called until it is |
+| **The Clocktower** | a spiral of steps and two great gears; every hour is the same hour |
+| **The Static**, **the Other Anteroom**, **the Workshop** | between channels; the mirror side; every prop on a plinth |
+
 ## Verifying without a screen
 
 Everything can be checked headlessly, which is how the project is developed:
