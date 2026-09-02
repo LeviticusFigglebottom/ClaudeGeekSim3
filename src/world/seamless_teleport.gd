@@ -8,6 +8,8 @@ extends Area3D
 
 var dest: Node3D = null
 var on_teleport: Callable
+## Box size in the seam's LOCAL frame: x = across the opening, y = height,
+## z = depth along the direction of travel (keep it thin).
 @export var size := Vector3(4, 4, 0.6)
 @export var count_flag := ""
 @export var one_way := true

@@ -47,7 +47,7 @@ P = {
     "offices": dict(yellow="#d8c26a", yellow2="#c4ad55", beige="#cbbf9c", carpet="#55606b", carpet2="#46505a", light="#fff8dc", ceiling="#e2dcc8"),
     "clocktower": dict(brass="#b58a3c", brass2="#8a6628", wood="#3a2a1a", iron="#4a4a50"),
     "nexus": dict(indigo="#1a1533", stone="#454866", stone2="#33365a", gold="#d9b24c", well="#0b0a18"),
-    "hallway": dict(black="#0a0a0c", grey="#2a2a2e", cold="#3d4550"),
+    "hallway": dict(black="#1e1e24", grey="#3c3c44", cold="#3d4550"),
 }
 
 
@@ -936,8 +936,8 @@ def build_catalog():
     reg("wall/plaster_house", lambda r: plaster(r, hs["wall"], "#7a7458", stains=0.5, stain_color="#3a3020"), surface="stone")
     reg("wall/concrete", lambda r: plaster(r, "#6a6a6e", "#54545a", stains=0.6, stain_color="#3a3a40"), surface="stone")
     reg("wall/concrete_dark", lambda r: plaster(r, "#3a3a40", "#2a2a30", stains=0.6, stain_color="#1a1a20"), surface="stone")
-    reg("wall/hallway_black", lambda r: plaster(r, hw["black"], "#141416", levels=6), surface="stone")
-    reg("wall/hallway_grey", lambda r: plaster(r, hw["grey"], "#1e1e22", levels=6), surface="stone")
+    reg("wall/hallway_black", lambda r: plaster(r, hw["black"], "#2a2a30", levels=6), surface="stone")
+    reg("wall/hallway_grey", lambda r: plaster(r, hw["grey"], "#2e2e34", levels=6), surface="stone")
     reg("wall/wallpaper_damask", lambda r: damask(r, hs["paper"], hs["paper2"]), surface="carpet")
     reg("wall/wallpaper_damask_red", lambda r: damask(r, "#5a1e28", "#3e1420"), surface="carpet")
     reg("wall/wallpaper_floral", lambda r: floral(r, "#d9cbb0", hs["floral"], "#8a4a5a"), surface="carpet")

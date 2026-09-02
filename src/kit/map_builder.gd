@@ -45,7 +45,11 @@ static func build(parent: Node, rows: Array, opts: Dictionary = {}) -> Dictionar
 	var tile := float(opts.get("tile", Kit.default_tile))
 	var floors: Dictionary = opts.get("floors", {})
 	var walls: Dictionary = opts.get("walls", {})
+	var rooms: Dictionary = opts.get("rooms", {})
+	var marker_rooms: Dictionary = opts.get("marker_rooms", {})
 	var no_ceiling := String(opts.get("no_ceiling", ""))
+	# cells that are open holes: no floor drawn (and none to walk on); the ceiling stays
+	var pit := String(opts.get("pit", ""))
 	var open_edges := bool(opts.get("open_edges", false))
 	var wall_tops := bool(opts.get("wall_tops", ceil_tex == ""))
 	var outer_faces := bool(opts.get("outer_faces", false))
@@ -73,6 +77,16 @@ static func build(parent: Node, rows: Array, opts: Dictionary = {}) -> Dictionar
 
 	var is_wall := func(ch: String) -> bool:
 		return ch == "#" or walls.has(ch)
+	# the room a floor-like cell belongs to ("" when it has no room entry)
+	var room_of := func(ch: String) -> String:
+		if rooms.has(ch):
+			return ch
+		return String(marker_rooms.get(ch, ""))
+	var room_tex := func(ch: String, kind: String, fallback: String) -> String:
+		var rk: String = room_of.call(ch)
+		if rk != "" and rooms[rk].has(kind):
+			return String(rooms[rk][kind])
+		return fallback
 	var is_open := func(ch: String) -> bool:
 		return ch == "D" or ch == "O"
 	var is_floor := func(ch: String) -> bool:
@@ -110,15 +124,17 @@ static func build(parent: Node, rows: Array, opts: Dictionary = {}) -> Dictionar
 					var nch: String = get.call(c + d.x, r + d.y)
 					if is_floor.call(nch) or (outer_faces and nch == " "):
 						touches = true
+						var ft: String = wt if nch == " " else room_tex.call(nch, "wall", wt)
 						var q := _wall_face(x0, x1, z0, z1, y0, y0 + height, d, tile)
-						add_quad.call("wall:" + wt, wt, "wall", q)
+						add_quad.call("wall:" + ft, ft, "wall", q)
 				if wall_tops and touches:
 					add_quad.call("wall:" + wt, wt, "wall", _top_face(x0, x1, z0, z1, y0 + height, tile))
 				if touches:
 					shapes.append([Vector3(cx, y0 + height * 0.5, cz), Vector3(cell, height, cell), Kit.surface_of(wt)])
 				continue
 			# floor-like cell
-			var ft := floor_tex
+			var ft: String = room_tex.call(ch, "floor", floor_tex)
+			var ct: String = room_tex.call(ch, "ceiling", ceil_tex)
 			var open_above := ch == ":" or no_ceiling.contains(ch)
 			if ch == "~":
 				water_cells.append(Vector3(cx, y0, cz))
@@ -126,9 +142,10 @@ static func build(parent: Node, rows: Array, opts: Dictionary = {}) -> Dictionar
 			elif floors.has(ch):
 				ft = String(floors[ch])
 			var fy := y0 - (0.6 if ch == "~" else 0.0)
-			add_quad.call("floor:" + ft, ft, "floor", _face(Vector3(x0, fy, z0), Vector3(x1, fy, z0), Vector3(x1, fy, z1), Vector3(x0, fy, z1), Vector2(x0 / tile, z0 / tile), Vector2(x1 / tile, z0 / tile), Vector2(x1 / tile, z1 / tile), Vector2(x0 / tile, z1 / tile), Vector3.UP))
-			if ceil_tex != "" and not open_above:
-				add_quad.call("ceil:" + ceil_tex, ceil_tex, "ceil", _face(Vector3(x0, y0 + height, z1), Vector3(x1, y0 + height, z1), Vector3(x1, y0 + height, z0), Vector3(x0, y0 + height, z0), Vector2(x0 / tile, z1 / tile), Vector2(x1 / tile, z1 / tile), Vector2(x1 / tile, z0 / tile), Vector2(x0 / tile, z0 / tile), Vector3.DOWN))
+			if not pit.contains(ch):
+				add_quad.call("floor:" + ft, ft, "floor", _face(Vector3(x0, fy, z0), Vector3(x1, fy, z0), Vector3(x1, fy, z1), Vector3(x0, fy, z1), Vector2(x0 / tile, z0 / tile), Vector2(x1 / tile, z0 / tile), Vector2(x1 / tile, z1 / tile), Vector2(x0 / tile, z1 / tile), Vector3.UP))
+			if ct != "" and not open_above:
+				add_quad.call("ceil:" + ct, ct, "ceil", _face(Vector3(x0, y0 + height, z1), Vector3(x1, y0 + height, z1), Vector3(x1, y0 + height, z0), Vector3(x0, y0 + height, z0), Vector2(x0 / tile, z1 / tile), Vector2(x1 / tile, z1 / tile), Vector2(x1 / tile, z0 / tile), Vector2(x0 / tile, z0 / tile), Vector3.DOWN))
 			if ch == "D" or ch == "O":
 				doorways.append({"pos": origin + Vector3(cx, y0, cz), "cell": cell, "height": door_h, "map": String(opts.get("name", "Map"))})
 			if ch == "D":
@@ -219,19 +236,70 @@ static func _face(a: Vector3, b: Vector3, c: Vector3, d: Vector3, uva: Vector2, 
 
 ## Face of the wall cell [x0,x1]x[z0,z1] that faces direction d (toward the neighbour).
 static func _wall_face(x0: float, x1: float, z0: float, z1: float, y0: float, y1: float, d: Vector2i, tile: float) -> Array:
+	# Wound clockwise as seen from the neighbour (Godot front faces are clockwise).
 	var hgt := y1 - y0
 	if d == Vector2i(0, -1):   # north face at z0, normal -Z
-		return _face(Vector3(x1, y0, z0), Vector3(x0, y0, z0), Vector3(x0, y1, z0), Vector3(x1, y1, z0), Vector2(-x1 / tile, hgt / tile), Vector2(-x0 / tile, hgt / tile), Vector2(-x0 / tile, 0), Vector2(-x1 / tile, 0), Vector3(0, 0, -1))
+		return _face(Vector3(x1, y0, z0), Vector3(x1, y1, z0), Vector3(x0, y1, z0), Vector3(x0, y0, z0), Vector2(-x1 / tile, hgt / tile), Vector2(-x1 / tile, 0), Vector2(-x0 / tile, 0), Vector2(-x0 / tile, hgt / tile), Vector3(0, 0, -1))
 	if d == Vector2i(0, 1):    # south face at z1, normal +Z
-		return _face(Vector3(x0, y0, z1), Vector3(x1, y0, z1), Vector3(x1, y1, z1), Vector3(x0, y1, z1), Vector2(x0 / tile, hgt / tile), Vector2(x1 / tile, hgt / tile), Vector2(x1 / tile, 0), Vector2(x0 / tile, 0), Vector3(0, 0, 1))
+		return _face(Vector3(x0, y0, z1), Vector3(x0, y1, z1), Vector3(x1, y1, z1), Vector3(x1, y0, z1), Vector2(x0 / tile, hgt / tile), Vector2(x0 / tile, 0), Vector2(x1 / tile, 0), Vector2(x1 / tile, hgt / tile), Vector3(0, 0, 1))
 	if d == Vector2i(1, 0):    # east face at x1, normal +X
-		return _face(Vector3(x1, y0, z1), Vector3(x1, y0, z0), Vector3(x1, y1, z0), Vector3(x1, y1, z1), Vector2(-z1 / tile, hgt / tile), Vector2(-z0 / tile, hgt / tile), Vector2(-z0 / tile, 0), Vector2(-z1 / tile, 0), Vector3(1, 0, 0))
+		return _face(Vector3(x1, y0, z1), Vector3(x1, y1, z1), Vector3(x1, y1, z0), Vector3(x1, y0, z0), Vector2(-z1 / tile, hgt / tile), Vector2(-z1 / tile, 0), Vector2(-z0 / tile, 0), Vector2(-z0 / tile, hgt / tile), Vector3(1, 0, 0))
 	# west face at x0, normal -X
-	return _face(Vector3(x0, y0, z0), Vector3(x0, y0, z1), Vector3(x0, y1, z1), Vector3(x0, y1, z0), Vector2(z0 / tile, hgt / tile), Vector2(z1 / tile, hgt / tile), Vector2(z1 / tile, 0), Vector2(z0 / tile, 0), Vector3(-1, 0, 0))
+	return _face(Vector3(x0, y0, z0), Vector3(x0, y1, z0), Vector3(x0, y1, z1), Vector3(x0, y0, z1), Vector2(z0 / tile, hgt / tile), Vector2(z0 / tile, 0), Vector2(z1 / tile, 0), Vector2(z1 / tile, hgt / tile), Vector3(-1, 0, 0))
 
 
 static func _top_face(x0: float, x1: float, z0: float, z1: float, y: float, tile: float) -> Array:
 	return _face(Vector3(x0, y, z0), Vector3(x1, y, z0), Vector3(x1, y, z1), Vector3(x0, y, z1), Vector2(x0 / tile, z0 / tile), Vector2(x1 / tile, z0 / tile), Vector2(x1 / tile, z1 / tile), Vector2(x0 / tile, z1 / tile), Vector3.UP)
+
+
+## Rasterise a floor plan into map rows. `rects` are [x0, z0, x1, z1, ch]
+## (cell units, x1/z1 exclusive) stamped as floor cells; every void cell touching
+## a floor (8-neighbourhood, so corners close) becomes a wall '#'. `doors` are
+## [x, z, ch] cells overwritten afterwards ('D' for a doorway with a lintel,
+## 'O' for a plain opening); `markers` are [x, z, ch] floor cells to relabel.
+static func rasterize(w: int, h: int, rects: Array, doors: Array = [], markers: Array = []) -> Array:
+	var grid: Array = []
+	for r in h:
+		var row: Array = []
+		for c in w:
+			row.append(" ")
+		grid.append(row)
+	for rect in rects:
+		var ch := String(rect[4])
+		for z in range(int(rect[1]), int(rect[3])):
+			for x in range(int(rect[0]), int(rect[2])):
+				if x >= 0 and x < w and z >= 0 and z < h:
+					grid[z][x] = ch
+	var walls_to_add: Array = []
+	for z in h:
+		for x in w:
+			if grid[z][x] != " ":
+				continue
+			var touch := false
+			for dz in range(-1, 2):
+				for dx in range(-1, 2):
+					var nx: int = x + dx
+					var nz: int = z + dz
+					if nx >= 0 and nx < w and nz >= 0 and nz < h and grid[nz][nx] != " " and grid[nz][nx] != "#":
+						touch = true
+			if touch:
+				walls_to_add.append(Vector2i(x, z))
+	for wp in walls_to_add:
+		grid[wp.y][wp.x] = "#"
+	for d in doors:
+		var x := int(d[0])
+		var z := int(d[1])
+		if x >= 0 and x < w and z >= 0 and z < h:
+			grid[z][x] = String(d[2])
+	for m in markers:
+		var x := int(m[0])
+		var z := int(m[1])
+		if x >= 0 and x < w and z >= 0 and z < h:
+			grid[z][x] = String(m[2])
+	var rows: Array = []
+	for z in h:
+		rows.append("".join(PackedStringArray(grid[z])))
+	return rows
 
 
 ## Mirror a map horizontally (the Nowhere House on its second visit).

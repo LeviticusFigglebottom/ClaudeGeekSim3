@@ -86,7 +86,7 @@ func build() -> void:
 	Kit.sign(self, "signs/graffiti_door", Vector3(29.0, 1.5, W * 0.5 - 0.02), 0.0, Vector2(1.6, 0.4))
 	Props.place(self, "window_night", Vector3(-3.9, 1.5, 0), -90.0, 1.0, {"collision": "none"})
 	Props.place(self, "plant_pot", Vector3(-3.4, 0, -1.0), 0.0, 1.0, {"collision": "none"})
-	SeamlessTeleport.link(self, Vector3(LOOP + 2.0, 0, 0), -90.0, Vector3(-2.0, 0, 0), -90.0, Vector3(0.6, 3.0, W), {"name": "Loop", "count_flag": "corridor_loops", "on_teleport": _on_loop})
+	SeamlessTeleport.link(self, Vector3(LOOP + 2.0, 0, 0), -90.0, Vector3(-2.0, 0, 0), -90.0, Vector3(W, 3.0, 0.6), {"name": "Loop", "count_flag": "corridor_loops", "on_teleport": _on_loop})
 	Kit.blocker(self, Vector3(-4.1, H * 0.5, 0), Vector3(0.2, H, W))
 	Kit.blocker(self, Vector3(LOOP + 4.1, H * 0.5, 0), Vector3(0.2, H, W))
 	Kit.wall(self, Vector3(-4, 0, W * 0.5), Vector3(-4, 0, -W * 0.5), H, wall_tex)

@@ -16,6 +16,9 @@ signal solved
 ## Things the solution hands over (trades, riddles): item ids / keepsake ids.
 @export var grants_item := ""
 @export var grants_keepsake := ""
+## A way through that only exists once the puzzle is done ("area:spawn"), e.g. a
+## stair that stops looping after three descents. Lets the route verifier see it.
+@export var grants_route := ""
 
 
 func is_solved() -> bool:
@@ -42,6 +45,7 @@ static func declare(parent: Node, id_: String, sets_flag_: String, requires_: Ar
 	p.hint = hint_
 	p.grants_item = String(grants.get("item", ""))
 	p.grants_keepsake = String(grants.get("keepsake", ""))
+	p.grants_route = String(grants.get("route", ""))
 	p.name = "Puzzle_" + id_
 	parent.add_child(p)
 	return p

@@ -13,7 +13,7 @@ func build() -> void:
 	ground.name = "Ground"
 	# wrap at the edges so there is no edge
 	var e := SIZE * 0.5 - 4.0
-	SeamlessTeleport.link(self, Vector3(e, 0, 0), -90.0, Vector3(-e, 0, 0), -90.0, Vector3(0.8, 6, SIZE), {"name": "WrapX"})
+	SeamlessTeleport.link(self, Vector3(e, 0, 0), -90.0, Vector3(-e, 0, 0), -90.0, Vector3(SIZE, 6, 0.8), {"name": "WrapX"})
 	SeamlessTeleport.link(self, Vector3(0, 0, e), 180.0, Vector3(0, 0, -e), 180.0, Vector3(SIZE, 6, 0.8), {"name": "WrapZ"})
 	# televisions, stacked and scattered, all showing snow
 	var stacks := [Vector3(6, 0, -8), Vector3(-9, 0, -3), Vector3(3, 0, 9), Vector3(-5, 0, 12), Vector3(14, 0, 4)]

@@ -152,6 +152,12 @@ func _check_physics(id: String, area: AreaBase) -> void:
 		var ray := PhysicsRayQueryParameters3D.create(t.origin + Vector3(0, 0.5, 0), t.origin + Vector3(0, -3.0, 0), 1 | 16 | 256 | 512)
 		if space.intersect_ray(ray).is_empty():
 			fail("area '%s' spawn '%s' at %s has no ground within 3 m below it" % [id, sid, t.origin])
+	# a seam that already contains a spawn point fires the moment the player lands
+	for seam in area.find_children("*", "SeamlessTeleport", true, false):
+		for sid in area.spawns:
+			var t: Transform3D = area.spawns[sid]
+			if seam.call("_contains", t.origin + Vector3(0, 0.9, 0)):
+				fail("area '%s' seam '%s' overlaps spawn '%s' at %s (check the seam's local size: x across, z depth)" % [id, seam.name, sid, t.origin])
 	var box := BoxShape3D.new()
 	var blocked := 0
 	for dw in MapBuilder.doorways:
@@ -175,8 +181,8 @@ func _check_physics(id: String, area: AreaBase) -> void:
 		if solid.size() > 0:
 			blocked += 1
 			fail("area '%s' doorway at %s (%s) is blocked by %s" % [id, dw.pos, dw.map, solid])
-	if blocked == 0 and MapBuilder.doorways.size() > 0:
-		ok("area %-12s %d doorways clear, %d spawns grounded" % [id, MapBuilder.doorways.size(), area.spawns.size()])
+	if blocked == 0:
+		ok("area %-12s %d doorways clear, %d spawns probed" % [id, MapBuilder.doorways.size(), area.spawns.size()])
 
 
 static func _under_door(n: Node) -> bool:
@@ -227,6 +233,12 @@ func _collect(node: Node, entry: Dictionary) -> void:
 	elif node is Puzzle:
 		var z: Puzzle = node
 		entry.puzzles.append({"id": z.id, "sets_flag": z.sets_flag, "req": z.requires.duplicate(), "grants_item": z.grants_item, "grants_keepsake": z.grants_keepsake})
+		if z.grants_route != "":
+			var parts := z.grants_route.split(":")
+			if parts.size() == 2:
+				entry.doors.append({"name": "Puzzle_" + z.id, "targets": [[parts[0], parts[1]]], "req": z.requires.duplicate(), "sets_flag": "", "forbids": ""})
+			else:
+				fail("puzzle '%s' grants_route '%s' is not area:spawn" % [z.id, z.grants_route])
 	elif node is Readable:
 		entry.readables += 1
 		var r: Readable = node

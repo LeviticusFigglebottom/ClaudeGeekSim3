@@ -84,7 +84,7 @@ func build() -> void:
 
 	# --- kitchen ---
 	var fridge: Vector3 = kitchen.first.call("f") + _v(0, 0, -CELL * 0.5 + 0.36)
-	Props.place(self, "fridge", fridge, _yaw(0.0), 1.0)
+	Props.place(self, "fridge", fridge, _yaw(180.0), 1.0)
 	Readable.create(self, fridge + _v(0, 1.3, 0.38), _yaw(0.0), "Read the note on the fridge", [
 		"things to do:",
 		"- sleep",
@@ -94,9 +94,9 @@ func build() -> void:
 		"The last one is crossed out. You do not remember crossing it out.",
 	], {"name": "FridgeNote", "sign": "signs/note_apartment", "sign_size": Vector2(0.4, 0.4), "size": Vector3(0.5, 0.5, 0.1), "note_key": "fridge_note", "note_title": "The note on the fridge", "note_text": "Sleep. Measure the closet. Do not open the closet. Sleep."})
 	var counter: Vector3 = kitchen.first.call("s") + _v(0, 0, -CELL * 0.5 + 0.32)
-	Props.place(self, "kitchen_counter", counter, _yaw(0.0), 1.0)
-	Props.place(self, "stove", counter + _v(1.4, 0, 0), _yaw(0.0), 1.0)
-	Props.place(self, "kitchen_sink", counter + _v(-1.7, 0, 0), _yaw(0.0), 1.0)
+	Props.place(self, "kitchen_counter", counter, _yaw(180.0), 1.0)
+	Props.place(self, "stove", counter + _v(1.4, 0, 0), _yaw(180.0), 1.0)
+	Props.place(self, "kitchen_sink", counter + _v(-1.7, 0, 0), _yaw(180.0), 1.0)
 	Interactable.make(self, counter + _v(0, 0.7, 0.35), Vector3(1.0, 0.3, 0.3), "Open the drawer", _on_drawer, {"name": "Drawer"})
 	var table: Vector3 = kitchen.first.call("t") + _v(0.3, 0, 0)
 	Props.place(self, "table_round", table, 0.0, 1.0)
@@ -105,7 +105,7 @@ func build() -> void:
 	Props.place(self, "mug", table + _v(0.1, 0.78, 0.1), 0.0, 1.0, {"collision": "none"})
 	var kwin: Vector3 = kitchen.first.call("W")
 	Props.place(self, "window_night", kwin + _v(CELL * 0.5 - 0.08, 1.5, 0), _yaw(-90.0), 1.0, {"collision": "none"})
-	Props.place(self, "frame_calendar", kitchen.first.call("f") + _v(1.6, 1.7, -CELL * 0.5 + 0.03), _yaw(0.0), 1.0, {"collision": "none"})
+	Props.place(self, "frame_calendar", kitchen.first.call("f") + _v(1.6, 1.7, -CELL * 0.5 + 0.03), _yaw(180.0), 1.0, {"collision": "none"})
 	Kit.light(self, kitchen.first.call("t") + _v(1.5, H - 0.2, -0.5), Color(1.0, 0.95, 0.8), 0.8, 6.5)
 	Puzzle.declare(self, "tape_measure", "", ["flag:has_woken"], "the kitchen drawer, after the first dream", {"item": "tape_measure"})
 
@@ -118,24 +118,24 @@ func build() -> void:
 	Kit.sign(self, "signs/five_half", front + _v(-0.05, 1.9, 0), _yaw(90.0), Vector2(0.32, 0.32))
 	Kit.sign(self, "props/keypad", front + _v(-0.05, 1.3, 0.7), _yaw(90.0), Vector2(0.3, 0.3))
 	add_spawn("front", front + _v(-1.2, 0.1, 0), _yaw(90.0))
-	Props.place(self, "coat_rack", hall.first.call("F") + _v(-2.4, 0, 0.5), 0.0, 1.0)
+	Props.place(self, "coat_rack", hall.first.call("F") + _v(0.15, 0, 0.5), 0.0, 0.85)
 	var phone: Vector3 = hall.first.call("p") + _v(0, 0, -CELL * 0.5 + 0.3)
-	Props.place(self, "dresser", phone, _yaw(0.0), 0.7)
-	Props.place(self, "telephone", phone + _v(0, 0.7, 0), _yaw(0.0), 1.0, {"collision": "none"})
+	Props.place(self, "dresser", phone, _yaw(180.0), 0.7)
+	Props.place(self, "telephone", phone + _v(0, 0.7, 0), _yaw(180.0), 1.0, {"collision": "none"})
 	Readable.create(self, phone + _v(0, 0.8, 0), _yaw(0.0), "The telephone", ["The telephone has no cord.", "It rings, sometimes, when you are in another room."], {"name": "Phone", "size": Vector3(0.6, 0.5, 0.5), "sound": "phone_ring"})
 	var photo_a := "props/photo_1"
 	if visit_count >= 4 or Game.stats.wakes >= 3:
 		photo_a = "props/photo_4"
 		if not Game.has_note("photo_extra"):
 			Game.note("photo_extra", "One more in the photograph", "There is one more person on the porch in the hall photograph. They are standing slightly apart. You do not remember them and they do not have a face.")
-	Props.place(self, "photo_1", hall.first.call("h") + _v(2.8, 1.7, -CELL * 0.5 + 0.03), _yaw(0.0), 1.0, {"collision": "none", "name": "HallPhotoA"})
+	Props.place(self, "photo_1", hall.first.call("h") + _v(2.8, 1.7, -CELL * 0.5 + 0.03), _yaw(180.0), 1.0, {"collision": "none", "name": "HallPhotoA"})
 	var pa := get_node_or_null("HallPhotoA")
 	if pa:
 		var pic := Props.part(pa, "Picture")
 		if pic and pic is MeshInstance3D:
 			(pic as MeshInstance3D).set_surface_override_material(0, Kit.mat(photo_a, {"vertex_color": true}))
-	Props.place(self, "photo_2", hall.first.call("h") + _v(7.5, 1.7, -CELL * 0.5 + 0.03), _yaw(0.0), 1.0, {"collision": "none"})
-	Props.place(self, "radiator", hall.first.call("h") + _v(5.0, 0, CELL * 0.5 - 0.1), _yaw(180.0), 1.0)
+	Props.place(self, "photo_2", hall.first.call("h") + _v(7.5, 1.7, -CELL * 0.5 + 0.03), _yaw(180.0), 1.0, {"collision": "none"})
+	Props.place(self, "radiator", hall.first.call("h") + _v(5.0, 0, CELL * 0.5 - 0.1), _yaw(0.0), 1.0)
 	for i in 3:
 		Kit.light(self, hall.first.call("h") + _v(2.5 + i * 4.5, H - 0.2, 0), Color(1.0, 0.9, 0.75), 0.55, 5.0)
 	Dog.maybe_spawn(self, hall.first.call("h") + _v(1.0, 0.1, 0))
@@ -154,7 +154,7 @@ func build() -> void:
 
 	# --- living room ---
 	var tv_pos: Vector3 = living.first.call("v") + _v(0, 0, -CELL * 0.5 + 0.45)
-	Props.place(self, "dresser", tv_pos + _v(0, 0, 0.05), _yaw(0.0), 0.9)
+	Props.place(self, "dresser", tv_pos + _v(0, 0, 0.05), _yaw(180.0), 0.9)
 	var tv := Props.place(self, "tv_crt", tv_pos + _v(0, 0.9, 0), _yaw(180.0), 1.0, {"collision": "none"})
 	var screen := Props.part(tv, "Screen")
 	if screen is MeshInstance3D:
@@ -166,11 +166,11 @@ func build() -> void:
 	Props.place(self, "rug_house", living.first.call("v") + _v(1.0, 0, 1.6), 0.0, 1.0, {"collision": "none"})
 	Props.place(self, "lamp_floor", living.first.call("p") + _v(2.6, 0, 0.3), 0.0, 1.0, {"collision": "none"})
 	Kit.light(self, living.first.call("p") + _v(2.6, 1.8, 0.3), Color(1.0, 0.85, 0.6), 0.9, 6.0)
-	Props.place(self, "painting_house", living.first.call("p") + _v(0, 1.7, CELL * 0.5 - 0.03), _yaw(180.0), 1.0, {"collision": "none"})
-	Props.place(self, "photo_0", living.first.call("p") + _v(-1.6, 1.6, CELL * 0.5 - 0.03), _yaw(180.0), 1.0, {"collision": "none"})
-	Props.place(self, "bookshelf", living.first.call("s") + _v(1.9, 0, -CELL * 0.5 + 0.2), _yaw(0.0), 1.0)
+	Props.place(self, "painting_house", living.first.call("p") + _v(0, 1.7, CELL * 0.5 - 0.03), _yaw(0.0), 1.0, {"collision": "none"})
+	Props.place(self, "photo_0", living.first.call("p") + _v(-1.6, 1.6, CELL * 0.5 - 0.03), _yaw(0.0), 1.0, {"collision": "none"})
+	Props.place(self, "bookshelf", living.first.call("s") + _v(1.9, 0, -CELL * 0.5 + 0.2), _yaw(180.0), 1.0)
 	Props.place(self, "plant_pot", living.first.call("v") + _v(-2.0, 0, -CELL * 0.5 + 0.4), 0.0, 1.0, {"collision": "none"})
-	Readable.create(self, living.first.call("p") + _v(0, 1.7, CELL * 0.5 - 0.1), _yaw(180.0), "Look at the painting", ["A house in a field at night. One window lit.", "You have never seen this house. You know exactly where the light switch is."], {"name": "HousePainting", "size": Vector3(1.0, 1.0, 0.2), "note_key": "house_painting", "note_title": "The painting of the house", "note_text": "A house alone in a field. You know its light switch."})
+	Readable.create(self, living.first.call("p") + _v(0, 1.7, CELL * 0.5 - 0.1), _yaw(0.0), "Look at the painting", ["A house in a field at night. One window lit.", "You have never seen this house. You know exactly where the light switch is."], {"name": "HousePainting", "size": Vector3(1.0, 1.0, 0.2), "note_key": "house_painting", "note_title": "The painting of the house", "note_text": "A house alone in a field. You know its light switch."})
 
 	if Game.is_night() and not tv_on:
 		_set_tv(true, false)

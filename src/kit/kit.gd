@@ -304,18 +304,21 @@ static func box_quads(c: Vector3, s: Vector3, tile: float, faces: Array = [], uv
 	var out: Array = []
 	var t := 1.0 / tile
 	var o := uv_origin
+	# Godot front faces are CLOCKWISE as seen from the visible side (verified by
+	# tools/winding_probe.gd), so each face is wound clockwise as seen from
+	# outside the box; the normal points outward.
 	if faces.is_empty() or "pz" in faces:
-		out.append(_face(Vector3(x0, y0, z1), Vector3(x1, y0, z1), Vector3(x1, y1, z1), Vector3(x0, y1, z1),
-			Vector2((x0 - o.x) * t, (y1 - y0) * t), Vector2((x1 - o.x) * t, (y1 - y0) * t), Vector2((x1 - o.x) * t, 0), Vector2((x0 - o.x) * t, 0), Vector3(0, 0, 1)))
+		out.append(_face(Vector3(x0, y0, z1), Vector3(x0, y1, z1), Vector3(x1, y1, z1), Vector3(x1, y0, z1),
+			Vector2((x0 - o.x) * t, (y1 - y0) * t), Vector2((x0 - o.x) * t, 0), Vector2((x1 - o.x) * t, 0), Vector2((x1 - o.x) * t, (y1 - y0) * t), Vector3(0, 0, 1)))
 	if faces.is_empty() or "nz" in faces:
-		out.append(_face(Vector3(x1, y0, z0), Vector3(x0, y0, z0), Vector3(x0, y1, z0), Vector3(x1, y1, z0),
-			Vector2((-x1 - o.x) * t, (y1 - y0) * t), Vector2((-x0 - o.x) * t, (y1 - y0) * t), Vector2((-x0 - o.x) * t, 0), Vector2((-x1 - o.x) * t, 0), Vector3(0, 0, -1)))
+		out.append(_face(Vector3(x1, y0, z0), Vector3(x1, y1, z0), Vector3(x0, y1, z0), Vector3(x0, y0, z0),
+			Vector2((-x1 - o.x) * t, (y1 - y0) * t), Vector2((-x1 - o.x) * t, 0), Vector2((-x0 - o.x) * t, 0), Vector2((-x0 - o.x) * t, (y1 - y0) * t), Vector3(0, 0, -1)))
 	if faces.is_empty() or "px" in faces:
-		out.append(_face(Vector3(x1, y0, z1), Vector3(x1, y0, z0), Vector3(x1, y1, z0), Vector3(x1, y1, z1),
-			Vector2((-z1 - o.z) * t, (y1 - y0) * t), Vector2((-z0 - o.z) * t, (y1 - y0) * t), Vector2((-z0 - o.z) * t, 0), Vector2((-z1 - o.z) * t, 0), Vector3(1, 0, 0)))
+		out.append(_face(Vector3(x1, y0, z1), Vector3(x1, y1, z1), Vector3(x1, y1, z0), Vector3(x1, y0, z0),
+			Vector2((-z1 - o.z) * t, (y1 - y0) * t), Vector2((-z1 - o.z) * t, 0), Vector2((-z0 - o.z) * t, 0), Vector2((-z0 - o.z) * t, (y1 - y0) * t), Vector3(1, 0, 0)))
 	if faces.is_empty() or "nx" in faces:
-		out.append(_face(Vector3(x0, y0, z0), Vector3(x0, y0, z1), Vector3(x0, y1, z1), Vector3(x0, y1, z0),
-			Vector2((z0 - o.z) * t, (y1 - y0) * t), Vector2((z1 - o.z) * t, (y1 - y0) * t), Vector2((z1 - o.z) * t, 0), Vector2((z0 - o.z) * t, 0), Vector3(-1, 0, 0)))
+		out.append(_face(Vector3(x0, y0, z0), Vector3(x0, y1, z0), Vector3(x0, y1, z1), Vector3(x0, y0, z1),
+			Vector2((z0 - o.z) * t, (y1 - y0) * t), Vector2((z0 - o.z) * t, 0), Vector2((z1 - o.z) * t, 0), Vector2((z1 - o.z) * t, (y1 - y0) * t), Vector3(-1, 0, 0)))
 	if faces.is_empty() or "py" in faces:
 		out.append(_face(Vector3(x0, y1, z0), Vector3(x1, y1, z0), Vector3(x1, y1, z1), Vector3(x0, y1, z1),
 			Vector2((x0 - o.x) * t, (z0 - o.z) * t), Vector2((x1 - o.x) * t, (z0 - o.z) * t), Vector2((x1 - o.x) * t, (z1 - o.z) * t), Vector2((x0 - o.x) * t, (z1 - o.z) * t), Vector3(0, 1, 0)))
@@ -392,7 +395,8 @@ static func wall(parent: Node, from: Vector3, to: Vector3, height: float, tex_na
 ## A single quad. Godot front faces are CLOCKWISE as seen from the front, so pass
 ## a, b, c, d going clockwise when looking at the visible side.
 static func quad(parent: Node, a: Vector3, b: Vector3, c: Vector3, d: Vector3, tex_name: String, opts: Dictionary = {}) -> MeshInstance3D:
-	var n := (b - a).cross(c - a).normalized()
+	# clockwise-from-front winding means the outward normal is (c - a) x (b - a)
+	var n := (c - a).cross(b - a).normalized()
 	var uvs: Array = opts.get("uvs", [Vector2(0, 1), Vector2(1, 1), Vector2(1, 0), Vector2(0, 0)])
 	var mesh := mesh_from_quads([_face(a, b, c, d, uvs[0], uvs[1], uvs[2], uvs[3], n)])
 	var material: Material = opts.get("mat", mat(tex_name, _mat_opts(opts)))
@@ -489,9 +493,9 @@ static func ramp(parent: Node, pos: Vector3, yaw_deg: float, width: float, lengt
 	var quads := [
 		_face(a, d, c, b, Vector2(0, 0), Vector2(0, slope_len / tile), Vector2(width / tile, slope_len / tile), Vector2(width / tile, 0), (b - a).cross(d - a).normalized()),
 		_face(a + Vector3(0, -thick, 0), b + Vector3(0, -thick, 0), c + Vector3(0, -thick, 0), d + Vector3(0, -thick, 0), Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(0, 1), Vector3(0, -1, 0)),
-		_face(a, d, d + Vector3(0, -thick, 0), a + Vector3(0, -thick, 0), Vector2(0, 0), Vector2(slope_len / tile, 0), Vector2(slope_len / tile, thick / tile), Vector2(0, thick / tile), Vector3(-1, 0, 0)),
-		_face(b, b + Vector3(0, -thick, 0), c + Vector3(0, -thick, 0), c, Vector2(0, 0), Vector2(0, thick / tile), Vector2(slope_len / tile, thick / tile), Vector2(slope_len / tile, 0), Vector3(1, 0, 0)),
-		_face(c, d, d + Vector3(0, -thick, 0), c + Vector3(0, -thick, 0), Vector2(0, 0), Vector2(width / tile, 0), Vector2(width / tile, thick / tile), Vector2(0, thick / tile), Vector3(0, 0, -1)),
+		_face(a, a + Vector3(0, -thick, 0), d + Vector3(0, -thick, 0), d, Vector2(0, 0), Vector2(0, thick / tile), Vector2(slope_len / tile, thick / tile), Vector2(slope_len / tile, 0), Vector3(-1, 0, 0)),
+		_face(b, c, c + Vector3(0, -thick, 0), b + Vector3(0, -thick, 0), Vector2(0, 0), Vector2(slope_len / tile, 0), Vector2(slope_len / tile, thick / tile), Vector2(0, thick / tile), Vector3(1, 0, 0)),
+		_face(c, c + Vector3(0, -thick, 0), d + Vector3(0, -thick, 0), d, Vector2(0, 0), Vector2(0, thick / tile), Vector2(width / tile, thick / tile), Vector2(width / tile, 0), Vector3(0, 0, -1)),
 	]
 	var mesh := mesh_from_quads(quads)
 	var o := opts.duplicate()

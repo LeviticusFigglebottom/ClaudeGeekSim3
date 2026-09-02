@@ -29,7 +29,8 @@ func build() -> void:
 	Kit.wall(self, Vector3(cw * 0.5, 0, 3.0), Vector3(-cw * 0.5, 0, 3.0), 2.2, "wall/plaster_cream")
 	Props.place(self, "coat_rack", Vector3(-0.35, 0, 2.3), 0.0, 0.9)
 	Props.place(self, "crate_small", Vector3(0.35, 0, 2.5), 20.0, 1.0)
-	Kit.light(self, Vector3(0, 1.9, 2.0), Color(1.0, 0.9, 0.75), 0.5, 3.0)
+	Kit.light(self, Vector3(0, 1.9, 2.0), Color(1.0, 0.9, 0.75), 0.7, 4.0)
+	Kit.light(self, Vector3(0, 2.0, -1.5), Color(0.6, 0.65, 0.85), 0.6, 6.0)
 	Door.create(self, Vector3(0, 0, 2.95), 180.0, "apartment", "closet", {"kind": "white", "label": "Back into the bedroom", "name": "ClosetBack", "walk_through": false})
 	add_spawn("entrance", Vector3(0, 0.1, 1.2), 0.0)
 	add_spawn("default", Vector3(0, 0.1, 1.2), 0.0)
@@ -55,9 +56,9 @@ func build() -> void:
 			Kit.wall(self, Vector3(-prev_w * 0.5, 0, z0), Vector3(-w * 0.5, 0, z0), h, wall_tex, {"tile": 3.0})
 			Kit.wall(self, Vector3(w * 0.5, 0, z0), Vector3(prev_w * 0.5, 0, z0), h, wall_tex, {"tile": 3.0})
 			Kit.box(self, Vector3(0, (prev_h + h) * 0.5, z0), Vector3(w, h - prev_h, 0.2), wall_tex, {"tile": 3.0})
-		# a cold dim light every other segment, so it is never quite black
-		if i % 2 == 0:
-			Kit.light(self, Vector3(0, h - 0.5, (z0 + z1) * 0.5), Color(0.55, 0.6, 0.75), 0.35, w + 5.0)
+		# a cold dim light in every segment, so it is never quite black: you can
+		# always see the floor and the walls, just not what is written on them
+		Kit.light(self, Vector3(0, minf(h - 0.5, 3.2), (z0 + z1) * 0.5), Color(0.55, 0.6, 0.8), 0.75 if i % 2 == 0 else 0.5, w + 7.0)
 		prev_w = w
 		prev_h = h
 		z = z1
@@ -89,7 +90,10 @@ func build() -> void:
 	# the landing at the end
 	var lw := 5.5
 	var landing_z := end_z - 6.0
-	Kit.floor(self, Vector3(0, 0, landing_z), Vector2(14.0, 12.0), floor_tex, {"tile": 1.5})
+	# the landing floor, with a hole where the stair shaft goes down (x -7..-2.9, z landing_z-4..landing_z)
+	Kit.floor(self, Vector3(0, 0, landing_z + 3.0), Vector2(14.0, 6.0), floor_tex, {"tile": 1.5})
+	Kit.floor(self, Vector3(0, 0, landing_z - 5.0), Vector2(14.0, 2.0), floor_tex, {"tile": 1.5})
+	Kit.floor(self, Vector3(2.05, 0, landing_z - 2.0), Vector2(9.9, 4.0), floor_tex, {"tile": 1.5})
 	Kit.ceiling(self, Vector3(0, 9.5, landing_z), Vector2(14.0, 12.0), wall_tex)
 	Kit.wall(self, Vector3(-7, 0, end_z), Vector3(-7, 0, landing_z - 6.0), 9.5, wall_tex, {"tile": 3.0})
 	Kit.wall(self, Vector3(7, 0, landing_z - 6.0), Vector3(7, 0, end_z), 9.5, wall_tex, {"tile": 3.0})
@@ -104,6 +108,7 @@ func build() -> void:
 	_build_stair(Vector3(-5.0, 0, landing_z), wall_tex, floor_tex)
 	Kit.particles(self, Vector3(0, 3, -40), "motes", Vector3(3, 3, 40), 40)
 	Puzzle.declare(self, "hallway_loops", "", [], "walk the far end twice")
+	Puzzle.declare(self, "hallway_stair", "", [], "go down the stair at the end until it is embarrassed (three times)", {"route": "catacombs:from_stairs"})
 
 
 func _build_stair(pos: Vector3, wall_tex: String, floor_tex: String) -> void:
@@ -114,11 +119,11 @@ func _build_stair(pos: Vector3, wall_tex: String, floor_tex: String) -> void:
 	add_child(shaft)
 	var size := 4.0
 	var depth := 8.0
-	Kit.box(shaft, Vector3(0, -depth * 0.5, 0), Vector3(size + 0.4, depth, 0.2), wall_tex, {"faces": ["pz"], "tile": 3.0})
+	Kit.box(shaft, Vector3(0, -depth * 0.5, 0.1), Vector3(size + 0.4, depth, 0.2), wall_tex, {"faces": ["nz"], "tile": 3.0})
 	Kit.box(shaft, Vector3(0, -depth * 0.5, -size), Vector3(size + 0.4, depth, 0.2), wall_tex, {"faces": ["nz", "pz"], "tile": 3.0})
 	Kit.box(shaft, Vector3(-size * 0.5 - 0.1, -depth * 0.5, -size * 0.5), Vector3(0.2, depth, size), wall_tex, {"faces": ["px"], "tile": 3.0})
 	Kit.box(shaft, Vector3(size * 0.5 + 0.1, -depth * 0.5, -size * 0.5), Vector3(0.2, depth, size), wall_tex, {"faces": ["nx"], "tile": 3.0})
-	# opening in the landing floor above the shaft: a hole (we just leave the landing floor as is and put the shaft below the wall; entrance is a doorway in the landing wall)
+	# the landing floor has a hole above the shaft (see build()); the first flight starts at floor level
 	Kit.stairs(shaft, Vector3(size * 0.5 - 0.6, 0.0, 0.0), 0.0, 1.2, 12, -0.25, 0.33, floor_tex, {"name": "FlightA"})
 	Kit.stairs(shaft, Vector3(0.6 - size * 0.5, -3.0, -size), 180.0, 1.2, 12, -0.25, 0.33, floor_tex, {"name": "FlightB"})
 	Kit.floor(shaft, Vector3(-size * 0.5 + 0.6, -3.0, -size + 0.6), Vector2(1.2, 1.2), floor_tex)

@@ -8,7 +8,7 @@ class_name Realm
 const PRESETS := {
 	"waking": {"bg": "#0d0c12", "ambient": "#6a6058", "ambient_energy": 0.74, "fog": "#141216", "fog_density": 0.022, "sun": [-35, 40, "#b8a888", 0.25], "sky": "sky/night"},
 	"corridor": {"bg": "#0a0b0e", "ambient": "#6e7a6e", "ambient_energy": 0.68, "fog": "#0c0e10", "fog_density": 0.038, "sun": null, "sky": ""},
-	"hallway": {"bg": "#000000", "ambient": "#3a3d44", "ambient_energy": 0.41, "fog": "#000000", "fog_density": 0.068, "sun": null, "sky": ""},
+	"hallway": {"bg": "#000000", "ambient": "#565a68", "ambient_energy": 0.95, "fog": "#020204", "fog_density": 0.030, "sun": null, "sky": ""},
 	"nexus": {"bg": "#0b0a18", "ambient": "#4a4870", "ambient_energy": 0.94, "fog": "#100e24", "fog_density": 0.026, "sun": [-60, 20, "#8a86c0", 0.2], "sky": "sky/nexus"},
 	"forest": {"bg": "#061a18", "ambient": "#3a6a5e", "ambient_energy": 0.94, "fog": "#0f2a25", "fog_density": 0.034, "sun": [-50, -30, "#8fd0bc", 0.35], "sky": "sky/forest"},
 	"city": {"bg": "#2a2f3a", "ambient": "#7a8090", "ambient_energy": 1.01, "fog": "#4a5060", "fog_density": 0.022, "sun": [-30, 60, "#c9c2b0", 0.6], "sky": "sky/city"},
@@ -16,7 +16,7 @@ const PRESETS := {
 	"house": {"bg": "#050812", "ambient": "#4a4a60", "ambient_energy": 0.61, "fog": "#0a0d1a", "fog_density": 0.030, "sun": [-70, 10, "#7a86b0", 0.15], "sky": "sky/house"},
 	"castle": {"bg": "#0c0a18", "ambient": "#5a5070", "ambient_energy": 0.74, "fog": "#1a1428", "fog_density": 0.026, "sun": [-45, 30, "#9a8ab8", 0.3], "sky": "sky/castle"},
 	"sea": {"bg": "#2b1a47", "ambient": "#b7a6f0", "ambient_energy": 1.22, "fog": "#b7a6f0", "fog_density": 0.009, "sun": [-40, -60, "#fff3dd", 0.7], "sky": "sky/sea"},
-	"catacombs": {"bg": "#050403", "ambient": "#3a3428", "ambient_energy": 0.47, "fog": "#0a0806", "fog_density": 0.060, "sun": null, "sky": ""},
+	"catacombs": {"bg": "#050403", "ambient": "#4a4434", "ambient_energy": 0.62, "fog": "#0a0806", "fog_density": 0.045, "sun": null, "sky": ""},
 	"furnace": {"bg": "#0a0204", "ambient": "#6a1a1e", "ambient_energy": 0.81, "fog": "#2a0508", "fog_density": 0.030, "sun": [-80, 0, "#ff5a1f", 0.25], "sky": "sky/furnace"},
 	"cistern": {"bg": "#0a2a2c", "ambient": "#8fc7c2", "ambient_energy": 1.08, "fog": "#2f8f95", "fog_density": 0.034, "sun": null, "sky": "sky/cistern"},
 	"offices": {"bg": "#d8c26a", "ambient": "#e8dca0", "ambient_energy": 1.22, "fog": "#c4ad55", "fog_density": 0.038, "sun": null, "sky": ""},

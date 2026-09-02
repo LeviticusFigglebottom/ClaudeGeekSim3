@@ -19,6 +19,8 @@ var _shot_path := ""
 var _shot_frames := 45
 var _shot_look := Vector2.ZERO
 var _has_look := false
+var _shot_pos := Vector3.ZERO
+var _has_pos := false
 var _frame := 0
 
 
@@ -57,6 +59,11 @@ func _ready() -> void:
 			if parts.size() >= 2:
 				_shot_look = Vector2(float(parts[0]), float(parts[1]))
 				_has_look = true
+		elif a.begins_with("--pos="):
+			var parts := a.trim_prefix("--pos=").split(",")
+			if parts.size() >= 3:
+				_shot_pos = Vector3(float(parts[0]), float(parts[1]), float(parts[2]))
+				_has_pos = true
 	if start_area != "":
 		Game.new_game()
 		Game.set_flag("debug", true)
@@ -69,6 +76,7 @@ func _ready() -> void:
 
 ## Debug launch options (after `--`): --give=lantern,bell  --flag=hallway_measured
 ## --item=tape_measure  --visits=house:2  --lantern  --mirror  --small
+## Screenshot placement: --pos=x,y,z (world) and --look=yaw,pitch (degrees)
 func _apply_debug_args() -> void:
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--give="):
@@ -104,6 +112,8 @@ func _process(_delta: float) -> void:
 	if _shot_path == "":
 		return
 	_frame += 1
+	if _has_pos and Game.player and _frame == 5:
+		Game.player.global_position = _shot_pos
 	if _has_look and Game.player and _frame == 5:
 		Game.player.set_look(deg_to_rad(_shot_look.x), deg_to_rad(_shot_look.y))
 	if _frame == _shot_frames:
