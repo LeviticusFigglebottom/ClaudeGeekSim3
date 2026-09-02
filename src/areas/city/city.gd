@@ -104,6 +104,7 @@ func _module(ox: float, phantom: bool, lo: float, hi: float) -> void:
 		x += w
 	_row(NORTH, -1, ox, phantom, lo, hi)
 	_row(SOUTH, 1, ox, phantom, lo, hi)
+	_dressing(ox, phantom, lo, hi)
 	for p in [[-30.0, -1], [-12.7, -1], [-3.0, -1], [30.5, -1], [-27.0, 1], [-10.2, 1], [12.5, 1], [28.0, 1]]:
 		var lx: float = ox + float(p[0])
 		if lx < lo or lx > hi:
@@ -257,16 +258,47 @@ func _figure(pos: Vector3, yaw: float) -> Node3D:
 	return Props.place(self, "figure_shadow", pos, yaw, 1.0, {"collision": "none"})
 
 
-## Doors, signs, watchers and litter that belong only to the real street.
+## Everything on the long street that must repeat with it (the seams only work
+## if the copies match): plates, numbers, torches, litter, the door leaves.
+func _dressing(ox: float, phantom: bool, lo: float, hi: float) -> void:
+	var inside := func(x: float) -> bool:
+		return ox + x > lo and ox + x < hi
+	if inside.call(-29.5):
+		_plate(Vector3(ox - 29.5, 3.1, -SH + 0.05), 180.0, "KING'S WAY", 2.8)
+		Props.place(self, "barrel", Vector3(ox - 30.5, 0, 3.3), 0.0, 1.0)
+		Props.place(self, "crate", Vector3(ox - 29.4, 0, 3.5), 25.0, 0.8)
+	if inside.call(27.0):
+		_plate(Vector3(ox + 27.0, 3.1, SH - 0.05), 0.0, "QUEEN'S WAY", 3.0)
+	if inside.call(-14.0):
+		Kit.label(self, "12", Vector3(ox - 19.1, 2.5, -SH + 0.04), 180.0, 52, Color(0.8, 0.78, 0.7), "body", {"pixel_size": 0.012})
+		Kit.label(self, "16", Vector3(ox - 10.1, 2.5, -SH + 0.04), 180.0, 52, Color(0.8, 0.78, 0.7), "body", {"pixel_size": 0.012})
+		Kit.box(self, Vector3(ox - 14.0, 5.0, -SH + 0.4), Vector3(2.2, 0.14, 0.8), DARK, {"solid": false, "tile": 1.0})
+		Props.place(self, "window_lit", Vector3(ox - 14.0, 5.8, -SH + 0.07), 180.0, 1.3, {"collision": "none"})
+		Kit.light(self, Vector3(ox - 14.0, 5.8, -SH + 1.0), WARM, 0.8, 6.0)
+		if phantom:
+			Props.place(self, "door_dark", Vector3(ox - 14.0, 0, -SH), 180.0, 1.0, {"collision": "none"})
+	if inside.call(28.0):
+		_torch(Vector3(ox + 26.4, 2.8, -SH + 0.1), 180.0)
+		_torch(Vector3(ox + 29.6, 2.8, -SH + 0.1), 180.0)
+		_plate(Vector3(ox + 30.6, 1.6, -SH + 0.05), 180.0, "THE HOUR", 1.4)
+		if phantom:
+			Props.place(self, "door_iron", Vector3(ox + 28.0, 0, -SH), 180.0, 1.0, {"collision": "none"})
+	if inside.call(8.0):
+		Props.place(self, "cart_broken", Vector3(ox + 8.0, 0, 3.0), 15.0, 1.0)
+	if inside.call(-1.0):
+		Props.place(self, "rubble_pile", Vector3(ox - 1.0, 0, -3.5), 0.0, 0.9)
+	if inside.call(23.0):
+		Props.place(self, "rubble_pile", Vector3(ox + 23.0, 0, 3.4), 110.0, 0.7)
+
+
+## Doors, readables and watchers: the real street only.
 func _street_things() -> void:
 	rains.append(Kit.particles(self, Vector3(0, 9.0, 0), "rain", Vector3(33.0, 2.0, 5.0), 420))
 	# two names for one street
-	_plate(Vector3(-29.5, 3.1, -SH + 0.05), 180.0, "KING'S WAY", 2.8)
 	Readable.create(self, Vector3(-29.5, 3.1, -SH + 0.2), 180.0, "Read the street sign", [
 		"KING'S WAY. The plate is older than the wall it is bolted to.",
 		"Somebody has scratched out KING and written it back in, smaller.",
 	], {"name": "SignKings", "size": Vector3(2.8, 0.6, 0.4), "offset": Vector3.ZERO, "note_key": "city_street_name", "note_title": "The long street", "note_text": "The long street is called King's Way at one end and Queen's Way at the other. It is the same street. It goes round."})
-	_plate(Vector3(27.0, 3.1, SH - 0.05), 0.0, "QUEEN'S WAY", 3.0)
 	Readable.create(self, Vector3(27.0, 3.1, SH - 0.2), 0.0, "Read the street sign", [
 		"QUEEN'S WAY. Under it, older paint: KING'S WAY. Under that, a name that has been scraped off the stone entirely.",
 		"You have walked this street. It is the same street. It did not say so.",
@@ -274,35 +306,21 @@ func _street_things() -> void:
 	# the house with no number, whose door opens on the city again, elsewhere
 	Door.create(self, Vector3(-14.0, 0, -SH), 180.0, "", "", {"kind": "dark", "label": "A house with no number", "name": "NoNumberDoor",
 		"unstable": _no_number_target, "possible_targets": NO_NUMBER_TARGETS, "fade_color": Color(0.02, 0.02, 0.03), "fade_duration": 1.3, "sound": "door_creak_long"})
-	Kit.label(self, "12", Vector3(-19.1, 2.5, -SH + 0.04), 180.0, 40, Color(0.8, 0.78, 0.7), "body", {"pixel_size": 0.012})
-	Kit.label(self, "16", Vector3(-10.1, 2.5, -SH + 0.04), 180.0, 40, Color(0.8, 0.78, 0.7), "body", {"pixel_size": 0.012})
 	Readable.create(self, Vector3(-12.85, 1.5, -SH + 0.15), 180.0, "A door with no number", [
 		"The houses either side are 12 and 16. This one has a nail where a number was.",
 		"The door is not locked. You can tell from here. It has the look of a door that has been opened from inside, recently, by someone who did not come out.",
 	], {"name": "NoNumberRead", "size": Vector3(0.6, 1.6, 0.3), "offset": Vector3.ZERO, "note_key": "city_no_number", "note_title": "The house with no number", "note_text": "Between 12 and 16 on the long street there is a house with a nail where its number was. Its door opens onto the city again, somewhere else in it."})
 	# a watcher on its balcony
-	Kit.box(self, Vector3(-14.0, 5.0, -SH + 0.4), Vector3(2.2, 0.14, 0.8), DARK, {"solid": false, "tile": 1.0})
-	Props.place(self, "window_lit", Vector3(-14.0, 5.8, -SH + 0.07), 180.0, 1.3, {"collision": "none"})
-	Kit.light(self, Vector3(-14.0, 5.8, -SH + 1.0), WARM, 0.8, 6.0)
 	watcher = _figure(Vector3(-14.0, 5.07, -SH + 0.45), 180.0)
 	LookAway.create(self, Vector3(-14.0, 6.1, -SH + 0.45), _on_watcher_unseen, {"name": "WatcherWatch", "radius": 16.0, "delay": 3.0, "require_seen_first": true, "once": true, "dot_threshold": 0.92})
 	# the tower door
 	Door.create(self, Vector3(28.0, 0, -SH), 180.0, "clocktower", "from_city", {"kind": "iron", "label": "The tower door", "name": "TowerDoor",
 		"requires_item": "tower_key", "locked_text": "A keyhole shaped like a clock hand.", "fade_color": Color(0.08, 0.06, 0.02), "sound": "key_turn"})
-	_torch(Vector3(26.4, 2.8, -SH + 0.1), 180.0)
-	_torch(Vector3(29.6, 2.8, -SH + 0.1), 180.0)
-	_plate(Vector3(30.6, 1.6, -SH + 0.05), 180.0, "THE HOUR", 1.4)
 	Readable.create(self, Vector3(30.6, 1.6, -SH + 0.2), 180.0, "Read the plate by the tower door", [
 		"THE TOWER KEEPS THE HOUR. THE HOUR KEEPS THE KEY.",
 		"Somebody has added, with a nail: the palace keeps the other thing. ask the knights. they will not answer.",
 	], {"name": "TowerPlate", "size": Vector3(1.4, 0.6, 0.4), "offset": Vector3.ZERO, "note_key": "city_tower_plate", "note_title": "The tower door", "note_text": "The clocktower's door on the long street has a keyhole shaped like a clock hand. The plate beside it says the palace keeps the other thing."})
 	add_spawn("from_tower", Vector3(28.0, 0.1, -2.6), 180.0)
-	# litter
-	Props.place(self, "cart_broken", Vector3(8.0, 0, 3.0), 15.0, 1.0)
-	Props.place(self, "rubble_pile", Vector3(-1.0, 0, -3.5), 0.0, 0.9)
-	Props.place(self, "rubble_pile", Vector3(23.0, 0, 3.4), 110.0, 0.7)
-	Props.place(self, "barrel", Vector3(-30.5, 0, 3.3), 0.0, 1.0)
-	Props.place(self, "crate", Vector3(-29.4, 0, 3.5), 25.0, 0.8)
 	Kit.sign(self, "signs/graffiti_wake", Vector3(-4.05, 1.4, 7.0), 90.0, Vector2(1.5, 0.45))
 
 
@@ -539,6 +557,10 @@ func _crypt() -> void:
 	Kit.wall(self, Vector3(e1.x, CRYPT_Y, -36.0), e1, 4.5, DARK)
 	Kit.light(self, Vector3(6.2, 2.6, -37.5), CANDLE, 0.8, 5.0)
 	_torch(Vector3(0.5, -1.9, -38.98), 180.0)
+	Kit.light(self, Vector3(2.0, 0.4, -37.5), CANDLE, 0.9, 6.0)
+	Kit.light(self, Vector3(-2.0, -2.4, -37.5), CANDLE, 0.9, 6.0)
+	Props.place(self, "candle_cluster", Vector3(2.0, -1.75, -38.7), 0.0, 1.0, {"collision": "none"})
+	Props.place(self, "candle_cluster", Vector3(-1.5, -4.2, -36.3), 0.0, 1.0, {"collision": "none"})
 	Props.place(self, "candle_cluster", Vector3(7.4, 0, -38.6), 0.0, 1.0, {"collision": "none"})
 	Props.place(self, "rubble_pile", Vector3(-4.6, CRYPT_Y, -36.5), 30.0, 0.5, {"collision": "none"})
 	Readable.create(self, Vector3(6.2, 1.4, -36.05), 0.0, "Read the lintel", [
