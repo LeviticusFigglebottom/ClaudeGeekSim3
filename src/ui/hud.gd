@@ -655,7 +655,8 @@ func show_title() -> void:
 	var b := _button(buttons, "sleep", _new_game)
 	if first == null:
 		first = b
-	_button(buttons, "quit", func() -> void: get_tree().quit())
+	if not OS.has_feature("web"):
+		_button(buttons, "quit", func() -> void: get_tree().quit())
 	fade.color.a = 0.0
 	first.call_deferred("grab_focus")
 

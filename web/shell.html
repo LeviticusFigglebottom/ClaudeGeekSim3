@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	<meta name="description" content="ANTEROOM — a dream of doors. A liminal, dark-fantasy exploration game.">
+	<meta name="color-scheme" content="dark">
+	<title>$GODOT_PROJECT_NAME</title>
+	<style>
+		html, body { margin: 0; padding: 0; border: 0; height: 100%; }
+		body {
+			background: $GODOT_SPLASH_COLOR;
+			color: #cfc7b4;
+			overflow: hidden;
+			touch-action: none;
+			font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+		}
+		#canvas {
+			display: block;
+			width: 100%;
+			height: 100%;
+			border: 0;
+			outline: none;
+			/* the game renders at a third of the window and scales up: keep the texels hard */
+			image-rendering: pixelated;
+			image-rendering: crisp-edges;
+		}
+		/* --- the loading room ------------------------------------------------ */
+		#status {
+			position: absolute;
+			inset: 0;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			background: radial-gradient(ellipse at center, #0b0a12 0%, #050507 70%, #000 100%);
+			transition: opacity 0.6s ease;
+			z-index: 10;
+		}
+		#status.gone { opacity: 0; pointer-events: none; }
+		#status-title {
+			font-size: clamp(1.6rem, 5vw, 3rem);
+			letter-spacing: 0.42em;
+			text-indent: 0.42em;
+			color: #d8cfb8;
+			text-shadow: 0 0 24px rgba(140, 130, 190, 0.35);
+			margin: 0 0 0.6rem;
+			font-weight: 400;
+		}
+		#status-sub {
+			font-size: clamp(0.7rem, 2vw, 0.95rem);
+			letter-spacing: 0.22em;
+			color: #6d6880;
+			margin: 0 0 2.6rem;
+			font-style: italic;
+		}
+		#status-bar {
+			width: min(52vw, 26rem);
+			height: 2px;
+			background: #1a1826;
+			overflow: hidden;
+		}
+		#status-fill {
+			height: 100%;
+			width: 0%;
+			background: linear-gradient(90deg, #4a4870, #9a92c8);
+			transition: width 0.25s ease-out;
+		}
+		#status-bar.indeterminate #status-fill {
+			width: 35%;
+			animation: drift 1.6s ease-in-out infinite alternate;
+		}
+		@keyframes drift { from { margin-left: -35%; } to { margin-left: 100%; } }
+		#status-hint {
+			margin-top: 1.4rem;
+			font-size: 0.75rem;
+			letter-spacing: 0.16em;
+			color: #4a4860;
+			min-height: 1.2em;
+		}
+		/* --- when it will not open ------------------------------------------- */
+		#status-notice {
+			display: none;
+			max-width: min(90vw, 34rem);
+			margin-top: 2rem;
+			padding: 1.1rem 1.3rem;
+			border: 1px solid #3a2b38;
+			background: #16101a;
+			color: #c8b8bd;
+			font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+			font-size: 0.8rem;
+			line-height: 1.5;
+			text-align: left;
+			white-space: pre-wrap;
+		}
+		#status.failed #status-bar, #status.failed #status-hint { display: none; }
+		#status.failed #status-notice { display: block; }
+		noscript { color: #c8b8bd; display: block; padding: 2rem; text-align: center; }
+	</style>
+	$GODOT_HEAD_INCLUDE
+</head>
+<body>
+	<canvas id="canvas" oncontextmenu="event.preventDefault();" tabindex="0">
+		Your browser does not support the canvas tag.
+	</canvas>
+
+	<noscript>ANTEROOM needs JavaScript. The door is painted on.</noscript>
+
+	<div id="status">
+		<h1 id="status-title">ANTEROOM</h1>
+		<p id="status-sub">a dream of doors</p>
+		<div id="status-bar" class="indeterminate"><div id="status-fill"></div></div>
+		<div id="status-hint">waking the dreamer</div>
+		<pre id="status-notice"></pre>
+	</div>
+
+	<script src="$GODOT_URL"></script>
+	<script>
+const GODOT_CONFIG = $GODOT_CONFIG;
+const GODOT_THREADS_ENABLED = $GODOT_THREADS_ENABLED;
+const engine = new Engine(GODOT_CONFIG);
+
+(function () {
+	const overlay = document.getElementById('status');
+	const bar = document.getElementById('status-bar');
+	const fill = document.getElementById('status-fill');
+	const hint = document.getElementById('status-hint');
+	const notice = document.getElementById('status-notice');
+
+	function fail(err) {
+		console.error(err);
+		let text = 'An unknown error occurred.';
+		if (err instanceof Error) {
+			text = err.message;
+		} else if (typeof err === 'string') {
+			text = err;
+		}
+		if (GODOT_THREADS_ENABLED && !window.crossOriginIsolated) {
+			text += '\n\nThis build uses threads, which need the page to be cross-origin isolated:\n'
+				+ '  Cross-Origin-Opener-Policy: same-origin\n'
+				+ '  Cross-Origin-Embedder-Policy: require-corp\n'
+				+ 'On Vercel those come from vercel.json; locally, use tools/serve_web.sh.';
+		}
+		notice.textContent = text;
+		overlay.classList.add('failed');
+		overlay.classList.remove('gone');
+	}
+
+	const missing = Engine.getMissingFeatures({ threads: GODOT_THREADS_ENABLED });
+	if (missing.length !== 0) {
+		fail('This browser is missing what the dream needs:\n  ' + missing.join('\n  '));
+		return;
+	}
+
+	hint.textContent = 'opening the door';
+	engine.startGame({
+		onProgress: function (current, total) {
+			if (current > 0 && total > 0) {
+				bar.classList.remove('indeterminate');
+				fill.style.width = Math.round((current / total) * 100) + '%';
+				hint.textContent = 'opening the door · ' + Math.round((current / total) * 100) + '%';
+			}
+		},
+	}).then(function () {
+		fill.style.width = '100%';
+		hint.textContent = 'letting your eyes adjust';
+		// The first frames of a web build draw placeholder materials while the
+		// shaders compile. The game calls window.anteroomReady() once it has
+		// really drawn; hold the curtain until then (or give up after a while).
+		let opened = false;
+		function open() {
+			if (opened) {
+				return;
+			}
+			opened = true;
+			hint.textContent = 'click to look around';
+			overlay.classList.add('gone');
+			window.setTimeout(function () { overlay.remove(); }, 700);
+			document.getElementById('canvas').focus();
+		}
+		window.anteroomReady = open;
+		window.setTimeout(open, 20000);
+	}, fail);
+}());
+	</script>
+</body>
+</html>

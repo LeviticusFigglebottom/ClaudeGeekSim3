@@ -1,0 +1,10 @@
+# Keep the upload to what the build actually needs. The game is built from
+# source on the build machine, so everything under assets/ and src/ stays.
+.git
+.bin
+build
+screenshots
+.github
+docs
+*.md
+**/__pycache__

@@ -1,0 +1,7 @@
+# Netlify / Cloudflare Pages style headers, copied into the build output.
+# Vercel reads vercel.json instead; this file is here so the same build can be
+# dropped on another static host without losing cross-origin isolation.
+/*
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: require-corp
+  Cross-Origin-Resource-Policy: same-origin

@@ -22,6 +22,9 @@ var _has_look := false
 var _shot_pos := Vector3.ZERO
 var _has_pos := false
 var _frame := 0
+## Web builds hold their HTML loading screen until the engine has drawn a few
+## real frames; see web/shell.html.
+var _web_frames := 0
 
 
 func _ready() -> void:
@@ -109,6 +112,7 @@ func _apply_debug_args() -> void:
 ## Screenshot mode (`--shot=path.png`): wait a few frames for the area to settle,
 ## save the window image and quit. Used by tools/screenshots.sh for visual QA.
 func _process(_delta: float) -> void:
+	_signal_web_ready()
 	if _shot_path == "":
 		return
 	_frame += 1
@@ -124,6 +128,17 @@ func _process(_delta: float) -> void:
 			where = " at %s yaw %.0f" % [Game.player.global_position, rad_to_deg(Game.player.yaw)]
 		print("[shot] %s -> %s (%s)%s" % [World.current_area_id, _shot_path, "ok" if err == OK else str(err), where])
 		get_tree().quit()
+
+
+## The browser shows our loading screen until this fires: the first frames of a
+## web build draw placeholder materials while the shaders compile, and nobody
+## needs to watch that happen.
+func _signal_web_ready() -> void:
+	if _web_frames > 8 or not OS.has_feature("web"):
+		return
+	_web_frames += 1
+	if _web_frames == 8:
+		JavaScriptBridge.eval("window.anteroomReady && window.anteroomReady();", true)
 
 
 func _build_postfx() -> void:

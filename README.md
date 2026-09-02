@@ -76,6 +76,24 @@ failure and prints a line per area (spawns, doors, pickups, puzzles). The
 GitHub Actions workflow in `.github/workflows/verify.yml` runs the same thing
 and uploads a screenshot tour rendered with software OpenGL.
 
+## Playing it in a browser
+
+The project exports to WebAssembly and deploys to Vercel as static files —
+same game, same renderer, same verification gate:
+
+```
+tools/export_web.sh        # verify, then build build/web/ (~43 MB)
+tools/serve_web.sh         # preview at http://localhost:8060
+node tools/verify_web.mjs  # boot it in a real browser, screenshot it, check for errors
+```
+
+`vercel.json` has the build wired up already: import the repository on Vercel,
+pick *Other* as the framework, and deploy. The build machine fetches Godot and
+— using HTTP range requests against Godot's 1.3 GB template archive — only the
+10 MB of web export template it actually needs. Threads are on, so the page is
+served cross-origin isolated; the headers for that are in `vercel.json`, and
+`web/_headers` carries them for other static hosts. See `docs/DEPLOY.md`.
+
 ## Assets are generated
 
 There are no hand-drawn files in the repository. Every texture, model and
@@ -100,6 +118,7 @@ src/core/                Game (state, keepsakes, journal, save), World (travel),
 src/main/                Main scene: low-res SubViewport upscale + dither post-process
 src/player/              first-person controller and keepsake behaviours
 src/ui/                  HUD, dialogue, journal, title, pause; theme from bundled OFL fonts
+web/                     browser loading screen and static-host headers
 src/kit/                 Kit (geometry/materials), MapBuilder (ASCII interiors),
                          Realm (environment presets), Props (GLB placement)
 src/world/               Interactable, Door, Pickup, Readable, NPC, Puzzle, Brazier,

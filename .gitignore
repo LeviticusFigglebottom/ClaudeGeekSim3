@@ -10,3 +10,7 @@ screenshots/*.png
 __pycache__/
 *.pyc
 .venv/
+
+# Web export output
+build/
+export_presets.cfg.orig
