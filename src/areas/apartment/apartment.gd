@@ -118,7 +118,7 @@ func build() -> void:
 	Kit.sign(self, "signs/five_half", front + _v(-0.05, 1.9, 0), _yaw(90.0), Vector2(0.32, 0.32))
 	Kit.sign(self, "props/keypad", front + _v(-0.05, 1.3, 0.7), _yaw(90.0), Vector2(0.3, 0.3))
 	add_spawn("front", front + _v(-1.2, 0.1, 0), _yaw(90.0))
-	Props.place(self, "coat_rack", hall.first.call("F") + _v(-0.9, 0, 0.5), 0.0, 1.0)
+	Props.place(self, "coat_rack", hall.first.call("F") + _v(-2.4, 0, 0.5), 0.0, 1.0)
 	var phone: Vector3 = hall.first.call("p") + _v(0, 0, -CELL * 0.5 + 0.3)
 	Props.place(self, "dresser", phone, _yaw(0.0), 0.7)
 	Props.place(self, "telephone", phone + _v(0, 0.7, 0), _yaw(0.0), 1.0, {"collision": "none"})

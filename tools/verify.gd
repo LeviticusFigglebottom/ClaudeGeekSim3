@@ -22,7 +22,7 @@ func _ready() -> void:
 	verbose = "--verbose" in OS.get_cmdline_user_args()
 	print("== ANTEROOM headless verification ==")
 	_check_scripts()
-	_check_registry_and_build()
+	await _check_registry_and_build()
 	_check_graph_targets()
 	_solve_routes()
 	_check_save_roundtrip()
@@ -112,6 +112,7 @@ func _check_registry_and_build() -> void:
 			fail("area '%s': root is not an AreaBase" % id)
 			inst.free()
 			continue
+		MapBuilder.reset_registry()
 		holder.add_child(inst)
 		var area: AreaBase = inst
 		var entry := {"spawns": area.spawns.keys(), "doors": [], "pickups": [], "puzzles": [], "readables": 0, "npcs": 0, "hidden": bool(info.get("hidden", false)), "can_wake": area.can_wake}
@@ -121,8 +122,84 @@ func _check_registry_and_build() -> void:
 			fail("area '%s' has no 'default' spawn" % id)
 		var dt := Time.get_ticks_msec() - t0
 		ok("area %-12s built in %4d ms: %2d spawns, %2d doors, %2d pickups, %2d puzzles, %2d readables, %2d npcs" % [id, dt, entry.spawns.size(), entry.doors.size(), entry.pickups.size(), entry.puzzles.size(), entry.readables, entry.npcs])
+		# let the physics server register the geometry, then probe it
+		await get_tree().physics_frame
+		await get_tree().physics_frame
+		_check_physics(id, area)
 		holder.remove_child(area)
 		area.free()
+
+
+## Physical sanity: every spawn point must fit a standing player, must have
+## ground under it, and every doorway cell must be free of solid obstacles.
+func _check_physics(id: String, area: AreaBase) -> void:
+	var space := area.get_world_3d().direct_space_state
+	var capsule := CapsuleShape3D.new()
+	capsule.radius = 0.3
+	capsule.height = 1.6
+	var q := PhysicsShapeQueryParameters3D.new()
+	q.shape = capsule
+	q.collision_mask = 1 | 16 | 256
+	for sid in area.spawns:
+		var t: Transform3D = area.spawns[sid]
+		q.transform = Transform3D(Basis(), t.origin + Vector3(0, 0.95, 0))
+		var hits := space.intersect_shape(q, 4)
+		if hits.size() > 0:
+			var names: Array = []
+			for h in hits:
+				names.append(_describe(h.collider))
+			fail("area '%s' spawn '%s' at %s is inside solid geometry: %s" % [id, sid, t.origin, names])
+		var ray := PhysicsRayQueryParameters3D.create(t.origin + Vector3(0, 0.5, 0), t.origin + Vector3(0, -3.0, 0), 1 | 16 | 256 | 512)
+		if space.intersect_ray(ray).is_empty():
+			fail("area '%s' spawn '%s' at %s has no ground within 3 m below it" % [id, sid, t.origin])
+	var box := BoxShape3D.new()
+	var blocked := 0
+	for dw in MapBuilder.doorways:
+		var cell: float = dw.cell
+		box.size = Vector3(cell * 0.5, 1.6, cell * 0.5)
+		var bq := PhysicsShapeQueryParameters3D.new()
+		bq.shape = box
+		bq.collision_mask = 1
+		bq.transform = Transform3D(Basis(), dw.pos + Vector3(0, 0.3 + 0.75, 0))
+		var hits := space.intersect_shape(bq, 6)
+		var solid: Array = []
+		for h in hits:
+			var c: Object = h.collider
+			# the map's own lintel and floor sit above/below the probe; a Door's own
+			# blocker is the door itself; anything else is an obstacle
+			if c is StaticBody3D and (c as Node).name == "WallBodies":
+				continue
+			if _under_door(c as Node):
+				continue
+			solid.append(_describe(c))
+		if solid.size() > 0:
+			blocked += 1
+			fail("area '%s' doorway at %s (%s) is blocked by %s" % [id, dw.pos, dw.map, solid])
+	if blocked == 0 and MapBuilder.doorways.size() > 0:
+		ok("area %-12s %d doorways clear, %d spawns grounded" % [id, MapBuilder.doorways.size(), area.spawns.size()])
+
+
+static func _under_door(n: Node) -> bool:
+	var p := n
+	while p != null and not (p is AreaBase):
+		if p is Door:
+			return true
+		p = p.get_parent()
+	return false
+
+
+static func _describe(o: Object) -> String:
+	var n := o as Node
+	if n == null:
+		return str(o)
+	var path := n.name
+	var parent := n.get_parent()
+	var depth := 0
+	while parent != null and depth < 3 and not (parent is AreaBase):
+		path = parent.name + "/" + path
+		parent = parent.get_parent()
+		depth += 1
+	return path
 
 
 func _collect(node: Node, entry: Dictionary) -> void:

@@ -24,6 +24,14 @@ class_name MapBuilder
 ## cells {Vector2i: ch}, cell (float), origin (Vector3), root (Node3D), size (Vector2i),
 ## and helper Callables: center(col, row) -> Vector3.
 
+## Doorway cells of every map built since `reset_registry()`; the verifier
+## checks that nothing solid stands in them. Each entry: {pos, cell, height}.
+static var doorways: Array = []
+
+static func reset_registry() -> void:
+	doorways = []
+
+
 static func build(parent: Node, rows: Array, opts: Dictionary = {}) -> Dictionary:
 	var cell := float(opts.get("cell", 2.0))
 	var height := float(opts.get("height", 3.0))
@@ -40,6 +48,9 @@ static func build(parent: Node, rows: Array, opts: Dictionary = {}) -> Dictionar
 	var no_ceiling := String(opts.get("no_ceiling", ""))
 	var open_edges := bool(opts.get("open_edges", false))
 	var wall_tops := bool(opts.get("wall_tops", ceil_tex == ""))
+	var outer_faces := bool(opts.get("outer_faces", false))
+	# thin edge walls draw their outer face too (for maps that stand alone; rooms that abut other maps must leave this off)
+	var double_thin := bool(opts.get("double_thin", false))
 	var mat_opts: Dictionary = {}
 	if opts.has("tint"):
 		mat_opts["tint"] = opts.tint
@@ -97,7 +108,7 @@ static func build(parent: Node, rows: Array, opts: Dictionary = {}) -> Dictionar
 				var touches := false
 				for d in dirs:
 					var nch: String = get.call(c + d.x, r + d.y)
-					if is_floor.call(nch):
+					if is_floor.call(nch) or (outer_faces and nch == " "):
 						touches = true
 						var q := _wall_face(x0, x1, z0, z1, y0, y0 + height, d, tile)
 						add_quad.call("wall:" + wt, wt, "wall", q)
@@ -118,6 +129,8 @@ static func build(parent: Node, rows: Array, opts: Dictionary = {}) -> Dictionar
 			add_quad.call("floor:" + ft, ft, "floor", _face(Vector3(x0, fy, z0), Vector3(x1, fy, z0), Vector3(x1, fy, z1), Vector3(x0, fy, z1), Vector2(x0 / tile, z0 / tile), Vector2(x1 / tile, z0 / tile), Vector2(x1 / tile, z1 / tile), Vector2(x0 / tile, z1 / tile), Vector3.UP))
 			if ceil_tex != "" and not open_above:
 				add_quad.call("ceil:" + ceil_tex, ceil_tex, "ceil", _face(Vector3(x0, y0 + height, z1), Vector3(x1, y0 + height, z1), Vector3(x1, y0 + height, z0), Vector3(x0, y0 + height, z0), Vector2(x0 / tile, z1 / tile), Vector2(x1 / tile, z1 / tile), Vector2(x1 / tile, z0 / tile), Vector2(x0 / tile, z0 / tile), Vector3.DOWN))
+			if ch == "D" or ch == "O":
+				doorways.append({"pos": origin + Vector3(cx, y0, cz), "cell": cell, "height": door_h, "map": String(opts.get("name", "Map"))})
 			if ch == "D":
 				# lintel: block above the door opening
 				var ly0 := y0 + door_h
@@ -144,6 +157,10 @@ static func build(parent: Node, rows: Array, opts: Dictionary = {}) -> Dictionar
 					if nch == " ":
 						var q := _wall_face(x0 + d.x * cell, x1 + d.x * cell, z0 + d.y * cell, z1 + d.y * cell, y0, y0 + height, -d, tile)
 						add_quad.call("wall:" + wall_tex, wall_tex, "wall", q)
+						if double_thin:
+							# outer face of the thin wall (0.3 m out, facing away from the room)
+							var qo := _wall_face(x0 + d.x * 0.3, x1 + d.x * 0.3, z0 + d.y * 0.3, z1 + d.y * 0.3, y0, y0 + height, d, tile)
+							add_quad.call("wall:" + wall_tex, wall_tex, "wall", qo)
 						var wc := Vector3(cx + d.x * (cell * 0.5 + 0.15), y0 + height * 0.5, cz + d.y * (cell * 0.5 + 0.15))
 						shapes.append([wc, Vector3(cell if d.x == 0 else 0.3, height, cell if d.y == 0 else 0.3), Kit.surface_of(wall_tex)])
 

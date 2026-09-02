@@ -26,7 +26,8 @@ func build() -> void:
 	_field()
 	# --- rooms (thin-walled maps; 'O' cells join rooms) ---
 	var hall := _room([
-		"D.",
+		"D.D",
+		"..",
 		"..",
 		"OO",
 		"c.",
@@ -36,8 +37,7 @@ func build() -> void:
 		"O.",
 		".O",
 		"D ",
-	], 6, 1, {"floor": "wood/planks_house", "wall": "wall/wallpaper_damask"})
-	var mud := _room(["D."], 6, 0, {"floor": "wall/tile_checker", "wall": "wall/plaster_house"})
+	], 6, 0, {"floor": "wood/planks_house", "wall": "wall/wallpaper_damask"})
 	var living := _room([
 		"t.f..",
 		"j...O",
@@ -70,16 +70,14 @@ func build() -> void:
 	], 3, 5, {"floor": "wood/planks_dark", "wall": "wall/hallway_grey", "ceiling": "wall/hallway_black"})
 
 	# --- hall ---
-	var front: Vector3 = hall.first.call("D")
-	var front_door: Vector3 = front
-	# 'D' markers are not recorded; find the front door cell from the map (row 9 of the hall = global row 10)
-	front_door = _cellpos(6, 10)
+	var front_door: Vector3 = _cellpos(6, 10)
 	var back_door := _cellpos(6, 0)
+	var basement_door := _cellpos(8, 0)
 	Props.place(self, "door_white", front_door + _v(0, 0, CELL * 0.5 - 0.2), _yaw(0.0), 1.0, {"collision": "none", "name": "FrontDoorProp"})
 	var leaf := Props.part(get_node("FrontDoorProp"), "Leaf")
 	if leaf:
 		leaf.rotation.y = deg_to_rad(-100.0)
-	Props.place(self, "coat_rack", _cellpos(7, 9) + _v(0.4, 0, 0.3), 0.0, 1.0)
+	Props.place(self, "coat_rack", _cellpos(7, 8) + _v(0.45, 0, 0), 0.0, 1.0)
 	var clock: Vector3 = hall.first.call("c")
 	var gc := Props.place(self, "clock_grandfather", clock + _v(-CELL * 0.5 + 0.25, 0, 0), _yaw(-90.0), 1.0)
 	var pend := Props.part(gc, "Pendulum")
@@ -89,8 +87,8 @@ func build() -> void:
 		cw.body.add_child(pend)
 		pend.position = Vector3.ZERO
 	Readable.create(self, clock + _v(-CELL * 0.5 + 0.3, 1.5, 0), _yaw(-90.0), "The grandfather clock", ["The clock says half past five.", "It has said half past five every time you have looked. It ticks anyway."], {"name": "ClockRead", "size": Vector3(0.7, 1.4, 0.7), "note_key": "house_clock", "note_title": "The clock in the hall", "note_text": "Half past five. Always. It ticks anyway."})
-	for i in 3:
-		Kit.light(self, _cellpos(7, 2 + i * 3) + Vector3(-0.75, H - 0.15, 0), Color(1.0, 0.88, 0.7), 0.7, 5.5)
+	for i in 4:
+		Kit.light(self, _cellpos(7, 1 + i * 3) + Vector3(-0.75, H - 0.15, 0), Color(1.0, 0.88, 0.7), 1.0, 6.0)
 	# photographs along the hall (they change)
 	var photos := ["photo_0", "photo_1", "photo_2"]
 	if visit_count == 2:
@@ -132,8 +130,8 @@ func build() -> void:
 	var bleaf := Props.part(get_node("BackDoorProp"), "Leaf")
 	if bleaf:
 		bleaf.rotation.y = deg_to_rad(-100.0)
-	Props.place(self, "shoe_pile" if Props.exists("shoe_pile") else "crate_small", back_door + _v(0.5, 0, 0.4), 20.0, 0.6, {"collision": "none"})
-	_basement(back_door)
+	Props.place(self, "shoe_pile" if Props.exists("shoe_pile") else "crate_small", back_door + _v(0.55, 0, 0.5), 20.0, 0.6, {"collision": "none"})
+	_basement(basement_door)
 
 	# --- living room ---
 	var tv_pos: Vector3 = living.first.call("t") + _v(0, 0, -CELL * 0.5 + 0.45)
@@ -188,7 +186,7 @@ func build() -> void:
 		Pickup.create(self, bowl + _v(0, 0.05, 0), {"keepsake": "mouse", "name": "TinMouse"})
 	else:
 		Readable.create(self, bowl, 0.0, "The dog's bowl", ["The dog's bowl. Empty.", "Something small and tin has been chewing at the rim."], {"name": "BowlRead", "size": Vector3(0.6, 0.4, 0.6)})
-	Kit.light(self, kitchen.first.call("t") + _v(0, H - 0.15, 0), Color(1.0, 0.95, 0.85), 0.9, 6.0)
+	Kit.light(self, kitchen.first.call("t") + _v(0, H - 0.15, 0), Color(1.0, 0.95, 0.85), 1.4, 7.5)
 	var wing: Vector3 = kitchen.first.call("w")
 	if visit_count >= 3:
 		Door.create(self, wing + _v(-CELL * 0.5 + 0.16, 0, 0), _yaw(-90.0), "offices", "from_house", {"kind": "white", "label": "STAFF ONLY", "name": "WingDoor", "fade_color": Color(0.85, 0.76, 0.42), "fade_duration": 0.9, "sets_flag": "found_staff_door"})
@@ -221,15 +219,15 @@ func build() -> void:
 	Props.place(self, "bathroom_cabinet" if Props.exists("bathroom_cabinet") else "mirror_wall", sink + _v(0, 1.6, -CELL * 0.5 + 0.06), _yaw(180.0) if Props.exists("bathroom_cabinet") else _yaw(0.0), 1.0, {"collision": "none"})
 	Props.place(self, "toilet", sink + _v(0.9, 0, 0.3), _yaw(90.0), 1.0)
 	Props.place(self, "bathtub", bath.first.call("a") + _v(0, 0, CELL * 0.5 - 0.42), _yaw(0.0), 1.0)
-	Kit.light(self, bath.first.call("O") + _v(0.5, H - 0.2, 0), Color(0.8, 0.95, 1.0), 0.8, 5.0)
-	var bath_door: Vector3 = bath.first.call("O")
+	var bath_door: Vector3 = _cellpos(8, 7)
+	Kit.light(self, bath_door + _v(0.5, H - 0.2, 0), Color(0.8, 0.95, 1.0), 0.8, 5.0)
 	if big_bath:
 		_big_bathroom(bath_door)
 	else:
 		Readable.create(self, bath.first.call("a") + _v(0.8, 0.5, 0), 0.0, "Measure the bathroom by eye", ["The bathroom is the size of a bathroom.", "You count the tiles anyway. Forty-one along the long wall. You will count again next time."], {"name": "BathMeasure", "size": Vector3(0.6, 0.6, 0.6), "note_key": "bath_41", "note_title": "Forty-one tiles", "note_text": "The bathroom's long wall has forty-one tiles. Remember that."})
 
 	# --- bedroom B (child's room) ---
-	var bb: Vector3 = bed_b.first.call("b") + _v(-0.2, 0, 0)
+	var bb: Vector3 = bed_b.first.call("b") + _v(-0.2, 0, -0.45)
 	Props.place(self, "bed_single", bb, _yaw(0.0), 1.0)
 	Props.place(self, "window_night", bed_b.first.call("w") + _v(0, 1.5, -CELL * 0.5 + 0.08), _yaw(180.0), 1.0, {"collision": "none"})
 	Props.place(self, "crate_small", bed_b.first.call("w") + _v(-0.6, 0, 0.4), 30.0, 0.6)
@@ -289,7 +287,12 @@ func _yaw(y: float) -> float:
 
 func _field() -> void:
 	var noise_fn := func(x: float, z: float) -> float:
-		return sin(x * 0.11) * 0.25 + cos(z * 0.09 + x * 0.03) * 0.3 - 0.05
+		# flat under the house and porch (a 30 x 26 m pad), rolling beyond it
+		var dx := maxf(0.0, absf(x) - 15.0)
+		var dz := maxf(0.0, absf(z + 1.0) - 13.0)
+		var edge := clampf(Vector2(dx, dz).length() / 6.0, 0.0, 1.0)
+		var h := sin(x * 0.11) * 0.25 + cos(z * 0.09 + x * 0.03) * 0.3
+		return lerpf(-0.08, h - 0.05, edge)
 	Kit.terrain(self, Vector3(0, -0.02, 0), Vector2(220, 220), 44, noise_fn, "nature/grass_dark", {"tile": 3.0})
 	# the house sits on a flat pad
 	Kit.floor(self, Vector3(0, 0.0, -1.5), Vector2(24, 20), "ground/dirt", {"tile": 3.0})
@@ -375,33 +378,43 @@ func _journal(pos: Vector3) -> void:
 	Readable.create(self, pos, _yaw(-90.0), "Read the house journal", lines, {"name": "HouseJournal", "size": Vector3(0.5, 0.6, 0.6), "note_key": "house_journal_%d" % mini(visit_count, 3), "note_title": "The house journal, day %d" % mini(visit_count, 3), "note_text": " ".join(lines)})
 
 
-func _basement(back_door: Vector3) -> void:
-	# a stair down from the mud room's west side, a concrete room, and a stair that keeps going down
-	var top := back_door + _v(-CELL * 0.5, 0, 0)
-	var stair_yaw := _yaw(90.0)
-	Kit.stairs(self, top, stair_yaw, 1.4, 10, -0.3, 0.4, "wall/concrete", {"name": "BasementStairs"})
-	var room_c := top + _v(-6.5, -3.0, 0)
+func _basement(bdoor: Vector3) -> void:
+	# through the doorway at the hall's north end: a stair down eastward, a concrete
+	# room, and a second stair that keeps going down
+	var top := bdoor + _v(CELL * 0.5, 0, 0)
+	var stair_yaw := _yaw(-90.0)
+	# a short walled landing so the stairwell has sides and a ceiling
+	Kit.floor(self, top + _v(0.4, 0, 0), Vector2(0.8, CELL), "wall/concrete")
+	Kit.ceiling(self, top + _v(2.5, 2.4, 0), Vector2(5.0, CELL), "wall/concrete_dark")
+	Kit.wall(self, top + _v(0, 0, -CELL * 0.5), top + _v(5.0, 0, -CELL * 0.5), 2.4, "wall/concrete", {"thick": 0.2})
+	Kit.wall(self, top + _v(5.0, 0, CELL * 0.5), top + _v(0, 0, CELL * 0.5), 2.4, "wall/concrete", {"thick": 0.2})
+	Kit.stairs(self, top + _v(0.8, 0, 0), stair_yaw, 1.4, 10, -0.3, 0.4, "wall/concrete", {"name": "BasementStairs"})
+	var room_c := top + _v(7.3, -3.0, 0)
 	var m := MapBuilder.build(self, [
 		"....",
 		"..b.",
 		"....",
-	], {"cell": CELL, "height": 2.4, "origin": room_c + _v(-3.0, 0, -2.25) if not mirrored else room_c + Vector3(-3.0, 0, -2.25), "y": 0.0, "floor": "wall/concrete", "wall": "wall/concrete_dark", "ceiling": "wall/concrete_dark"})
+	], {"cell": CELL, "height": 2.4, "origin": room_c + Vector3(-3.0, 0, -2.25), "y": 0.0, "floor": "wall/concrete", "wall": "wall/concrete_dark", "ceiling": "wall/concrete_dark", "name": "Basement"})
 	var b: Vector3 = m.first.call("b")
 	Props.place(self, "boxes_moving" if Props.exists("boxes_moving") else "crate", b + Vector3(0.8, 0, -0.8), 20.0, 1.0)
 	Props.place(self, "crate_small", b + Vector3(-1.0, 0, 0.9), 70.0, 1.0)
 	Kit.light(self, b + Vector3(0, 2.1, 0), Color(1.0, 0.9, 0.7), 0.7, 5.0)
 	Readable.create(self, b + Vector3(-1.2, 1.2, -1.4), 0.0, "Writing on the pipe", ["Someone has written on the pipe: DOWN IS THE SAME AS DOWN."], {"name": "PipeWriting", "size": Vector3(0.8, 0.5, 0.3)})
-	add_spawn("basement", top + _v(-1.0, 0.1, 0), _yaw(180.0))
+	add_spawn("basement", top + _v(-0.9, 0.1, 0), _yaw(90.0))
 	# the second flight, which loops onto the first
-	var second_top := b + Vector3(2.2, 0, 0)
-	Kit.stairs(self, second_top, _yaw(90.0), 1.4, 10, -0.3, 0.4, "wall/concrete", {"name": "BasementStairs2"})
-	var bottom := second_top + _v(-4.0, -3.0, 0)
-	Kit.floor(self, bottom, Vector2(2.0, 2.0), "wall/concrete")
+	var second_top := b + _v(2.2, 0, 0)
+	Kit.stairs(self, second_top, _yaw(-90.0), 1.4, 10, -0.3, 0.4, "wall/concrete", {"name": "BasementStairs2"})
+	var bottom := second_top + _v(4.4, -3.0, 0)
+	Kit.floor(self, bottom, Vector2(2.4, 2.4), "wall/concrete")
+	Kit.ceiling(self, bottom + Vector3(0, 2.4, 0), Vector2(2.4, 2.4), "wall/concrete_dark")
+	Kit.wall(self, bottom + _v(-1.2, 0, -1.2), bottom + _v(1.2, 0, -1.2), 2.4, "wall/concrete_dark")
+	Kit.wall(self, bottom + _v(1.2, 0, 1.2), bottom + _v(-1.2, 0, 1.2), 2.4, "wall/concrete_dark")
+	Kit.wall(self, bottom + _v(1.2, 0, -1.2), bottom + _v(1.2, 0, 1.2), 2.4, "wall/concrete_dark")
 	var loops := Game.count("house_basement_loops")
-	basement_seam = SeamlessTeleport.create(self, bottom, _yaw(90.0), top + _v(-0.4, 0, 0), _yaw(90.0), Vector3(2.0, 2.5, 0.6), {"name": "BasementSeam", "count_flag": "house_basement_loops", "one_way": false, "on_teleport": _on_basement_loop})
+	basement_seam = SeamlessTeleport.create(self, bottom + _v(-0.6, 0, 0), _yaw(-90.0), top + _v(0.4, 0, 0), _yaw(-90.0), Vector3(2.0, 2.5, 0.6), {"name": "BasementSeam", "count_flag": "house_basement_loops", "one_way": false, "on_teleport": _on_basement_loop})
 	if loops >= 3:
 		basement_seam.enabled = false
-		Door.create(self, bottom + _v(-1.0, 0, 0), _yaw(90.0), "cistern", "from_basement", {"kind": "white", "label": "A tiled door at the bottom of the stairs", "name": "CisternDoor", "fade_color": Color(0.2, 0.5, 0.55), "fade_duration": 1.0})
+		Door.create(self, bottom + _v(1.0, 0, 0), _yaw(-90.0), "cistern", "from_basement", {"kind": "white", "label": "A tiled door at the bottom of the stairs", "name": "CisternDoor", "fade_color": Color(0.2, 0.5, 0.55), "fade_duration": 1.0})
 		Kit.light(self, bottom + Vector3(0, 2.0, 0), Color(0.5, 0.9, 0.9), 1.0, 5.0)
 	else:
 		Kit.light(self, bottom + Vector3(0, 2.0, 0), Color(0.9, 0.85, 0.7), 0.4, 4.0)
@@ -435,6 +448,10 @@ func _bedroom_corridor(xdoor: Vector3) -> void:
 		Kit.wall(self, Vector3(rx + 1.8, 0, c0.z - 0.8), Vector3(rx + 2.7, 0, c0.z - 0.8), H, "wall/wallpaper_damask")
 		Kit.wall(self, Vector3(rx - 2.7, 0, c0.z - 0.8), Vector3(rx - 1.8, 0, c0.z - 0.8), H, "wall/wallpaper_damask")
 	Kit.wall(self, c0 + Vector3(dirx * length, 0, -0.8), c0 + Vector3(dirx * length, 0, 0.8), H, "wall/wallpaper_damask")
+	Kit.wall(self, c0 + Vector3(0, 0, -0.8), c0 + Vector3(dirx * (3.0 - 1.8), 0, -0.8), H, "wall/wallpaper_damask")
+	Kit.wall(self, c0 + Vector3(dirx * (3.0 + 5 * 4.5 + 2.7), 0, -0.8), c0 + Vector3(dirx * length, 0, -0.8), H, "wall/wallpaper_damask")
+	# the corridor sits outside the house: give it an outer shell so nothing shows through
+	Kit.box(self, c0 + Vector3(dirx * length * 0.5, H + 0.15, -2.6), Vector3(length + 0.4, 0.3, 6.0), "stone/blocks_dark", {"solid": false})
 	Readable.create(self, Vector3(c0.x + dirx * 3.0, 1.0, c0.z - 3.4), 0.0, "The child's bed", ["The same bed. The same window. The same drawing.", "Every room along this corridor is the same room. You are not sure the corridor is not also the same room."], {"name": "SameRoom", "size": Vector3(1.2, 0.8, 2.0), "note_key": "same_room", "note_title": "The door that was not there", "note_text": "Behind the door that was not there: a corridor of the same child's bedroom, over and over."})
 	# the loop: from room 5 back to room 2
 	var seam_x := c0.x + dirx * (3.0 + 4 * 4.5 + 2.2)

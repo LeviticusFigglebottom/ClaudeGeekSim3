@@ -54,19 +54,25 @@ func travel(area_id: String, spawn_id: String = "default", opts: Dictionary = {}
 		await hud.fade_out(color, dur)
 	_unload_current()
 	var scene_path: String = info(area_id).scene
-	var scene := load(scene_path) as PackedScene
+	var scene: PackedScene = load(scene_path) as PackedScene if ResourceLoader.exists(scene_path) else null
 	if scene == null:
 		push_error("World.travel: could not load %s" % scene_path)
-		traveling = false
+		_abort_travel("That door leads nowhere yet.")
 		return
 	var area := scene.instantiate()
+	if not (area is AreaBase):
+		push_error("World.travel: %s is not an AreaBase" % scene_path)
+		area.free()
+		_abort_travel("That door leads nowhere yet.")
+		return
 	previous_area_id = current_area_id
 	current_area_id = area_id
 	current_spawn_id = spawn_id
-	area_root.add_child(area)
-	current_area = area
+	# count the visit before _ready() so build() sees the current visit number (1 on the first visit)
 	var n := Game.visit(area_id)
 	Game.set_flag("visited_" + area_id, true)
+	area_root.add_child(area)
+	current_area = area
 	_place_player(area, spawn_id)
 	if area.has_method("on_enter"):
 		area.on_enter(spawn_id, n)
@@ -119,6 +125,22 @@ func spawn_transform(area: Node, spawn_id: String) -> Transform3D:
 		return area.spawns["default"]
 	push_warning("World: area '%s' has no spawn '%s' and no default" % [current_area_id, spawn_id])
 	return Transform3D(Basis(), Vector3(0, 1, 0))
+
+
+## Undo the fade/freeze when a travel cannot complete, so the player is never
+## left staring at a black screen with dead controls.
+func _abort_travel(message: String) -> void:
+	traveling = false
+	if Game.player and Game.player.has_method("set_frozen"):
+		Game.player.set_frozen(false)
+	if hud and not quiet:
+		hud.fade_in(0.4)
+		hud.show_toast(message)
+
+
+## True when the area is registered AND its scene file exists.
+func is_open(area_id: String) -> bool:
+	return has_area(area_id) and ResourceLoader.exists(String(info(area_id).get("scene", "")))
 
 
 func _place_player(area: Node, spawn_id: String) -> void:

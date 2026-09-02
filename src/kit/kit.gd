@@ -697,8 +697,11 @@ static func trigger(parent: Node, pos: Vector3, size: Vector3, on_enter: Callabl
 	a.add_child(cs)
 	parent.add_child(a)
 	var once := bool(opts.get("once", false))
+	var born := Time.get_ticks_msec()
 	a.body_entered.connect(func(body: Node3D) -> void:
 		if body is Player:
+			if Time.get_ticks_msec() - born < 400:
+				return
 			on_enter.call(body)
 			if once:
 				a.set_deferred("monitoring", false))

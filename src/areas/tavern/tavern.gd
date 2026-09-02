@@ -14,6 +14,9 @@ const ORIGIN := Vector3(-8, 0, -10)
 const UT := Vector3(50, 0, -50)
 const WARM := Color(1.0, 0.78, 0.5)
 const CANDLE := Color(1.0, 0.85, 0.6)
+const BACK_DOOR_TARGETS := [["forest", "clearing"], ["city", "alley"], ["house", "field"], ["sea", "shore"]]
+const PORTRAIT_BEFORE := ["A man in a good coat, holding a lamp. His eyes follow you. That is what portraits do.", "This one is doing it from slightly further away than it was."]
+const PORTRAIT_AFTER := ["Where the portrait was, there is a painting of a door.", "It is painted from the other side."]
 
 var fire_light: OmniLight3D = null
 var flames: Array = []
@@ -58,9 +61,20 @@ func _ground_floor() -> void:
 	]
 	MapBuilder.build(self, rows, {"cell": CELL, "height": H, "origin": ORIGIN, "floor": "wood/planks_warm",
 		"wall": "wall/plaster_tavern", "ceiling": "wood/planks_dark", "open_edges": true, "door_h": 2.3, "name": "Ground"})
+	# the eight lights that matter most come first (the renderer keeps eight per mesh)
+	fire_light = Kit.light(self, Vector3(-4.9, 1.1, 1.0), Color(1.0, 0.55, 0.2), 2.2, 12.0)
+	Kit.light(self, Vector3(1.0, 2.2, 3.0), WARM, 1.9, 13.0)
+	var lantern_spots := [Vector3(-3.0, H - 0.05, 4.0), Vector3(-1.5, H - 0.05, -1.0), Vector3(6.5, H - 0.05, 4.0), Vector3(7.0, H - 0.05, -0.8)]
+	for p in lantern_spots:
+		var lp: Vector3 = p
+		Props.place(self, "lantern_hanging", lp, 0.0, 1.0, {"collision": "none"})
+		Kit.light(self, lp + Vector3(0, -1.45, 0), WARM, 1.2, 8.0)
+	Kit.light(self, Vector3(4.5, 2.7, -3.5), WARM, 1.4, 9.0)
+	Kit.light(self, Vector3(-3.0, 1.9, -5.5), WARM, 1.2, 8.0)
 	# ceiling beams across the taproom and along it
-	for z in [-1.0, 1.5, 4.0, 6.5]:
-		Kit.box(self, Vector3(2.0, H - 0.15, z), Vector3(16.0, 0.3, 0.3), "wood/planks_dark", {"solid": false})
+	for zb in [-1.0, 1.5, 4.0, 6.5]:
+		var bz: float = float(zb)
+		Kit.box(self, Vector3(2.0, H - 0.15, bz), Vector3(16.0, 0.3, 0.3), "wood/planks_dark", {"solid": false})
 	Kit.box(self, Vector3(2.0, H - 0.32, 3.0), Vector3(0.3, 0.34, 10.0), "wood/planks_dark", {"solid": false})
 	Kit.box(self, Vector3(6.0, H - 0.15, -5.0), Vector3(0.3, 0.3, 6.0), "wood/planks_dark", {"solid": false})
 	# the back wall behind the bar is built by hand so it can have a hole in it
@@ -76,7 +90,7 @@ func _ground_floor() -> void:
 	Kit.box(self, Vector3(6.45, 0.3, -10.2), Vector3(0.3, 0.6, 4.0), "wood/planks_dark")
 	Kit.box(self, Vector3(6.0, 0.3, -12.35), Vector3(0.6, 0.6, 0.3), "wood/planks_dark")
 	Kit.light(self, Vector3(6.0, 0.45, -10.0), WARM, 0.5, 3.0)
-	SeamlessTeleport.link(self, Vector3(6.0, 0, -12.0), 0.0, UT + Vector3(0, 0, 11.4), 0.0, Vector3(1.0, 1.0, 0.3), {"name": "MouseSeam", "on_teleport": _on_mouse_seam})
+	SeamlessTeleport.link(self, Vector3(6.0, 0, -12.0), 0.0, UT + Vector3(0, 0, 11.4), 0.0, Vector3(2.0, 2.0, 0.4), {"name": "MouseSeam", "on_teleport": _on_mouse_seam})
 
 	# --- the bar ---
 	Props.place(self, "bar_counter", Vector3(4.0, 0, -2.4), 180.0, 1.0)
@@ -85,13 +99,13 @@ func _ground_floor() -> void:
 	Props.place(self, "mug", Vector3(2.8, 1.16, -2.1), 20.0, 1.0, {"collision": "none"})
 	Props.place(self, "mug", Vector3(5.1, 1.16, -2.2), -40.0, 1.0, {"collision": "none"})
 	Props.place(self, "candle", Vector3(3.9, 1.16, -2.0), 0.0, 1.0, {"collision": "none"})
+	Props.place(self, "stool", Vector3(3.4, 0, -1.45), 0.0, 1.0)
+	Props.place(self, "stool", Vector3(5.2, 0, -1.45), 0.0, 1.0)
 	_shelf(Vector3(4.0, 0, -7.85))
 	_shelf(Vector3(8.0, 0, -7.85))
 	Props.place(self, "barrel", Vector3(9.2, 0, -7.2), 0.0, 1.0)
 	Props.place(self, "crate", Vector3(9.3, 0, -5.4), 15.0, 1.0)
 	Props.place(self, "crate_small", Vector3(9.3, 0.9, -5.4), -10.0, 1.0, {"collision": "none"})
-	Kit.light(self, Vector3(4.5, 2.7, -3.5), WARM, 1.4, 9.0)
-	Kit.light(self, Vector3(8.5, 2.6, -6.0), WARM, 0.8, 6.0)
 	# the menu chalkboard and the riddle note
 	var menu_lines: Array = ["TODAY: nothing", "TOMORROW: nothing, warmed"]
 	if visit_count >= 2:
@@ -111,41 +125,40 @@ func _ground_floor() -> void:
 		"lines": ["He does not have a face. He has a very good apron."], "on_talk": _barkeep_talk, "name": "Barkeep"})
 	_stand_in(keep, "barkeep")
 	_bard_stage()
-	_patrons()
 
 	# --- the hearth ---
 	_hearth(Vector3(-5.9, 0, 1.0))
 	Props.place(self, "rug_tavern", Vector3(-3.6, 0.005, 1.0), 0.0, 1.0, {"collision": "none"})
-	Props.place(self, "chair", Vector3(-4.0, 0, -0.4), 150.0, 1.0)
-	Props.place(self, "chair", Vector3(-4.0, 0, 2.4), 30.0, 1.0)
+	Props.place(self, "chair", Vector3(-4.2, 0, -0.5), 150.0, 1.0)
+	Props.place(self, "chair", Vector3(-4.2, 0, 2.5), 30.0, 1.0)
 
-	# --- tables ---
-	_round_table(Vector3(-1.0, 0, 0.6), [0.0, 120.0, 240.0])
-	_round_table(Vector3(-3.0, 0, 5.2), [60.0, 180.0, 300.0])
-	_round_table(Vector3(2.2, 0, 3.6), [30.0, 150.0, 270.0])
-	_round_table(Vector3(5.6, 0, 1.2), [0.0, 90.0, 200.0])
+	# --- tables and the people at them ---
+	var t1 := Vector3(-1.0, 0, 0.6)
+	var t2 := Vector3(-2.6, 0, 3.8)
+	var t3 := Vector3(2.2, 0, 3.4)
+	var t4 := Vector3(5.8, 0, 1.0)
+	_round_table(t1, [0.0, 120.0, 240.0])
+	_round_table(t2, [60.0, 180.0, 300.0])
+	_round_table(t3, [30.0, 150.0, 270.0])
+	_round_table(t4, [0.0, 90.0, 200.0])
 	Props.place(self, "table_long", Vector3(5.0, 0, 6.2), 0.0, 1.0)
 	Props.place(self, "bench", Vector3(5.0, 0, 5.2), 0.0, 1.0)
 	Props.place(self, "bench", Vector3(5.0, 0, 7.2), 0.0, 1.0)
+	Props.place(self, "stool", Vector3(3.2, 0, 6.2), 0.0, 1.0)
 	Props.place(self, "candle", Vector3(4.2, 0.8, 6.2), 0.0, 1.0, {"collision": "none"})
 	Props.place(self, "bottle", Vector3(5.7, 0.8, 6.0), 0.0, 1.0, {"collision": "none"})
 	Props.place(self, "mug", Vector3(5.3, 0.8, 6.5), 70.0, 1.0, {"collision": "none"})
+	_patrons(t1, t2, t4)
 
-	# --- lights, windows, hangings ---
+	# --- windows, hangings, the chandelier ---
 	Props.place(self, "chandelier", Vector3(1.0, 2.35, 3.0), 0.0, 1.0, {"collision": "none"})
-	Kit.light(self, Vector3(1.0, 2.2, 3.0), WARM, 1.9, 13.0)
-	for p in [Vector3(-3.0, H - 0.05, 4.0), Vector3(-1.5, H - 0.05, -1.0), Vector3(6.5, H - 0.05, 4.0), Vector3(7.0, H - 0.05, -0.8)]:
-		Props.place(self, "lantern_hanging", p, 0.0, 1.0, {"collision": "none"})
-		Kit.light(self, p + Vector3(0, -1.45, 0), WARM, 1.2, 8.0)
 	Props.place(self, "window_lit", Vector3(-3.0, 1.7, 7.92), 0.0, 1.0, {"collision": "none"})
 	Props.place(self, "window_lit", Vector3(4.5, 1.7, 7.92), 0.0, 1.0, {"collision": "none"})
-	Props.place(self, "window_lit", Vector3(-5.92, 1.7, 5.0), -90.0, 1.0, {"collision": "none"})
-	Props.place(self, "tapestry", Vector3(-1.5, 3.2, -1.92), 0.0, 1.0, {"collision": "none"})
+	Props.place(self, "window_lit", Vector3(-5.92, 1.7, 5.4), -90.0, 1.0, {"collision": "none"})
+	Props.place(self, "tapestry", Vector3(-1.5, 3.2, -1.92), 180.0, 1.0, {"collision": "none"})
 	Props.place(self, "torch_wall", Vector3(9.9, 1.6, -0.5), 90.0, 1.0, {"collision": "none"})
-	Kit.light(self, Vector3(9.4, 2.2, -0.5), Color(1.0, 0.6, 0.3), 0.9, 6.0)
 	Props.place(self, "clock_grandfather", Vector3(-5.7, 0, -1.4), -90.0, 1.0)
 	Props.place(self, "coat_rack", Vector3(2.9, 0, 7.6), 0.0, 1.0)
-	Props.place(self, "sign_no_vacancy", Vector3(-1.0, 0, 7.9), 0.0, 0.62, {"collision": "none"})
 	Kit.particles(self, Vector3(1.0, 2.0, 3.0), "motes", Vector3(7.0, 1.2, 5.0), 60)
 	rain = Kit.particles(self, Vector3(1.0, H - 0.4, 3.0), "rain", Vector3(7.0, 0.2, 5.0), 260)
 	rain.emitting = Game.umbrella_open
@@ -157,7 +170,6 @@ func _ground_floor() -> void:
 	Door.create(self, door_pos, 0.0, "nexus", "from_tavern", {"kind": "red", "label": "Out", "name": "FrontDoor", "fade_color": Color(0.05, 0.02, 0.0)})
 	Kit.box(self, Vector3(0.22, 1.15, 9.0), Vector3(0.44, 2.3, 0.3), "wood/planks_dark")
 	Kit.box(self, Vector3(1.78, 1.15, 9.0), Vector3(0.44, 2.3, 0.3), "wood/planks_dark")
-	Kit.light(self, Vector3(1.0, 2.6, 7.6), WARM, 0.9, 6.0)
 	add_spawn("from_nexus", door_pos + Vector3(0, 0.1, -1.7), 0.0)
 	add_spawn("default", door_pos + Vector3(0, 0.1, -1.7), 0.0)
 
@@ -170,24 +182,17 @@ func _ground_floor() -> void:
 	Props.place(self, "bottle", Vector3(-2.4, 0.92, -7.6), 0.0, 1.0, {"collision": "none"})
 	Props.place(self, "bottle", Vector3(-2.2, 0.92, -7.4), 0.0, 1.0, {"collision": "none"})
 	Props.place(self, "lantern_hanging", Vector3(-3.0, H - 0.05, -5.5), 0.0, 1.0, {"collision": "none"})
-	Kit.light(self, Vector3(-3.0, 1.9, -5.5), WARM, 1.2, 8.0)
 	Readable.create(self, Vector3(-1.3, 0.95, -7.3), 0.0, "Look in the pot", [
 		"Something is simmering. It has been simmering since before the tavern.",
 		"It smells of nothing, warmly.",
 	], {"name": "Pot", "size": Vector3(0.8, 0.6, 0.6), "sound": "drip"})
 	# the back door: it goes somewhere
-	var targets := [["forest", "clearing"], ["city", "alley"], ["house", "field"], ["sea", "shore"]]
 	Door.create(self, Vector3(-5.84, 0, -5.0), -90.0, "", "", {"kind": "dark", "label": "The back door. It goes somewhere.", "name": "BackDoor",
-		"fade_color": Color(0.01, 0.01, 0.02), "fade_duration": 1.3, "sound": "door_open",
-		"unstable": func() -> Array:
-			var pick: Array = targets[Game.rng.randi_range(0, targets.size() - 1)]
-			Game.bump("back_door_used")
-			Game.note("back_door", "The back door", "The back door of the Last Lamp opens onto a different place each time. The barkeep does not seem to know this, or mind.")
-			return pick,
-		"possible_targets": targets})
+		"fade_color": Color(0.01, 0.01, 0.02), "fade_duration": 1.3, "unstable": _back_door_target, "possible_targets": BACK_DOOR_TARGETS})
 	Kit.light(self, Vector3(-5.0, 2.2, -5.0), Color(0.55, 0.6, 0.85), 0.5, 3.5)
 	# a stair down to the cellar leaves through the kitchen's north door
 	Kit.stairs(self, Vector3(-3.0, 0, -10.0), 0.0, 1.9, 14, -0.243, 0.32, "wood/planks_dark", {"name": "CellarStairs"})
+	Kit.box(self, Vector3(-3.0, -0.13, -9.86), Vector3(1.9, 0.26, 0.28), "wood/planks_dark")
 
 	# --- the stair up ---
 	Kit.stairs(self, Vector3(9.0, 0, 8.0), 0.0, 1.9, 14, 0.243, 0.32, "wood/planks_warm", {"name": "Stairs"})
@@ -210,7 +215,14 @@ func _ground_floor() -> void:
 			"The stair is roped off. A small brass plate: RESIDENTS ONLY.",
 			"You are not a resident. You are barely a guest.",
 		], {"name": "RopeSign", "size": Vector3(0.5, 1.2, 1.0)})
-	Dog.maybe_spawn(self, Vector3(-2.5, 0.1, 2.6))
+	Dog.maybe_spawn(self, Vector3(-2.5, 0.1, 2.0))
+
+
+func _back_door_target() -> Array:
+	var pick: Array = BACK_DOOR_TARGETS[Game.rng.randi_range(0, BACK_DOOR_TARGETS.size() - 1)]
+	Game.bump("back_door_used")
+	Game.note("back_door", "The back door", "The back door of the Last Lamp opens onto a different place each time. The barkeep does not seem to know this, or mind.")
+	return pick
 
 
 func _shelf(pos: Vector3) -> void:
@@ -265,7 +277,6 @@ func _hearth(pos: Vector3) -> void:
 		flames.append(fire)
 		Props.place(self, "candle_tall", pos + Vector3(0.45, 2.5, -1.0), 0.0, 1.0, {"collision": "none"})
 		Props.place(self, "bottle", pos + Vector3(0.5, 2.5, 0.9), 0.0, 1.0, {"collision": "none"})
-	fire_light = Kit.light(self, pos + Vector3(1.0, 1.1, 0), glow, 2.2, 12.0)
 	Kit.particles(self, pos + Vector3(0.35, 0.5, 0), "embers", Vector3(0.3, 0.2, 0.7), 16)
 	Readable.create(self, pos + Vector3(0.6, 0.6, 0), -90.0, "Warm your hands", [
 		"The fire is the warmest thing you have ever stood near. It makes no sound.",
@@ -280,10 +291,9 @@ func _bard_stage() -> void:
 		Props.place(self, "stage_small", pos, 0.0, 1.0)
 	else:
 		Kit.box(self, pos + Vector3(0, 0.15, 0), Vector3(3.0, 0.3, 2.2), "wood/planks_dark")
-		Kit.box(self, pos + Vector3(0, 0.04, 1.25), Vector3(3.0, 0.08, 0.3), "wood/planks_dark")
+		Kit.box(self, pos + Vector3(0, 0.04, -1.25), Vector3(3.0, 0.08, 0.3), "wood/planks_dark")
 	Props.place(self, "candle_tall", pos + Vector3(-1.3, 0.3, 0.9), 0.0, 1.0, {"collision": "none"})
 	Props.place(self, "candle_tall", pos + Vector3(1.3, 0.3, 0.9), 0.0, 1.0, {"collision": "none"})
-	Kit.light(self, pos + Vector3(0, 1.4, 0.6), CANDLE, 0.9, 5.0)
 	bard = NPC.create(self, pos + Vector3(0, 0.3, -0.2), 0.0, "The Bard", {"model": "bard", "face_player": false, "name": "Bard",
 		"lines": [
 			"The song has no end. It has a middle, which is where you came in.",
@@ -296,22 +306,20 @@ func _bard_stage() -> void:
 			"knife": ["\"You can't cut a song,\" he says. \"People have tried. It just goes quiet for a bit.\""],
 		}})
 	_stand_in(bard, "bard")
-	if Props.exists("lute") and bard.body != null and Props.exists("bard"):
-		pass
-	bard_sign = Readable.create(self, pos + Vector3(0, 0.3, 0.95), 0.0, "Read the chalked sign", [
+	bard_sign = Readable.create(self, pos + Vector3(0, 0.3, -0.95), 0.0, "Read the chalked sign", [
 		"Chalked on the front of the stage: TONIGHT — THE SONG (cont.)",
 		"The 'cont.' has been re-chalked many times. The chalk under it is worn into a groove.",
 	], {"name": "BardSign", "size": Vector3(1.2, 0.5, 0.3), "offset": Vector3(0, 0.1, 0)})
-	Kit.label(self, "TONIGHT: THE SONG (cont.)", pos + Vector3(0, 0.18, 1.12), 0.0, 22, Color(0.9, 0.86, 0.75), "body", {"pixel_size": 0.008, "outline": 6})
+	Kit.label(self, "TONIGHT: THE SONG (cont.)", pos + Vector3(0, 0.18, -1.12), 0.0, 22, Color(0.9, 0.86, 0.75), "body", {"pixel_size": 0.008, "outline": 6})
 
 
-func _patrons() -> void:
+func _patrons(t1: Vector3, t2: Vector3, t4: Vector3) -> void:
 	var specs := [
-		[Vector3(3.4, 0, -1.35), 0.0, "A Patron", ["\"It's warm,\" he says, to nobody. \"That's the point.\"", "He has been saying it for a while. It is still true."], {}, false],
-		[Vector3(0.05, 0, 0.6), 90.0, "A Woman with a Mug", ["\"Don't answer his riddle,\" she says. \"He only has the one, and then what will he do?\"", "Her mug is full. It has always been full."], {"mouse": ["She looks down. It takes her a moment to find you.", "\"You're very small. Is that on purpose?\""]}, false],
-		[Vector3(-3.0, 0, 6.15), 180.0, "A Patron by the Stage", ["\"He's been playing since I got here,\" the patron says. \"I got here before him.\""], {}, true],
-		[Vector3(5.6, 0, 0.25), 0.0, "A Patron in the Corner", ["The patron does not look up. There is nothing on the patron to look up with.", "\"Coming or going?\" he asks. You are not sure. \"Same,\" he says."], {}, false],
-		[Vector3(5.0, 0, 5.15), 0.0, "A Quiet Patron", ["Nothing. A nod. The nod is warm too."], {"crown": ["The quiet patron stands, bows, sits. \"Majesty.\" Then, quieter: \"It's paper, isn't it. Doesn't matter. Doesn't matter here.\""]}, false],
+		[Vector3(3.4, 0, -1.45), 0.0, "A Patron at the Bar", ["\"It's warm,\" he says, to nobody. \"That's the point.\"", "He has been saying it for a while. It is still true."], {}, false],
+		[t1 + Kit.polar(0.95, 0.0), Kit.dir_to_yaw(-Kit.polar(1.0, 0.0)), "A Woman with a Mug", ["\"Don't answer his riddle,\" she says. \"He only has the one, and then what will he do?\"", "Her mug is full. It has always been full."], {"mouse": ["She looks down. It takes her a moment to find you.", "\"You're very small. Is that on purpose?\""]}, false],
+		[t2 + Kit.polar(0.95, 300.0), Kit.dir_to_yaw(-Kit.polar(1.0, 300.0)), "A Patron by the Stage", ["\"He's been playing since I got here,\" the patron says. \"I got here before him.\""], {}, true],
+		[t4 + Kit.polar(0.95, 0.0), Kit.dir_to_yaw(-Kit.polar(1.0, 0.0)), "A Patron in the Corner", ["The patron does not look up. There is nothing on the patron to look up with.", "\"Coming or going?\" he asks. You are not sure. \"Same,\" he says."], {}, false],
+		[Vector3(3.2, 0, 6.2), -90.0, "A Quiet Patron", ["Nothing. A nod. The nod is warm too."], {"crown": ["The quiet patron stands, bows, sits. \"Majesty.\" Then, quieter: \"It's paper, isn't it. Doesn't matter. Doesn't matter here.\""]}, false],
 	]
 	var i := 0
 	for s in specs:
@@ -328,29 +336,29 @@ func _patrons() -> void:
 
 
 func _portrait() -> void:
-	var pos := Vector3(-5.94, 1.85, 4.2)
+	var pos := Vector3(-5.94, 1.85, 3.2)
 	portrait_a = Props.place(self, "painting_portrait", pos, -90.0, 1.0, {"collision": "none", "name": "Portrait"})
 	portrait_b = Props.place(self, "painting_door", pos, -90.0, 1.0, {"collision": "none", "name": "PortraitDoor"})
 	var swapped := Game.has_flag("portrait_swapped")
 	portrait_a.visible = not swapped
 	portrait_b.visible = swapped
-	var lines_before := ["A man in a good coat, holding a lamp. His eyes follow you. That is what portraits do.", "This one is doing it from slightly further away than it was."]
-	var lines_after := ["Where the portrait was, there is a painting of a door.", "It is painted from the other side."]
-	portrait_readable = Readable.create(self, pos, -90.0, "Look at the portrait", lines_after if swapped else lines_before,
+	portrait_readable = Readable.create(self, pos, -90.0, "Look at the portrait", PORTRAIT_AFTER if swapped else PORTRAIT_BEFORE,
 		{"name": "PortraitLook", "size": Vector3(0.3, 1.2, 1.2), "offset": Vector3.ZERO})
 	if not swapped:
-		LookAway.create(self, pos, func(_l: Node) -> void:
-			Game.set_flag("portrait_swapped", true)
-			if portrait_a:
-				portrait_a.visible = false
-			if portrait_b:
-				portrait_b.visible = true
-			if portrait_readable:
-				portrait_readable.lines = lines_after
-			Audio.sfx("creak", pos, -8.0)
-			Game.toast.emit("Something on the wall changes while you are not looking at it.")
-			Game.note("portrait", "The portrait by the hearth", "A man with a lamp, in a good coat. When you looked away for long enough he was a door. Nobody in the taproom noticed. Nobody in the taproom has eyes."),
-			{"radius": 11.0, "delay": 2.5, "require_seen_first": true, "once": true, "name": "PortraitWatch"})
+		LookAway.create(self, pos, _on_portrait_unseen, {"radius": 11.0, "delay": 2.5, "require_seen_first": true, "once": true, "name": "PortraitWatch"})
+
+
+func _on_portrait_unseen(_l: Node) -> void:
+	Game.set_flag("portrait_swapped", true)
+	if portrait_a != null:
+		portrait_a.visible = false
+	if portrait_b != null:
+		portrait_b.visible = true
+	if portrait_readable != null:
+		portrait_readable.lines = PORTRAIT_AFTER
+	Audio.sfx("creak", Vector3(-5.9, 1.8, 3.2), -8.0)
+	Game.toast.emit("Something on the wall changes while you are not looking at it.")
+	Game.note("portrait", "The portrait by the hearth", "A man with a lamp, in a good coat. When you looked away for long enough he was a door. Nobody in the taproom noticed. Nobody in the taproom has eyes.")
 
 
 # --- upstairs ---------------------------------------------------------------------
@@ -364,7 +372,7 @@ func _upstairs() -> void:
 		"#####.#",
 		"    #.#",
 	]
-	MapBuilder.build(self, rows, {"cell": CELL, "height": 2.8, "origin": Vector3(-2, H, -10), "y": 0.0, "floor": "wood/planks_warm",
+	MapBuilder.build(self, rows, {"cell": CELL, "height": 2.8, "origin": Vector3(-2, H, -10), "floor": "wood/planks_warm",
 		"wall": "wall/plaster_tavern", "ceiling": "wood/planks_dark", "open_edges": true, "door_h": 2.1, "name": "Upstairs"})
 	# landing
 	Props.place(self, "lantern_hanging", Vector3(9.0, H + 2.75, -4.0), 0.0, 1.0, {"collision": "none"})
@@ -394,13 +402,13 @@ func _upstairs() -> void:
 		"There is no sea outside the tavern. It is very close.",
 	], {"name": "RoomWindow", "size": Vector3(1.4, 1.5, 0.2), "offset": Vector3.ZERO})
 	Kit.light(self, Vector3(4.0, H + 1.6, -7.2), Color(0.75, 0.7, 1.0), 0.6, 5.0)
-	Props.place(self, "dresser", Vector3(4.9, H, -5.0), -90.0, 0.9)
-	Props.place(self, "candle_tall", Vector3(4.9, H + 1.0, -5.0), 0.0, 1.0, {"collision": "none"})
-	Kit.light(self, Vector3(4.4, H + 1.6, -5.0), CANDLE, 1.0, 6.0)
+	Props.place(self, "dresser", Vector3(5.6, H, -5.0), 90.0, 0.9)
+	Props.place(self, "candle_tall", Vector3(5.6, H + 0.9, -5.0), 0.0, 1.0, {"collision": "none"})
+	Kit.light(self, Vector3(5.0, H + 1.6, -5.0), CANDLE, 1.0, 6.0)
 	Props.place(self, "chair", Vector3(3.6, H, -3.0), 40.0, 1.0)
 	Props.place(self, "rug_house", Vector3(3.2, H + 0.005, -5.0), 90.0, 1.0, {"collision": "none"})
 	Props.place(self, "painting_house", Vector3(0.06, H + 1.7, -3.5), -90.0, 0.8, {"collision": "none"})
-	Props.place(self, "coat_rack", Vector3(5.6, H, -3.0), 0.0, 1.0)
+	Props.place(self, "coat_rack", Vector3(5.6, H, -2.5), 0.0, 1.0)
 	# the usher waits on the landing, second time round
 	if visit_count >= 2 and Game.count("usher_sightings") < 9:
 		Usher.spawn(self, Vector3(9.0, H, -7.0), {"appear_delay": 3.0, "radius": 16.0})
@@ -458,7 +466,7 @@ func _outside() -> void:
 	# the inn's face: the walls of the map have no outside, so give them one
 	Kit.box(self, Vector3(-4.0, 2.4, 10.15), Vector3(8.0, 4.8, 0.3), "wood/planks_wall")
 	Kit.box(self, Vector3(7.0, 2.4, 10.15), Vector3(10.0, 4.8, 0.3), "wood/planks_wall")
-	Kit.box(self, Vector3(1.0, 3.6, 10.15), Vector3(2.0, 2.4, 0.3), "wood/planks_wall")
+	Kit.box(self, Vector3(1.0, 3.55, 10.15), Vector3(2.0, 2.5, 0.3), "wood/planks_wall")
 	Kit.box(self, Vector3(2.0, 5.0, 10.7), Vector3(21.0, 0.5, 1.5), "wood/thatch")
 	Props.place(self, "window_lit", Vector3(-3.0, 1.7, 10.36), 180.0, 1.0, {"collision": "none"})
 	Props.place(self, "window_lit", Vector3(4.5, 1.7, 10.36), 180.0, 1.0, {"collision": "none"})
@@ -471,16 +479,17 @@ func _outside() -> void:
 	Props.place(self, "barrel", Vector3(6.2, 0, 11.4), 0.0, 1.0)
 	Props.place(self, "tree_dead_1", Vector3(7.5, 0, 15.2), 70.0, 0.9, {"collision": "cylinder", "collision_scale": 0.3})
 	Props.place(self, "rock_1", Vector3(-1.5, 0, 15.5), 20.0, 1.0)
-	Readable.create(self, Vector3(-3.4, 0, 12.4), 0.0, "Read the sign", [
-		"NO VACANCY.",
-		"Someone has added, underneath, in chalk: except the one." if Game.has_flag("tavern_room") else "It has said this for years. The lamp above it is the last lamp. After this there are no more.",
-	], {"name": "VacancySign", "size": Vector3(1.6, 3.2, 0.6), "offset": Vector3(0.6, 1.6, 0)})
+	var vacancy_line := "It has said this for years. The lamp above it is the last lamp. After this there are no more."
+	if Game.has_flag("tavern_room"):
+		vacancy_line = "Someone has added, underneath, in chalk: except the one."
+	Readable.create(self, Vector3(-3.4, 0, 12.4), 0.0, "Read the sign", ["NO VACANCY.", vacancy_line],
+		{"name": "VacancySign", "size": Vector3(1.6, 3.2, 0.6), "offset": Vector3(0.6, 1.6, 0)})
 	Kit.particles(self, Vector3(1.0, 1.0, 13.0), "fog", Vector3(7.0, 0.4, 3.0), 10)
 	# the road ends here. beyond the porch is nothing at all.
 	Kit.blocker(self, Vector3(1.0, 2.0, 16.15), Vector3(12.4, 4.0, 0.3))
 	Kit.blocker(self, Vector3(-5.15, 2.0, 13.0), Vector3(0.3, 4.0, 6.4))
 	Kit.blocker(self, Vector3(7.15, 2.0, 13.0), Vector3(0.3, 4.0, 6.4))
-	Kit.label(self, "the road ends", Vector3(1.0, 0.02, 15.5), 0.0, 24, Color(0.35, 0.3, 0.25), "body", {"pixel_size": 0.01, "outline": 0})
+	Kit.label(self, "the road ends here", Vector3(1.0, 0.9, 15.7), 0.0, 30, Color(0.45, 0.4, 0.32), "body", {"pixel_size": 0.01})
 
 
 # --- the undertavern (for the Tin Mouse) -----------------------------------------------
@@ -496,7 +505,7 @@ func _undertavern() -> void:
 	Kit.box(self, c + Vector3(0, 2.25, -D * 0.5 - 0.3), Vector3(W + 1.2, 4.5, 0.6), wood, {"tile": 6.0})
 	Kit.box(self, c + Vector3(-W * 0.5 - 0.3, 2.25, 0), Vector3(0.6, 4.5, D), wood, {"tile": 6.0})
 	Kit.box(self, c + Vector3(W * 0.5 + 0.3, 2.25, 0), Vector3(0.6, 4.5, D), wood, {"tile": 6.0})
-	# south wall with the tunnel mouth (1.8 m: the hole, seen from the other side)
+	# south wall with the tunnel mouth (1.8 m: the hole behind the bar, seen from the other side)
 	Kit.box(self, c + Vector3(-(W * 0.25 + 0.45), 2.25, D * 0.5 + 0.3), Vector3(W * 0.5 - 0.9, 4.5, 0.6), wood, {"tile": 6.0})
 	Kit.box(self, c + Vector3((W * 0.25 + 0.45), 2.25, D * 0.5 + 0.3), Vector3(W * 0.5 - 0.9, 4.5, 0.6), wood, {"tile": 6.0})
 	Kit.box(self, c + Vector3(0, 3.15, D * 0.5 + 0.3), Vector3(1.8, 2.7, 0.6), wood, {"tile": 6.0})
@@ -539,25 +548,27 @@ func _undertavern() -> void:
 		var sz := rng.randf_range(0.15, 0.45)
 		Kit.box(self, p + Vector3(0, sz * 0.5, 0), Vector3(sz * rng.randf_range(0.8, 1.6), sz, sz), "", {"tint": crumb.darkened(rng.randf_range(0.0, 0.3)), "rotation": Vector3(0, rng.randf_range(0, 360), 0)})
 	# the mice
-	var m1 := NPC.create(self, c + Vector3(-1.0, 0, 3.6), 180.0, "A Mouse", {"model": "item_mouse", "lines": [
+	var mouse_model: String = "item_mouse" if Props.exists("item_mouse") else "dog"
+	var mouse_scale: float = 2.5 if mouse_model == "item_mouse" else 0.4
+	var m1 := NPC.create(self, c + Vector3(-1.0, 0, 3.6), 180.0, "A Mouse", {"model": mouse_model, "lines": [
 		"\"Oh,\" says the mouse. \"You're one of the big ones, only not.\"",
 		"\"We have a tavern too. Ours is under theirs. Theirs is under something else. Nobody's asked what.\"",
 	], "name": "Mouse1"})
-	var m2 := NPC.create(self, c + Vector3(5.5, 0, -4.2), 240.0, "Another Mouse", {"model": "item_mouse", "lines": [
+	var m2 := NPC.create(self, c + Vector3(5.5, 0, -4.2), 240.0, "Another Mouse", {"model": mouse_model, "lines": [
 		"\"The rose on the table isn't ours,\" the mouse says. \"It fell through the boards. Paper. Folded from a page.\"",
 		"\"We don't read. We were going to keep it anyway. You can have it if you can get up there.\"",
 	], "name": "Mouse2"})
-	var m3 := NPC.create(self, c + Vector3(-6.0, 0, -5.5), 120.0, "The Oldest Mouse", {"model": "item_mouse", "lines": [
+	var m3 := NPC.create(self, c + Vector3(-6.0, 0, -5.5), 120.0, "The Oldest Mouse", {"model": mouse_model, "lines": [
 		"\"The barkeep upstairs has no face,\" says the oldest mouse. \"We've had a look. Under the floor you can see up through the knots in the wood.\"",
 		"\"He has a very good apron,\" it adds, with something like loyalty.",
 	], "reactions": {"bell": ["The oldest mouse flinches at the bell and then pretends it didn't.", "\"We heard that one before. It rang for a long time. Then the sea came in.\""]}, "name": "Mouse3"})
 	for m in [m1, m2, m3]:
 		var npc: NPC = m
 		if npc.body != null:
-			npc.body.scale = Vector3.ONE * 2.5
+			npc.body.scale = Vector3.ONE * mouse_scale
 		else:
 			_stand_in(npc, "mouse")
-	Readable.create(self, c + Vector3(-8.6, 0.8, -1.0), 90.0, "Read the scratches on the wall", [
+	Readable.create(self, c + Vector3(-8.6, 0.8, -1.0), -90.0, "Read the scratches on the wall", [
 		"Scratched into the skirting, very small, very neat:",
 		"WE ARE ALSO WAITING. WE DO NOT KNOW WHAT FOR. IT IS WARM.",
 		"Under it, a tally. It has been kept for a long time.",
@@ -588,7 +599,6 @@ func _stand_in(npc: NPC, kind: String, seed_: int = 0) -> void:
 	npc.body = b
 	npc.add_box(Vector3(0.7, 1.7, 0.7), Vector3(0, 0.85, 0))
 	var skin := Color(0.9, 0.82, 0.7)
-	var o := {"solid": false}
 	match kind:
 		"barkeep":
 			var shirt := Color(0.55, 0.5, 0.42)
@@ -635,7 +645,6 @@ func _stand_in(npc: NPC, kind: String, seed_: int = 0) -> void:
 			_bx(b, Vector3(0, 0.2, 0.55), Vector3(0.04, 0.04, 0.6), Color(0.55, 0.5, 0.45), Vector3(15, 0, 0))
 			_bx(b, Vector3(0, 0.6, 0.05), Vector3(0.2, 0.05, 0.04), Color(0.5, 0.48, 0.45))
 			_bx(b, Vector3(0, 0.5, 0.05), Vector3(0.04, 0.2, 0.04), Color(0.5, 0.48, 0.45))
-	o.clear()
 
 
 func _bx(parent: Node, pos: Vector3, size: Vector3, col: Color, rot: Vector3 = Vector3.ZERO) -> void:

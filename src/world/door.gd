@@ -62,6 +62,8 @@ func can_focus() -> bool:
 
 
 func requirements_met() -> bool:
+	if not unstable.is_valid() and target_area != "" and not World.is_open(target_area):
+		return false
 	if requires_keepsake != "" and not Game.has_keepsake(requires_keepsake):
 		return false
 	if requires_item != "" and not Game.has_item(requires_item):
@@ -91,7 +93,10 @@ func _on_body_entered(body: Node3D) -> void:
 
 func _on_interact(player: Node) -> void:
 	if not requirements_met():
-		Game.toast.emit(locked_text)
+		if not unstable.is_valid() and target_area != "" and not World.is_open(target_area):
+			Game.toast.emit("The door is painted on. Whatever is behind it has not been dreamt yet.")
+		else:
+			Game.toast.emit(locked_text)
 		Audio.sfx("door_locked", global_position, -6.0)
 		return
 	go(player)

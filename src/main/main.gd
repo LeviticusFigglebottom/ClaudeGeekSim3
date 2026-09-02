@@ -60,10 +60,42 @@ func _ready() -> void:
 	if start_area != "":
 		Game.new_game()
 		Game.set_flag("debug", true)
+		_apply_debug_args()
 		hud.hide_title()
 		World.travel(start_area, start_spawn, {"duration": 0.2})
 	else:
 		hud.show_title()
+
+
+## Debug launch options (after `--`): --give=lantern,bell  --flag=hallway_measured
+## --item=tape_measure  --visits=house:2  --lantern  --mirror  --small
+func _apply_debug_args() -> void:
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--give="):
+			for k in a.trim_prefix("--give=").split(","):
+				if k != "":
+					Game.gain_keepsake(k)
+		elif a.begins_with("--item="):
+			for k in a.trim_prefix("--item=").split(","):
+				if k != "":
+					Game.gain_item(k)
+		elif a.begins_with("--flag="):
+			for k in a.trim_prefix("--flag=").split(","):
+				if k != "":
+					Game.set_flag(k, true)
+		elif a.begins_with("--visits="):
+			var parts := a.trim_prefix("--visits=").split(":")
+			if parts.size() == 2:
+				Game.visits[parts[0]] = int(parts[1])
+		elif a == "--lantern":
+			Game.equip("lantern")
+			Game.lantern_lit = true
+		elif a == "--mirror":
+			Game.equip("shard")
+			Game.mirror_sight = true
+		elif a == "--small":
+			Game.equip("mouse")
+			Game.small = true
 
 
 ## Screenshot mode (`--shot=path.png`): wait a few frames for the area to settle,
@@ -77,7 +109,10 @@ func _process(_delta: float) -> void:
 	if _frame == _shot_frames:
 		var img := get_viewport().get_texture().get_image()
 		var err := img.save_png(_shot_path)
-		print("[shot] %s -> %s (%s)" % [World.current_area_id, _shot_path, "ok" if err == OK else str(err)])
+		var where := ""
+		if Game.player:
+			where = " at %s yaw %.0f" % [Game.player.global_position, rad_to_deg(Game.player.yaw)]
+		print("[shot] %s -> %s (%s)%s" % [World.current_area_id, _shot_path, "ok" if err == OK else str(err), where])
 		get_tree().quit()
 
 
