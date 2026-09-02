@@ -43,7 +43,7 @@ const NORTH := [
 	[-32.0, -27.0, 11.0, "stone/blocks_city", "e", ""],
 	[-27.0, -21.0, 0.0, "", "", ""],                        # the west gate street
 	[-21.0, -16.0, 9.0, "brick/dark", "w", ""],
-	[-16.0, -12.0, 8.0, "wood/planks_dark", "", "nodoor"],  # the house with no number
+	[-16.0, -12.0, 7.0, "wood/planks_dark", "", "nodoor"],  # the house with no number (one storey of windows; the balcony is the other)
 	[-12.0, -6.0, 13.0, "stone/blocks_city", "", ""],
 	[-6.0, 0.0, 10.0, "brick/dark", "", ""],
 	[0.0, 4.0, 12.0, "stone/blocks_dark", "e", ""],
@@ -57,7 +57,7 @@ const SOUTH := [
 	[-9.0, -6.5, 0.0, "", "", ""],                          # the alley
 	[-6.5, -4.0, 8.0, "wood/planks_dark", "we", ""],
 	[-4.0, 4.0, 0.0, "", "", ""],                           # the gate street
-	[4.0, 10.0, 11.0, "stone/blocks_city", "ws", ""],
+	[4.0, 10.0, 11.0, "stone/blocks_city", "w", ""],
 	[10.0, 16.0, 9.0, "wood/planks_dark", "es", ""],
 	[16.0, 24.0, 0.0, "", "", ""],                          # drowned lane
 	[24.0, 32.0, 12.0, "brick/dark", "ws", ""],
@@ -260,7 +260,6 @@ func _figure(pos: Vector3, yaw: float) -> Node3D:
 ## Doors, signs, watchers and litter that belong only to the real street.
 func _street_things() -> void:
 	rains.append(Kit.particles(self, Vector3(0, 9.0, 0), "rain", Vector3(33.0, 2.0, 5.0), 420))
-	Kit.particles(self, Vector3(0, 1.0, 0), "fog", Vector3(30.0, 0.4, 4.0), 14)
 	# two names for one street
 	_plate(Vector3(-29.5, 3.1, -SH + 0.05), 180.0, "KING'S WAY", 2.8)
 	Readable.create(self, Vector3(-29.5, 3.1, -SH + 0.2), 180.0, "Read the street sign", [
@@ -275,18 +274,18 @@ func _street_things() -> void:
 	# the house with no number, whose door opens on the city again, elsewhere
 	Door.create(self, Vector3(-14.0, 0, -SH), 180.0, "", "", {"kind": "dark", "label": "A house with no number", "name": "NoNumberDoor",
 		"unstable": _no_number_target, "possible_targets": NO_NUMBER_TARGETS, "fade_color": Color(0.02, 0.02, 0.03), "fade_duration": 1.3, "sound": "door_creak_long"})
-	Kit.label(self, "12", Vector3(-19.1, 2.45, -SH + 0.04), 180.0, 26, Color(0.8, 0.78, 0.7), "body", {"pixel_size": 0.012})
-	Kit.label(self, "16", Vector3(-10.1, 2.45, -SH + 0.04), 180.0, 26, Color(0.8, 0.78, 0.7), "body", {"pixel_size": 0.012})
+	Kit.label(self, "12", Vector3(-19.1, 2.5, -SH + 0.04), 180.0, 40, Color(0.8, 0.78, 0.7), "body", {"pixel_size": 0.012})
+	Kit.label(self, "16", Vector3(-10.1, 2.5, -SH + 0.04), 180.0, 40, Color(0.8, 0.78, 0.7), "body", {"pixel_size": 0.012})
 	Readable.create(self, Vector3(-12.85, 1.5, -SH + 0.15), 180.0, "A door with no number", [
 		"The houses either side are 12 and 16. This one has a nail where a number was.",
 		"The door is not locked. You can tell from here. It has the look of a door that has been opened from inside, recently, by someone who did not come out.",
 	], {"name": "NoNumberRead", "size": Vector3(0.6, 1.6, 0.3), "offset": Vector3.ZERO, "note_key": "city_no_number", "note_title": "The house with no number", "note_text": "Between 12 and 16 on the long street there is a house with a nail where its number was. Its door opens onto the city again, somewhere else in it."})
 	# a watcher on its balcony
-	Kit.box(self, Vector3(-14.0, 5.5, -SH + 0.4), Vector3(1.8, 0.14, 0.8), DARK, {"solid": false, "tile": 1.0})
-	Props.place(self, "window_lit", Vector3(-14.0, 5.75, -SH + 0.07), 180.0, 0.8, {"collision": "none"})
-	Kit.light(self, Vector3(-14.0, 6.0, -SH + 0.9), WARM, 0.6, 5.0)
-	watcher = _figure(Vector3(-14.0, 5.57, -SH + 0.45), 180.0)
-	LookAway.create(self, Vector3(-14.0, 6.6, -SH + 0.45), _on_watcher_unseen, {"name": "WatcherWatch", "radius": 26.0, "delay": 2.5, "require_seen_first": true, "once": true, "dot_threshold": 0.8})
+	Kit.box(self, Vector3(-14.0, 5.0, -SH + 0.4), Vector3(2.2, 0.14, 0.8), DARK, {"solid": false, "tile": 1.0})
+	Props.place(self, "window_lit", Vector3(-14.0, 5.8, -SH + 0.07), 180.0, 1.3, {"collision": "none"})
+	Kit.light(self, Vector3(-14.0, 5.8, -SH + 1.0), WARM, 0.8, 6.0)
+	watcher = _figure(Vector3(-14.0, 5.07, -SH + 0.45), 180.0)
+	LookAway.create(self, Vector3(-14.0, 6.1, -SH + 0.45), _on_watcher_unseen, {"name": "WatcherWatch", "radius": 16.0, "delay": 3.0, "require_seen_first": true, "once": true, "dot_threshold": 0.92})
 	# the tower door
 	Door.create(self, Vector3(28.0, 0, -SH), 180.0, "clocktower", "from_city", {"kind": "iron", "label": "The tower door", "name": "TowerDoor",
 		"requires_item": "tower_key", "locked_text": "A keyhole shaped like a clock hand.", "fade_color": Color(0.08, 0.06, 0.02), "sound": "key_turn"})
@@ -311,8 +310,8 @@ func _street_things() -> void:
 
 func _gate_street() -> void:
 	Kit.floor(self, Vector3(0, 0, 13.85), Vector2(8.0, 18.7), "stone/cobble_city", {"tile": 2.0})
-	_building(-10.0, -4.0, 12.5, 22.0, 11.0, "stone/blocks_city", "e")
-	_building(4.0, 10.0, 12.5, 22.0, 9.0, "brick/dark", "w")
+	_building(-10.0, -4.0, 12.9, 22.0, 11.0, "stone/blocks_city", "e")
+	_building(4.0, 10.0, 12.5, 22.0, 9.0, "brick/dark", "we")
 	var g := Vector3(0, 0, 23.0)
 	for sx in [-1.0, 1.0]:
 		Kit.box(self, g + Vector3(sx * 6.0, 7.0, 0), Vector3(4.0, 14.0, 6.0), "stone/blocks_city", {"tile": 2.0})
@@ -332,6 +331,7 @@ func _gate_street() -> void:
 	Props.place(self, "portcullis", g + Vector3(0, 4.3, -0.8), 0.0, 2.7, {"collision": "none"})
 	Kit.box(self, g + Vector3(0, 3.25, 0.85), Vector3(8.0, 6.5, 1.2), DARK, {"tile": 2.0})
 	Kit.light(self, g + Vector3(0, 5.6, -2.5), COOL, 1.2, 10.0)
+	Kit.light(self, g + Vector3(0, 2.2, -1.6), Color(0.85, 0.8, 0.7), 0.9, 6.0)
 	Kit.particles(self, g + Vector3(0, 5.0, -1.2), "motes", Vector3(3.0, 2.0, 1.0), 20)
 	_plate(g + Vector3(-3.95, 1.7, -1.4), -90.0, "ULLE", 1.5)
 	Readable.create(self, g + Vector3(-3.8, 1.7, -1.4), -90.0, "Read the plaque", [
@@ -367,7 +367,7 @@ func _west_gate() -> void:
 	Props.place(self, "tree_pine_1", Vector3(-31.5, -0.2, -32.0), 80.0, 1.0, {"collision": "none"})
 	Kit.box(self, Vector3(-24.0, 3.5, -33.2), Vector3(16.0, 7.0, 1.4), "nature/roots", {"tile": 1.5})
 	Kit.blocker(self, Vector3(-24.0, 3.0, -31.6), Vector3(16.0, 6.0, 0.4))
-	Kit.particles(self, Vector3(-24.0, 0.8, -28.0), "fog", Vector3(5.0, 0.4, 4.0), 10)
+	Kit.particles(self, Vector3(-24.0, 2.0, -28.0), "motes", Vector3(4.0, 1.5, 4.0), 30)
 	_lantern(Vector3(-26.6, 0, -20.0), -90.0)
 	_lantern(Vector3(-21.4, 0, -9.0), 90.0)
 	Kit.light(self, g + Vector3(0, 4.5, 1.5), Color(0.6, 0.9, 0.8), 1.2, 9.0)
@@ -561,7 +561,7 @@ func _crypt() -> void:
 		Props.place(pivot, "bell_large", Vector3(0, -1.5, 0), 0.0, 1.0, {"collision": "none"})
 		bell_pivots.append(pivot)
 		Interactable.make(self, p + Vector3(0, 1.75, 0), Vector3(1.3, 1.7, 1.3), "Ring the bell", _on_ring.bind(i), {"name": "Bell%d" % i})
-		Kit.label(self, BELL_NAMES[i], CRYPT_C + Kit.polar(CRYPT_R - 0.1, a, 2.7), Kit.yaw_to_center(a), 44, Color(0.8, 0.74, 0.6), "display", {"pixel_size": 0.012})
+		Kit.label(self, BELL_NAMES[i], CRYPT_C + Kit.polar(CRYPT_R - 0.45, a, 2.7), Kit.yaw_to_center(a), 44, Color(0.8, 0.74, 0.6), "display", {"pixel_size": 0.012})
 		Kit.light(self, p + Vector3(0, 2.3, 0), Color(0.95, 0.8, 0.55), 0.9, 6.5)
 		Props.place(self, "candle_cluster", CRYPT_C + Kit.polar(4.9, a + 12.0), 0.0, 1.0, {"collision": "none"})
 	Kit.cylinder(self, CRYPT_C, 0.6, 0.9, "stone/smooth_grey", {"segments": 8, "tile": 1.0})
@@ -583,7 +583,6 @@ func _crypt() -> void:
 	Props.place(self, "urn", CRYPT_C + Kit.polar(5.2, 45.0), 0.0, 1.0)
 	Props.place(self, "urn", CRYPT_C + Kit.polar(5.3, 315.0), 0.0, 0.9)
 	Props.place(self, "skull", CRYPT_C + Kit.polar(5.4, 60.0), 200.0, 1.0, {"collision": "none"})
-	Kit.particles(self, CRYPT_C + Vector3(0, 0.4, 0), "fog", Vector3(5.0, 0.3, 5.0), 10)
 	Kit.particles(self, CRYPT_C + Vector3(0, 2.2, 0), "motes", Vector3(5.0, 2.0, 5.0), 40)
 
 
@@ -674,7 +673,7 @@ func _palace_front() -> void:
 func _alley() -> void:
 	var cx := -7.75
 	Kit.floor(self, Vector3(cx, 0, 8.6), Vector2(2.5, 8.2), "stone/cobble_mossy", {"tile": 1.5})
-	Kit.box(self, Vector3(cx, 5.0, 12.9), Vector3(2.9, 10.0, 0.4), "brick/dark", {"tile": 2.0})
+	Kit.box(self, Vector3(-6.6, 5.0, 12.9), Vector3(5.2, 10.0, 0.4), "brick/dark", {"tile": 2.0})
 	Kit.sign(self, "wood/door_dark", Vector3(cx, 1.05, 12.68), 0.0, Vector2(1.0, 2.1), {"tint": Color(0.7, 0.62, 0.6)})
 	Readable.create(self, Vector3(cx, 0, 12.5), 0.0, "A door with no handle", [
 		"A door with no handle on this side. Through it, very faintly, a song that has no end, and the smell of somewhere warm.",
@@ -706,17 +705,17 @@ func _lower_town() -> void:
 	Kit.stairs(self, Vector3(20.0, 0, 8.0), 180.0, 8.0, 2, -0.275, 0.6, "stone/cobble_city", {"name": "LaneSteps", "tile": 2.0})
 	var wet := {"tile": 2.0, "surface": "water"}
 	Kit.floor(self, Vector3(20.0, LOW_Y, 10.85), Vector2(8.0, 3.3), "stone/cobble_mossy", wet)
-	Kit.floor(self, Vector3(20.0, LOW_Y, 16.75), Vector2(28.0, 8.5), "stone/cobble_mossy", wet)
-	Kit.floor(self, Vector3(20.0, LOW_Y, 27.25), Vector2(28.0, 5.5), "stone/cobble_mossy", wet)
-	Kit.floor(self, Vector3(20.0, CHANNEL_Y, 22.75), Vector2(28.0, 3.5), "ground/mud", wet)
-	Kit.box(self, Vector3(20.0, (LOW_Y + CHANNEL_Y) * 0.5, 20.85), Vector3(28.0, LOW_Y - CHANNEL_Y, 0.3), DARK, {"tile": 1.0})
-	Kit.box(self, Vector3(20.0, (LOW_Y + CHANNEL_Y) * 0.5, 24.65), Vector3(28.0, LOW_Y - CHANNEL_Y, 0.3), DARK, {"tile": 1.0})
+	Kit.floor(self, Vector3(22.0, LOW_Y, 16.75), Vector2(24.0, 8.5), "stone/cobble_mossy", wet)
+	Kit.floor(self, Vector3(22.0, LOW_Y, 27.25), Vector2(24.0, 5.5), "stone/cobble_mossy", wet)
+	Kit.floor(self, Vector3(22.0, CHANNEL_Y, 22.75), Vector2(24.0, 3.5), "ground/mud", wet)
+	Kit.box(self, Vector3(22.0, (LOW_Y + CHANNEL_Y) * 0.5, 20.85), Vector3(24.0, LOW_Y - CHANNEL_Y, 0.3), DARK, {"tile": 1.0})
+	Kit.box(self, Vector3(22.0, (LOW_Y + CHANNEL_Y) * 0.5, 24.65), Vector3(24.0, LOW_Y - CHANNEL_Y, 0.3), DARK, {"tile": 1.0})
 	var lb := {"base": LOW_Y - 0.2}
-	_building(0.0, 6.0, 12.5, 30.0, 10.0, "brick/dark", "e", lb)
+	_building(4.0, 10.0, 22.0, 30.0, 10.0, "brick/dark", "e", lb)
 	_building(32.0, 40.0, 12.5, 30.0, 11.0, "stone/blocks_city", "w", lb)
-	_building(6.0, 34.0, 30.0, 38.0, 9.0, "wood/planks_dark", "n", lb)
+	_building(10.0, 34.0, 30.0, 38.0, 9.0, "wood/planks_dark", "n", lb)
 	# the channel is deeper than the city; nobody wades it
-	var spans := [[6.0, 18.5], [21.5, 34.0]] if not second else [[6.0, 34.0]]
+	var spans := [[10.0, 18.5], [21.5, 34.0]] if not second else [[10.0, 34.0]]
 	for s in spans:
 		var sp: Array = s
 		var bx := (float(sp[0]) + float(sp[1])) * 0.5
@@ -735,7 +734,7 @@ func _lower_town() -> void:
 			"Two stumps of planking, one on each bank. The bridge was here. The water has taken the middle of it and left the ends, the way it leaves the ends of things.",
 			"Across the channel the market is still standing, up to its counters. Nobody is going to sell you anything from there now.",
 		], {"name": "BridgeGone", "size": Vector3(2.4, 0.8, 0.6), "note_key": "city_bridge_gone", "note_title": "The bridge is gone", "note_text": "Second time in the Drowned City the water was higher and the bridge over the channel was gone. The far side of the lower town is the water's now."})
-	Kit.water(self, Vector3(20.0, water_y, 19.6), Vector2(28.0, 20.8), "nature/water_dark", {"tint": Color(0.55, 0.66, 0.76, 0.88), "speed": 0.012, "swell": 0.035, "subdiv": 6})
+	Kit.water(self, Vector3(22.0, water_y, 19.6), Vector2(24.0, 20.8), "nature/water_dark", {"tint": Color(0.72, 0.84, 0.92, 0.82), "speed": 0.012, "swell": 0.035, "glow": 0.25, "subdiv": 6})
 	if second:
 		Kit.water(self, Vector3(20.0, 0.03, 6.25), Vector2(8.0, 3.5), "nature/water_dark", {"tint": Color(0.55, 0.66, 0.76, 0.7), "subdiv": 2, "swell": 0.0})
 	# the sewer grate on its stone, and the way down
@@ -753,16 +752,16 @@ func _lower_town() -> void:
 	_lantern(Vector3(32.0, 0, 16.3), 90.0)
 	add_spawn("sewer_top", Vector3(30.6, 0.1, 18.4), 90.0)
 	# the drowned market, and what the lantern finds under the water
-	Props.place(self, "market_stall", Vector3(12.0, LOW_Y, 27.2), 0.0, 1.0)
-	Readable.create(self, Vector3(12.0, LOW_Y + 0.9, 26.2), 0.0, "Read the drowned menu", [
+	Props.place(self, "market_stall", Vector3(13.0, LOW_Y, 27.2), 0.0, 1.0)
+	Readable.create(self, Vector3(13.0, LOW_Y + 0.9, 26.2), 0.0, "Read the drowned menu", [
 		"The chalkboard has run. What is left says: EVERYTHING, WET.",
 	], {"name": "WetMenu", "size": Vector3(1.6, 0.8, 0.5)})
 	Props.place(self, "market_stall", Vector3(27.5, LOW_Y, 27.6), 180.0, 1.0)
 	Props.place(self, "cart_broken", Vector3(19.5, LOW_Y, 28.3), 40.0, 1.0)
-	Props.place(self, "rubble_pile", Vector3(9.0, LOW_Y, 16.0), 0.0, 1.0)
+	Props.place(self, "rubble_pile", Vector3(11.6, LOW_Y, 15.2), 0.0, 1.0)
 	Props.place(self, "rubble_pile", Vector3(30.5, LOW_Y, 27.5), 60.0, 1.1)
 	Props.place(self, "statue_knight", Vector3(24.5, LOW_Y, 15.0), 200.0, 1.0)
-	Props.place(self, "barrel", Vector3(8.0, LOW_Y, 19.5), 0.0, 1.0)
+	Props.place(self, "barrel", Vector3(11.2, LOW_Y, 19.5), 0.0, 1.0)
 	Props.place(self, "gargoyle", Vector3(15.0, LOW_Y, 19.0), 160.0, 1.0)
 	var ring := Node3D.new()
 	ring.name = "DrownedRing"
@@ -778,19 +777,24 @@ func _lower_town() -> void:
 	Props.place(self, "window_lit", Vector3(26.0, 1.3, 29.93), 0.0, 1.0, {"collision": "none"})
 	_figure(Vector3(26.0, LOW_Y, 29.4), 0.0)
 	Kit.light(self, Vector3(26.0, 1.4, 28.8), WARM, 0.7, 5.0)
-	_lantern(Vector3(8.5, LOW_Y, 14.0), -90.0)
+	_lantern(Vector3(11.3, LOW_Y, 13.8), -90.0)
 	_lantern(Vector3(25.5, LOW_Y, 19.6), 90.0)
 	_lantern(Vector3(12.5, LOW_Y, 29.0), 0.0)
 	_lantern(Vector3(31.0, LOW_Y, 25.0), 90.0)
 	Props.place(self, "chain_hanging", Vector3(31.7, 8.0, 22.0), 0.0, 0.8, {"collision": "none"})
-	Props.place(self, "chain_hanging", Vector3(6.3, 7.0, 25.0), 0.0, 0.7, {"collision": "none"})
+	Props.place(self, "chain_hanging", Vector3(10.3, 7.0, 25.0), 0.0, 0.7, {"collision": "none"})
 	_plate(Vector3(24.05, 3.0, 6.8), 90.0, "DRY LANE", 2.0)
 	Readable.create(self, Vector3(24.2, 3.0, 6.8), 90.0, "Read the street sign", [
 		"DRY LANE. Somebody has scratched a line through DRY and written nothing to replace it.",
 		"The steps go down into the water. The water has been coming up the steps to meet them.",
 	], {"name": "SignDryLane", "size": Vector3(0.4, 0.6, 2.0), "offset": Vector3.ZERO})
-	Kit.particles(self, Vector3(20.0, LOW_Y + 0.5, 21.0), "fog", Vector3(13.0, 0.3, 8.0), 16)
-	rains.append(Kit.particles(self, Vector3(20.0, 8.0, 21.0), "rain", Vector3(14.0, 2.0, 9.0), 260))
+	Kit.particles(self, Vector3(22.0, 1.5, 21.0), "motes", Vector3(11.0, 1.0, 8.0), 50)
+	Kit.light(self, Vector3(20.0, 1.6, 11.0), COOL, 0.9, 8.0)
+	Kit.light(self, Vector3(22.0, 2.6, 17.0), Color(0.7, 0.8, 0.95), 1.1, 13.0)
+	Kit.light(self, Vector3(22.0, 7.0, 21.0), Color(0.62, 0.7, 0.88), 1.3, 26.0)
+	Kit.light(self, Vector3(20.0, 1.8, 27.0), COOL, 0.9, 10.0)
+	Kit.light(self, Vector3(30.0, 1.5, 17.5), Color(0.6, 0.85, 0.75), 0.8, 6.0)
+	rains.append(Kit.particles(self, Vector3(22.0, 8.0, 21.0), "rain", Vector3(12.0, 2.0, 9.0), 260))
 
 
 # --- the bells ------------------------------------------------------------------------

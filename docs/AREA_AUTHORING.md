@@ -106,6 +106,8 @@ wall, then `doors` `[x, z, "D"]` are punched through. The Nowhere House, the
 Waiting Halls, the Cistern and the Furnace are built this way. Thin-walled
 rooms (separate maps with no `#` cells, edges grow 0.3 m walls) still work
 for small flats, but never let two thin-walled maps share a wall plane.
+A `D` cell on the map's outer edge (a doorway out to hand-built geometry) must
+be a single cell: two stacked edge `D` cells wall off each other's void side.
 
 ### Props
 `Props.place(parent, "tree_oak_1", pos, yaw, scale, {collision: "cylinder"})`
