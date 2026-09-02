@@ -47,6 +47,12 @@ roughly in order of value:
   Last Lamp's cellar.
 * The Waiting Halls' number display is a Label3D over a small prop; a proper
   seven-segment texture would read better at pixel scale 3.
+* The Keep of Hours: the King has two states (on the throne, then in bed); a
+  third (gone) is not written. The library's secret shelf door re-enters the
+  keep and so bumps `visit_count`, which is what makes the King get up: dream
+  logic, but change it if visits should only count from the Anteroom gate.
+  Hooks left in comments: chapel bells starting the great clock, the Steward,
+  the "king woken" ending.
 * Areas rebuild on every visit; large realms take ~100 ms under software GL.
   Fine on hardware; could cache.
 * Under llvmpipe the frame rate is low (it is a verification path, not a play
