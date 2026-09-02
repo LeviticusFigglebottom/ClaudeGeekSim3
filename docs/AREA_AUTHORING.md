@@ -33,9 +33,17 @@ func build() -> void:
   fails if it does not exist.
 * Yaw is in degrees around +Y: 0 faces north (-Z), 90 faces west (-X),
   -90 faces east (+X), 180 faces south (+Z). Spawns face the way the player
-  will look on arrival.
-* Godot front faces are clockwise. The Kit handles that; if you hand-build
-  meshes, wind clockwise as seen from the visible side.
+  will look on arrival. Props, signs and readables face -Z at yaw 0, so a
+  picture on the NORTH wall gets yaw 180, on the SOUTH wall yaw 0, on the
+  WEST wall yaw -90 and on the EAST wall yaw 90 (otherwise you see its back).
+* Godot front faces are clockwise. The Kit handles that (verified by
+  `tools/winding_probe.gd`); if you hand-build meshes, wind clockwise as seen
+  from the visible side. `Kit.box` `faces` names are outward normals: "px" is
+  the +X face and is visible from +X.
+* `SeamlessTeleport` sizes are in the seam's LOCAL frame: `Vector3(across,
+  height, depth)`, forward being -Z rotated by the yaw. A seam across a 3 m
+  corridor walked eastward (yaw -90) is `Vector3(3, 3, 0.6)`. The verifier
+  fails a seam that contains a spawn point.
 * Hooks: `on_enter(spawn_id, n)`, `on_exit()`, `on_bell(origin)`,
   `on_umbrella(open)`, `on_time_frozen(frozen)`, `on_lantern(lit)`,
   `on_mirror_sight(active)`.
@@ -85,9 +93,19 @@ add_spawn("default", m.first.call("@"), 0.0)
 ```
 
 Options: `floors {ch: tex}` per-character floor textures, `walls {ch: tex}`
-alternate wall characters, `no_ceiling "chars"`, `open_edges`, `door_h`,
-`tile`. Thin-walled rooms: build each room as its own map with no `#` cells;
-the edges beside void grow 0.3 m walls automatically.
+alternate wall characters, `rooms {ch: {floor, wall, ceiling}}` per-room
+textures (a wall cell shows each room its own wallpaper), `no_ceiling "chars"`,
+`pit "chars"` (holes: no floor, nothing to walk on — the Furnace's fire pit,
+a stairwell), `outer_faces` (a free-standing building draws its outside),
+`open_edges`, `door_h`, `tile`.
+
+Prefer ONE map per building. `MapBuilder.rasterize(w, h, rects, doors,
+markers)` turns a floor plan into rows: `rects` are `[x0, z0, x1, z1, ch]`
+in cells (x1/z1 exclusive), every void cell touching a floor becomes a `#`
+wall, then `doors` `[x, z, "D"]` are punched through. The Nowhere House, the
+Waiting Halls, the Cistern and the Furnace are built this way. Thin-walled
+rooms (separate maps with no `#` cells, edges grow 0.3 m walls) still work
+for small flats, but never let two thin-walled maps share a wall plane.
 
 ### Props
 `Props.place(parent, "tree_oak_1", pos, yaw, scale, {collision: "cylinder"})`
@@ -116,6 +134,10 @@ Puzzle.declare(self, "id", "flag_it_sets", ["keepsake:bell", "item:coin"], "hint
 
 Doors remember requirements; `unstable` doors take a Callable returning
 `[area, spawn]` and must list `possible_targets` for the verifier.
+A way through that only appears after something is counted (a stair that
+stops looping on the third descent) is invisible to the verifier unless you
+declare it: `Puzzle.declare(self, "house_basement", "", [], "hint",
+{"route": "cistern:from_basement"})`.
 
 Dialogue: `await World.hud.say("Name", ["..."])`, choices:
 `var i: int = await World.hud.ask("Name", "Question?", ["A", "B"])`.
@@ -134,7 +156,8 @@ Sounds: `Audio.sfx("bell_big", position)`; ambience is chosen by the registry.
 
 ## Checklist before you call an area done
 1. `tools/verify.sh` is green (every door target exists, routes solve).
-2. `tools/shot.sh <id> out.png [spawn] [yaw,pitch]` looks like a place, not a box:
+2. `tools/shot.sh <id> out.png [spawn] [yaw,pitch] [--pos=x,y,z] [--give=lantern] [--visits=<id>:2]`
+   looks like a place, not a box (open the PNG and check from several spots):
    at least three light sources, a floor/ceiling/sky, props with silhouettes, one
    readable thing, one secret.
 3. Something happens when you come back (visit_count / flags).

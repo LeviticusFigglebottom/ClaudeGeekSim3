@@ -271,7 +271,7 @@ func _kitchen() -> void:
 		if not Game.has_note("staff_only"):
 			Game.note("staff_only", "STAFF ONLY", "There is a door in the kitchen that says STAFF ONLY. You do not have staff. You do not have a kitchen that size.")
 	add_spawn("from_offices", _m(1.8, 10.5, 0.1), _yaw(-90.0))
-	Puzzle.declare(self, "house_visits", "", [], "come back to the house; it changes", {})
+	Puzzle.declare(self, "house_visits", "", [], "come back to the house; the second time the Tin Mouse is in the dog's bowl", {"keepsake": "mouse"})
 
 
 func _bedroom_a() -> void:

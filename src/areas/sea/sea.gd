@@ -102,8 +102,8 @@ func build() -> void:
 func _height(x: float, z: float) -> float:
 	var h := 0.0
 	var k := TAU / WRAP
-	if z > 5.0:
-		var t := z - 5.0
+	if z > 8.0:
+		var t := z - 8.0
 		h += 0.35 * (1.0 - cos(x * k * 3.0 + z * 0.12)) * smoothstep(0.0, 10.0, t)
 		h += 0.6 * (0.5 + 0.5 * sin(x * k * 5.0 - z * 0.2)) * smoothstep(4.0, 16.0, t)
 		h += 9.0 * smoothstep(34.0, 66.0, z)
@@ -288,7 +288,7 @@ func _faces() -> void:
 	if visit_count >= 2:
 		var rz := -80.0 if visit_count == 2 else -56.0
 		var rp := Vector3(-12.0, -22.0, rz)
-		_face(rp, 180.0, 6.0, 8.0, "awake", "Risen", Color(0.42, 0.34, 0.56))
+		_face(rp, 180.0, 6.0, 8.0, "awake", "Risen", Color(0.55, 0.45, 0.66))
 		Kit.light(self, rp + Vector3(0, 20.0, 12.0), Color(1.0, 0.7, 0.9), 2.5, 45.0)
 		if not Game.has_note("sea_risen"):
 			Game.note("sea_risen", "Something out at sea", "The second time, there was a face out in the deep water, taller than the pier is long, with its eyes open. It was not there before. The tide brought it, at the tide's speed.")
@@ -410,8 +410,10 @@ func _shore() -> void:
 	_motes(self, Vector3(6.5, 1.5, 6.0), "motes", Vector3(1.5, 1.0, 1.5), 16, Color(0.9, 0.85, 1.0, 0.6))
 
 
+## Text written flat in the sand (readable by someone standing south of it), sitting on the terrain.
 func _sand_text(text: String, pos: Vector3, yaw: float, size: int, color: Color) -> Label3D:
-	var l := Kit.label(self, text, pos, yaw, size, color, "body", {"pixel_size": 0.012, "outline": 0})
+	var p := Vector3(pos.x, _height(pos.x, pos.z) + 0.03, pos.z)
+	var l := Kit.label(self, text, p, yaw, size, color, "body", {"pixel_size": 0.012, "outline": 0})
 	l.rotation_degrees = Vector3(-90.0, yaw, 0.0)
 	return l
 

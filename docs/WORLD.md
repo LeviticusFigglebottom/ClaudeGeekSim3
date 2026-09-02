@@ -22,10 +22,10 @@ the verifier (`tools/verify.sh`) checks all of them.
 | `castle` | The Keep of Hours | nexus | gate → `nexus:from_castle` | **Paper Crown** (rotating rooms; hourglass steadies them); tapestry (knife) → the King's dream; infinite library; throne |
 | `sea` | The Slow Sea | tavern (`from_tavern`), nexus, tavern back door (`shore`) | pier door → `nexus:from_sea`; sleeping shore → `tavern:from_sea` | **Moth Wings** (highest platform; clockwork platforms); giant faces; colour-shifting sky |
 | `catacombs` | The Ossuary | forest (`from_well`), city (`from_sewer`), hallway (`from_stairs`), nexus | ladder → `forest:well_top`; grate → `city:sewer_top`; door → `nexus:from_catacombs` | **Mirror Shard** (reflecting pool; needs lantern to find the way); gravestone name puzzle; lantern-only paths |
-| `furnace` | The Furnace | mirror_nexus (`from_mirror`), nexus | iron door → `nexus:from_furnace`; mirror gate → `mirror_nexus:from_furnace` | **Kitchen Knife** (chained giant's hand); chains, cages, the choir |
-| `cistern` | The Cistern | house (`from_basement`), nexus | drain ladder → `house:basement`; tiled door → `nexus:from_cistern` | **torn page** (follow the sound); endless tiled water halls; lifeguard chair |
-| `offices` | The Waiting Halls | corridor (`from_stairs`), house (`from_house`), nexus | fire door → `corridor:from_stairs`; the called number → `nexus:from_offices`; back way → `house:from_offices` | **missing photo** (filing cabinets); number puzzle; looping cubicles |
-| `clocktower` | The Clocktower | city (`from_city`), nexus | ground door → `city:from_tower`; top door → `nexus:from_clocktower` | **Hourglass** (top; gears and platforms) |
+| `furnace` | The Furnace | mirror_nexus (`from_mirror`), nexus | iron door → `nexus:from_furnace`; mirror gate (shard) → `mirror_nexus:from_furnace` | **Kitchen Knife** (the chained giant holds it out); the pit of slow fire (fall in: the Static); the forge and the Stoker; **candle stub** (iron maiden); the choir that sings one note (the bell stops it); the gallows rope (knife) opens every cage |
+| `cistern` | The Cistern | house (`from_basement`), nexus | drain ladder → `house:basement`; tiled door → `nexus:from_cistern` | **torn page** (follow the reading voice to the showers); the great sunken bath and its writing on the bottom; the lifeguard who climbed down; the corridor that only goes on (three passes → the glass float); the umbrella makes it rain indoors; higher water on the second visit |
+| `offices` | The Waiting Halls | corridor (`from_stairs`), house (`from_house`), nexus | fire door → `corridor:from_stairs`; door 5½ (once your number is called) → `nexus:from_offices`; STAFF ONLY → `house:from_offices`; door 0604 (door code) → `hallway:end`; door 0001 → the same waiting room | **missing photo** (archive drawer marked 5½); take a number, wait three times; **dog biscuit** (vending machine, B4); the corridor of cubicles that goes round; the photocopier that prints a face; the shadow at the desk |
+| `clocktower` | The Clocktower | city (`from_city`), nexus (`from_nexus`, both at the bottom) | ground doors → `city:from_tower` and `nexus:from_clocktower`; top door → `nexus:from_clocktower` | **Hourglass** (top of the spiral; two great gears to ride, the wings make it easy); the clock whose hands move only when unseen; the great bell stops the works; the keeper; a chest with a clock hand with your name on it |
 | `static` | The Static | falling out of any world (`default`), corridor lift (`lift`), nexus | a screen → `nexus:from_static` | the Usher's home; nothing stays |
 | `mirror_nexus` | The Other Anteroom | apartment mirror (`default`), furnace (`from_furnace`) | mirror → `apartment:mirror`; furnace door → `furnace:from_mirror`; a crack → `nexus:from_mirror` | reversed plaque; mirror-only geometry |
 | `workshop` | The Workshop (hidden) | nexus (13 bells) | door → `nexus:from_workshop` | every prop on a plinth |
@@ -52,6 +52,11 @@ closet is the Hallway → measure it → door code 0604 and a side door to the
 field → the Nowhere House → the Halden Arms via the front door → the
 Waiting Halls → and back into the house from the wrong side.
 
+## Latent routes the solver is told about
+Count-gated exits are declared with `Puzzle.declare(..., {"route": "area:spawn"})`:
+the Nowhere House basement stair (three descents) → `cistern:from_basement`,
+the Hallway stair (three descents) → `catacombs:from_stairs`.
+
 ## Secrets (first pass)
 * TV face on channel zero (1 in 24, or half the time at 3 am).
 * Knock on every flat; something knocks back from too low down.
@@ -61,3 +66,8 @@ Waiting Halls → and back into the house from the wrong side.
 * Five and a half minutes in the Hallway.
 * Feed the dog; it follows you between worlds and comes to the bell.
 * Extra person in the hall photograph after three wakings.
+* Door 0604 in the Waiting Halls opens onto the far end of the Hallway.
+* Press B4. The vending machine has been waiting.
+* Strike the anvil in the Furnace seven times; something upstairs barks.
+* Ring the great bell at the top of the Clocktower with the Small Bell in hand.
+* The corridor in the Cistern that only goes on gives up after three passes.
