@@ -22,6 +22,17 @@ var _has_look := false
 var _shot_pos := Vector3.ZERO
 var _has_pos := false
 var _frame := 0
+## The title screen looks out over the dream: a slow camera drifts through
+## one realm after another behind the menu.
+const TOUR := [["nexus", "default"], ["forest", "default"], ["city", "from_nexus"], ["tavern", "default"],
+	["sea", "default"], ["cistern", "default"], ["castle", "from_nexus"], ["house", "porch"],
+	["offices", "default"], ["clocktower", "from_city"], ["catacombs", "chapel"], ["furnace", "from_nexus"]]
+const TOUR_SECONDS := 26.0
+var title_cam: Camera3D = null
+var touring := false
+var _tour_i := 0
+var _tour_target := Vector3.ZERO
+var _tour_tween: Tween = null
 ## Web builds hold their HTML loading screen until the engine has drawn a few
 ## real frames; see web/shell.html.
 var _web_frames := 0
@@ -34,6 +45,8 @@ func _ready() -> void:
 	container.stretch_shrink = PIXEL_SCALE
 	container.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	_build_postfx()
+	_apply_settings()
+	Settings.changed.connect(func(_k: String, _v: Variant) -> void: _apply_settings())
 	World.area_changed.connect(_on_area_changed)
 	player.focus_changed.connect(_on_focus_changed)
 
@@ -75,6 +88,7 @@ func _ready() -> void:
 		World.travel(start_area, start_spawn, {"duration": 0.2})
 	else:
 		hud.show_title()
+		tour_start()
 
 
 ## Debug launch options (after `--`): --give=lantern,bell  --flag=hallway_measured
@@ -113,6 +127,8 @@ func _apply_debug_args() -> void:
 ## save the window image and quit. Used by tools/screenshots.sh for visual QA.
 func _process(_delta: float) -> void:
 	_signal_web_ready()
+	if touring and title_cam and title_cam.current and title_cam.global_position.distance_to(_tour_target) > 0.5:
+		title_cam.look_at(_tour_target)
 	if _shot_path == "":
 		return
 	_frame += 1
@@ -162,8 +178,84 @@ func _exit_tree() -> void:
 
 
 func _on_area_changed(_area_id: String, _spawn_id: String) -> void:
-	if Game.started and not Game.has_flag("debug"):
+	# the title tour travels too; that is not the player's dream to save
+	if Game.started and not Game.has_flag("debug") and not hud.title_open:
 		Game.save()
+
+
+## Picture settings: how coarse the pixels are and how strong the dither is.
+func _apply_settings() -> void:
+	var px: int = clampi(int(Settings.get_value("pixel")), 1, 4)
+	container.stretch_shrink = px
+	if postfx_rect and postfx_rect.material is ShaderMaterial:
+		var m := postfx_rect.material as ShaderMaterial
+		m.set_shader_parameter("pixel_size", float(px))
+		m.set_shader_parameter("dither_strength", 0.55 * clampf(float(Settings.get_value("dither")), 0.0, 1.5))
+
+
+# --- the title tour ----------------------------------------------------------
+
+func tour_start() -> void:
+	if touring:
+		return
+	touring = true
+	if title_cam == null:
+		title_cam = Camera3D.new()
+		title_cam.name = "TitleCamera"
+		title_cam.fov = 68.0
+		title_cam.near = 0.05
+		viewport.add_child(title_cam)
+	_tour_i = 0
+	_tour_show()
+
+
+func _tour_show() -> void:
+	if not touring:
+		return
+	var entry: Array = TOUR[_tour_i % TOUR.size()]
+	await World.travel(entry[0], entry[1], {"duration": 0.0, "silent": true})
+	if not touring:
+		return
+	player.set_frozen(true)
+	player.collider.disabled = true
+	player.camera.current = false
+	var sp: Transform3D = World.current_area.spawns.get(entry[1], Transform3D()) if World.current_area else Transform3D()
+	var fwd := -sp.basis.z
+	var right := sp.basis.x
+	var from := sp.origin + Vector3(0, 1.6, 0) + right * 0.8 - fwd * 0.4
+	var to := from + fwd * 4.0 - right * 2.2 + Vector3(0, 0.25, 0)
+	_tour_target = sp.origin + Vector3(0, 1.3, 0) + fwd * 12.0
+	title_cam.global_position = from
+	title_cam.current = true
+	title_cam.look_at(_tour_target)
+	hud.fade_in(1.8)
+	_tour_tween = create_tween()
+	_tour_tween.tween_property(title_cam, "global_position", to, TOUR_SECONDS)
+	_tour_tween.parallel().tween_property(self, "_tour_target", _tour_target + right * 5.0, TOUR_SECONDS)
+	_tour_tween.tween_callback(_tour_advance)
+
+
+func _tour_advance() -> void:
+	if not touring:
+		return
+	_tour_i += 1
+	await hud.fade_out(Color.BLACK, 1.2)
+	_tour_show()
+
+
+## Hand the world back to the player (called before a game starts).
+func tour_stop() -> void:
+	if not touring:
+		return
+	touring = false
+	if _tour_tween:
+		_tour_tween.kill()
+	while World.traveling:
+		await get_tree().process_frame
+	if title_cam:
+		title_cam.current = false
+	player.collider.disabled = false
+	player.camera.current = true
 
 
 func _on_focus_changed(target: Node) -> void:

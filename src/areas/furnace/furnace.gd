@@ -325,7 +325,7 @@ func _cages() -> void:
 	})
 	# the gallows and the rope
 	Props.place(self, "gallows", _m(53.0, 32.0), 0.0, 1.0)
-	Cuttable.create(self, _m(53.0, 32.0, 2.0), 0.0, Vector3(0.4, 2.2, 0.4), {"tex": "metal/chain", "flag": "gallows_cut", "cut_text": "Cut the rope", "name": "GallowsRope", "on_cut": func() -> void:
+	Cuttable.create(self, _m(53.0, 32.0, 2.0), 0.0, Vector3(0.4, 2.2, 0.4), {"tex": "metal/chain", "flag": "gallows_cut", "cut_text": "Cut the rope", "name": "GallowsRope", "on_cut": func(_rope: Node) -> void:
 		Game.note("furnace_rope", "The rope", "You cut the rope on the gallows in the Furnace. Every cage in the corridor swung open at once. The one who was humming did not leave. He said the tab stands.")
 		Game.toast.emit("Every cage in the corridor swings open at once.")})
 	Readable.create(self, _m(53.0, 31.0, 1.0), 0.0, "The gallows", ["A gallows with one rope. The rope runs up through a ring and away along the ceiling to every cage in the corridor.", "Cut it and nothing will hang from anything."], {"name": "GallowsRead", "size": Vector3(1.6, 1.4, 1.0)})

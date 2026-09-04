@@ -88,9 +88,12 @@ from the browser cache.
 
 * **Mouse look** needs a click first: browsers only grant pointer lock after a
   gesture. Clicking *sleep* on the title screen is enough.
-* **Saves** live in the browser's IndexedDB, per origin. They survive a reload
-  (the browser test checks exactly that) but they are not the same save as the
-  desktop build's, and clearing site data clears them.
+* **Saves** (all three slots, and the settings file) live in the browser's
+  IndexedDB, per origin. They survive a reload (the browser test checks exactly
+  that) but they are not the same saves as the desktop build's, and clearing
+  site data clears them.
+* **Fullscreen** works from the settings toggle or F11 — browsers only allow
+  it from a click or key press, so the saved preference is not applied on load.
 * **There is no quit button** in a browser; the title screen leaves it out.
 * **F12** belongs to the browser, so the in-game screenshot key does nothing
   there. Everything else is as documented in the README.

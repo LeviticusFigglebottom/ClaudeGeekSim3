@@ -110,7 +110,8 @@ func _poll_actions() -> void:
 func on_mouse_motion(relative: Vector2) -> void:
 	if frozen or input_locked or not _in_play():
 		return
-	rotate_look(-relative.x * MOUSE_SENS, -relative.y * MOUSE_SENS)
+	var sens: float = MOUSE_SENS * float(Settings.get_value("mouse"))
+	rotate_look(-relative.x * sens, -relative.y * sens)
 
 
 func _in_play() -> bool:

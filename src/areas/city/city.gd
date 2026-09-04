@@ -373,7 +373,12 @@ func _west_gate() -> void:
 	var g := Vector3(-24.0, 0, -22.5)
 	Kit.arch(self, g, 0.0, 6.0, 5.5, "stone/blocks_city", {"depth": 1.6, "post": 0.8, "top": 0.9, "tile": 1.0})
 	Kit.box(self, g + Vector3(0, 8.4, 0), Vector3(7.6, 4.0, 1.6), "stone/blocks_city", {"tile": 2.0})
-	Door.create(self, g, 0.0, "forest", "road", {"kind": "none", "label": "The road out, into the wood", "name": "WestGate", "fade_color": Color(0.05, 0.1, 0.09), "fade_duration": 1.0, "sound": "wind_gust"})
+	var gate := Door.create(self, g, 0.0, "forest", "road", {"kind": "none", "walk_through": true, "label": "The road out, into the wood", "name": "WestGate", "fade_color": Color(0.05, 0.1, 0.09), "fade_duration": 1.0, "sound": "wind_gust"})
+	gate.add_box(Vector3(5.6, 5.0, 1.4), Vector3(0, 2.5, 0))
+	# the wood closes in on both sides of the road past the gate
+	for sx in [-28.2, -19.8]:
+		Kit.box(self, Vector3(sx, 2.5, -27.8), Vector3(1.6, 5.0, 10.6), "nature/roots", {"tile": 1.5})
+		Kit.blocker(self, Vector3(sx, 3.0, -27.8), Vector3(1.8, 6.0, 10.8))
 	Kit.label(self, "THE HOLLOW WOOD", g + Vector3(0, 6.9, 0.85), 180.0, 34, Color(0.7, 0.85, 0.8), "display", {"pixel_size": 0.014})
 	Kit.floor(self, Vector3(-24.0, 0, -27.5), Vector2(7.0, 9.0), "ground/dirt", {"tile": 3.0, "surface": "grass"})
 	Kit.floor(self, Vector3(-24.0, -0.02, -34.0), Vector2(30.0, 12.0), "nature/grass_dark", {"tile": 3.0})
@@ -492,6 +497,8 @@ func _cathedral() -> void:
 		"outer_faces": true, "wall_tops": true, "name": "Cathedral"})
 	for zz in [-46.0, -42.0, -38.0, -34.0, -30.0]:
 		for xx in [11.2, 18.8]:
+			if xx < 15.0 and absf(zz + 37.5) < 2.5:
+				continue   # this one stood in front of the crypt door
 			Props.place(self, "pillar_city", Vector3(xx, 0, zz), 0.0, 1.6, {"collision": "cylinder"})
 	for i in 6:
 		var zz := -27.5 - i * 1.6

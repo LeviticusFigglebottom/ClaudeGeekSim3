@@ -21,10 +21,15 @@ the bathroom that is too big).
 Controls: **WASD** move · mouse look · **E** interact · **F** use the held
 keepsake · **Tab / Q** cycle keepsakes · **Space** jump (and glide, with the
 wings) · **C** crouch · **J** journal · **hold R** to wake up · **Esc** pause ·
-**F12** screenshot.
+**F11** fullscreen · **F12** screenshot.
 
-The game autosaves when you change areas. There is one save slot
-(`user://anteroom_save.json`).
+The game autosaves when you change areas, into one of **three save slots**
+(`user://anteroom_save_<n>.json`); a new dream picks an empty slot, or asks
+before it takes a used one. **Settings** (Esc or the title screen) has sliders
+for how much PS1 the picture has — pixel dither, vertex wobble, texture warp,
+pixel size — plus mouse speed, volume and fullscreen; they live in
+`user://settings.json`, apart from the saves. The title screen drifts through
+the realms behind the menu.
 
 ```
 # run (needs Godot 4.7; put the binary at .bin/godot or on PATH)

@@ -108,6 +108,7 @@ var small := false: set = set_small
 
 
 func _ready() -> void:
+	migrate_legacy_save()
 	InputSetup.ensure()
 	rng.randomize()
 	run_seed = rng.randi()
@@ -313,7 +314,9 @@ func weekday() -> int:
 
 # --- save / load ---------------------------------------------------------
 
-func new_game() -> void:
+func new_game(i: int = 0) -> void:
+	if i >= 1:
+		slot = i
 	flags = {}
 	keepsakes = []
 	active_keepsake = ""
@@ -357,32 +360,101 @@ func deserialize(d: Dictionary) -> void:
 	reset_toggles()
 	started = true
 
+## Three dreams can be kept at once. `slot` is the one being played; a new
+## game picks a slot instead of overwriting whatever was there.
+const SLOTS := 3
+var slot := 1
+
+
+static func slot_path(i: int) -> String:
+	return "user://anteroom_save_%d.json" % i
+
+
 func save() -> bool:
-	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	var f := FileAccess.open(slot_path(slot), FileAccess.WRITE)
 	if f == null:
-		push_error("Could not open save file for writing: %s" % FileAccess.get_open_error())
+		push_error("Could not open save slot %d for writing: %s" % [slot, FileAccess.get_open_error()])
 		return false
 	f.store_string(JSON.stringify(serialize(), "\t"))
 	f.close()
 	return true
 
-func has_save() -> bool:
-	return FileAccess.file_exists(SAVE_PATH)
 
-func load_save() -> Dictionary:
-	if not has_save():
+## Any slot (i < 1) or one slot in particular.
+func has_save(i: int = 0) -> bool:
+	if i >= 1:
+		return FileAccess.file_exists(slot_path(i))
+	for k in range(1, SLOTS + 1):
+		if FileAccess.file_exists(slot_path(k)):
+			return true
+	return false
+
+
+func _read_slot(i: int) -> Dictionary:
+	if not FileAccess.file_exists(slot_path(i)):
 		return {}
-	var f := FileAccess.open(SAVE_PATH, FileAccess.READ)
+	var f := FileAccess.open(slot_path(i), FileAccess.READ)
 	if f == null:
 		return {}
 	var parsed = JSON.parse_string(f.get_as_text())
 	f.close()
-	if not (parsed is Dictionary):
-		push_error("Save file is not a dictionary")
-		return {}
-	deserialize(parsed)
-	return parsed
+	return parsed if parsed is Dictionary else {}
 
-func delete_save() -> void:
-	if has_save():
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
+
+## What the title screen shows for a slot: where, how far, when.
+func slot_summary(i: int) -> Dictionary:
+	var d := _read_slot(i)
+	if d.is_empty():
+		return {}
+	var st: Dictionary = d.get("stats", {})
+	return {
+		"area": String(d.get("area", "")),
+		"keepsakes": (d.get("keepsakes", []) as Array).size(),
+		"playtime": float(st.get("playtime", 0.0)),
+		"saved_at": String(d.get("saved_at", "")),
+		"wakes": int(st.get("wakes", 0)),
+	}
+
+
+## The slot saved most recently, or 0 when there is none.
+func latest_slot() -> int:
+	var best := 0
+	var best_at := ""
+	for k in range(1, SLOTS + 1):
+		var at := String(_read_slot(k).get("saved_at", ""))
+		if at != "" and at > best_at:
+			best_at = at
+			best = k
+	return best
+
+
+func first_free_slot() -> int:
+	for k in range(1, SLOTS + 1):
+		if not has_save(k):
+			return k
+	return 0
+
+
+func load_save(i: int = 0) -> Dictionary:
+	if i >= 1:
+		slot = i
+	var d := _read_slot(slot)
+	if d.is_empty():
+		push_error("Save slot %d is empty or unreadable" % slot)
+		return {}
+	deserialize(d)
+	return d
+
+
+func delete_save(i: int = 0) -> void:
+	var k := i if i >= 1 else slot
+	if has_save(k):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(slot_path(k)))
+
+
+## Saves from before there were slots become slot 1.
+func migrate_legacy_save() -> void:
+	if FileAccess.file_exists(SAVE_PATH) and not has_save(1):
+		var d := DirAccess.open("user://")
+		if d:
+			d.rename(SAVE_PATH.get_file(), slot_path(1).get_file())

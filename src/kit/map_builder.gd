@@ -164,7 +164,16 @@ static func build(parent: Node, rows: Array, opts: Dictionary = {}) -> Dictionar
 			if not open_edges:
 				var axis_ns := false
 				if is_open.call(ch):
-					axis_ns = is_floor.call(get.call(c, r - 1)) or is_floor.call(get.call(c, r + 1))
+					var real := func(cc: int, rr: int) -> bool:
+						var n: String = get.call(cc, rr)
+						return is_floor.call(n) and not is_open.call(n)
+					var ns_real: bool = real.call(c, r - 1) or real.call(c, r + 1)
+					var ew_real: bool = real.call(c - 1, r) or real.call(c + 1, r)
+					if ns_real == ew_real:
+						# ambiguous (or a lone cell): fall back to any floor-like neighbour
+						axis_ns = is_floor.call(get.call(c, r - 1)) or is_floor.call(get.call(c, r + 1))
+					else:
+						axis_ns = ns_real
 				for d in dirs:
 					var nch: String = get.call(c + d.x, r + d.y)
 					if is_open.call(ch):

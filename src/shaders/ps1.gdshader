@@ -17,14 +17,19 @@ uniform bool use_vertex_color = false;
 uniform float specular_amt : hint_range(0.0, 1.0) = 0.05;
 uniform float scroll_x = 0.0;
 uniform float scroll_y = 0.0;
+// player settings (project shader globals): 1.0 = as authored, 0.0 = clean
+global uniform float ps1_wobble;
+global uniform float ps1_warp;
 
 varying vec2 uv_affine;
 varying float w_var;
 
 void vertex() {
 	vec4 clip = PROJECTION_MATRIX * MODELVIEW_MATRIX * vec4(VERTEX, 1.0);
-	if (snap > 0.0 && clip.w > 0.0) {
-		vec2 grid = vec2(snap, snap * 0.5625);
+	if (snap > 0.0 && clip.w > 0.0 && ps1_wobble > 0.001) {
+		// a finer grid wobbles less; 4096 is as good as none at these resolutions
+		float s = mix(4096.0, snap, clamp(ps1_wobble, 0.0, 1.0));
+		vec2 grid = vec2(s, s * 0.5625);
 		clip.xy = floor(clip.xy / clip.w * grid + 0.5) / grid * clip.w;
 	}
 	POSITION = clip;
@@ -34,7 +39,7 @@ void vertex() {
 
 void fragment() {
 	vec2 uv_a = uv_affine / max(w_var, 0.0001);
-	vec2 uv = mix(UV, uv_a, affine) * uv_scale + uv_offset + vec2(scroll_x, scroll_y) * TIME;
+	vec2 uv = mix(UV, uv_a, affine * clamp(ps1_warp, 0.0, 1.0)) * uv_scale + uv_offset + vec2(scroll_x, scroll_y) * TIME;
 	vec4 tex = texture(albedo_tex, uv) * tint;
 	if (use_vertex_color) {
 		tex *= COLOR;

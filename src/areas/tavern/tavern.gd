@@ -402,9 +402,9 @@ func _upstairs() -> void:
 		"There is no sea outside the tavern. It is very close.",
 	], {"name": "RoomWindow", "size": Vector3(1.4, 1.5, 0.2), "offset": Vector3.ZERO})
 	Kit.light(self, Vector3(4.0, H + 1.6, -7.2), Color(0.75, 0.7, 1.0), 0.6, 5.0)
-	Props.place(self, "dresser", Vector3(5.6, H, -5.0), 90.0, 0.9)
-	Props.place(self, "candle_tall", Vector3(5.6, H + 0.9, -5.0), 0.0, 1.0, {"collision": "none"})
-	Kit.light(self, Vector3(5.0, H + 1.6, -5.0), CANDLE, 1.0, 6.0)
+	Props.place(self, "dresser", Vector3(2.2, H, -2.5), 0.0, 0.9)
+	Props.place(self, "candle_tall", Vector3(2.2, H + 0.9, -2.5), 0.0, 1.0, {"collision": "none"})
+	Kit.light(self, Vector3(2.4, H + 1.6, -3.2), CANDLE, 1.0, 6.0)
 	Props.place(self, "chair", Vector3(3.6, H, -3.0), 40.0, 1.0)
 	Props.place(self, "rug_house", Vector3(3.2, H + 0.005, -5.0), 90.0, 1.0, {"collision": "none"})
 	Props.place(self, "painting_house", Vector3(0.06, H + 1.7, -3.5), -90.0, 0.8, {"collision": "none"})

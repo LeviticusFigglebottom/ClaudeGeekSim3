@@ -190,7 +190,8 @@ func _hut() -> void:
 	if Props.exists("hermit_hut"):
 		Props.place(self, "hermit_hut", HUT, 180.0, 1.5, {"collision": "none", "name": "Hut"})
 		r = 2.2
-		_ring_blockers(HUT, r + 0.2, 3.6, 8, 90.0, 44.0)
+		# eight segments starting on a centre, so the one on the door (90°) is the gap
+		_ring_blockers(HUT, r + 0.2, 3.6, 8, 90.0, 44.0, 0.0)
 		Kit.ring(self, HUT + Vector3(0, 0.03, 0), 0.0, r + 0.1, 10, "wood/planks_dark", {"solid": false})
 	else:
 		Kit.ring(self, HUT + Vector3(0, 0.03, 0), 0.0, 2.9, 12, "wood/planks_dark", {"solid": false})
@@ -268,10 +269,10 @@ func _kit_figure(parent: Node, col: Color) -> void:
 	Kit.box(parent, Vector3(0.16, 0.25, 0), Vector3(0.16, 0.5, 0.2), "", {"mat": m, "solid": false})
 
 
-func _ring_blockers(centre: Vector3, radius: float, height: float, segments: int, gap_angle: float, gap_width: float) -> void:
+func _ring_blockers(centre: Vector3, radius: float, height: float, segments: int, gap_angle: float, gap_width: float, phase: float = 0.5) -> void:
 	var chord := 2.0 * radius * sin(PI / segments) + 0.3
 	for i in segments:
-		var a := 360.0 * (i + 0.5) / segments
+		var a := 360.0 * (i + phase) / segments
 		if absf(wrapf(a - gap_angle, -180.0, 180.0)) < gap_width * 0.5:
 			continue
 		var b := Kit.blocker(self, centre + Kit.polar(radius, a, height * 0.5), Vector3(chord, height, 0.3))

@@ -117,9 +117,12 @@ try {
 	await page.screenshot({ path: join(SHOTS, "web_title.png") });
 	note("title screen -> " + join(SHOTS, "web_title.png"));
 
-	// click for the pointer-lock gesture, then press the focused button ("sleep")
+	// click for the pointer-lock gesture, then press the focused button: "continue"
+	// when a save exists, otherwise "new dream" and then the first empty slot
 	await page.mouse.click(640, 400);
 	await page.waitForTimeout(500);
+	await page.keyboard.press("Enter");
+	await page.waitForTimeout(1200);
 	await page.keyboard.press("Enter");
 	await settle(page);
 	await page.screenshot({ path: join(SHOTS, "web_game.png") });

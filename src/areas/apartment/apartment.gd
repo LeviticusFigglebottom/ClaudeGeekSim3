@@ -60,7 +60,7 @@ func build() -> void:
 	var win: Vector3 = bedroom.first.call("w")
 	Props.place(self, "window_night", win + _v(0, 1.5, -CELL * 0.5 + 0.08), _yaw(180.0), 1.0, {"collision": "none"})
 	Kit.light(self, win + _v(0, 1.6, 0.4), Color(0.5, 0.6, 0.9), 0.35, 4.0)
-	var desk_pos: Vector3 = bedroom.first.call("d") + _v(CELL * 0.5 - 0.45, 0, 0)
+	var desk_pos: Vector3 = bedroom.first.call("d") + _v(CELL * 0.5 - 0.45, 0, -2.0 * CELL)
 	Props.place(self, "desk", desk_pos, _yaw(90.0), 1.0)
 	Props.place(self, "lamp_desk", desk_pos + _v(0, 0.77, -0.35), _yaw(90.0), 1.0, {"collision": "none"})
 	Kit.light(self, desk_pos + _v(-0.4, 1.3, 0), Color(1.0, 0.85, 0.6), 0.9, 5.0)
@@ -68,7 +68,7 @@ func build() -> void:
 		if World.hud:
 			World.hud.toggle_journal(), {"name": "Journal"})
 	Props.place(self, "chair", desk_pos + _v(-0.7, 0, 0.1), _yaw(-90.0), 1.0)
-	Props.place(self, "bookshelf_white", bedroom.first.call("d") + _v(CELL * 0.5 - 0.2, 0, -1.3), _yaw(90.0), 1.0)
+	Props.place(self, "bookshelf_white", bedroom.first.call("d") + _v(CELL * 0.5 - 0.2, 0, -0.9), _yaw(90.0), 1.0)
 	Props.place(self, "painting_door", desk_pos + _v(0.4, 1.9, 0), _yaw(90.0), 0.8, {"collision": "none"})
 	Props.place(self, "rug_house", bedroom.first.call("b") + _v(0, 0, 1.5), _yaw(0.0), 1.0, {"collision": "none"})
 	# the closet

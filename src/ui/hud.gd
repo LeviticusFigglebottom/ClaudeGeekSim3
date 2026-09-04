@@ -38,6 +38,9 @@ var dialogue_active := false
 var journal_open := false
 var paused := false
 var title_open := false
+var settings_panel: PanelContainer
+var settings_open := false
+var _settings_back: Callable
 var _toasts: Array[String] = []
 var _toast_busy := false
 var _lines: Array = []
@@ -220,13 +223,19 @@ func _ready() -> void:
 	_button(pause_buttons, "resume", toggle_pause)
 	_button(pause_buttons, "save", func() -> void:
 		Game.save()
-		show_toast("Saved."))
+		show_toast("Saved to slot %d." % Game.slot))
+	_button(pause_buttons, "settings", func() -> void:
+		open_settings(func() -> void: pause_menu.visible = true))
 	_button(pause_buttons, "wake up", func() -> void:
 		toggle_pause()
 		World.wake())
 	_button(pause_buttons, "return to title", func() -> void:
+		Game.save()
 		toggle_pause()
-		show_title())
+		show_title()
+		var main := get_parent()
+		if main and main.has_method("tour_start"):
+			main.tour_start())
 	_button(pause_buttons, "quit", func() -> void:
 		Game.save()
 		get_tree().quit())
@@ -237,7 +246,7 @@ func _ready() -> void:
 	title_screen.visible = false
 	root.add_child(title_screen)
 	var bg := ColorRect.new()
-	bg.color = Color(0.02, 0.015, 0.03, 1.0)
+	bg.color = Color(0.02, 0.015, 0.03, 0.42)
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	title_screen.add_child(bg)
 	var tv := VBoxContainer.new()
@@ -260,6 +269,8 @@ func _ready() -> void:
 	tv.add_child(title_buttons)
 	var tf := _label(tv, "the flat has a door it did not have yesterday", 20, "body", Color(0.35, 0.33, 0.3))
 	tf.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+	_build_settings(root)
 
 	# fade (topmost)
 	fade = ColorRect.new()
@@ -325,6 +336,15 @@ func _input(event: InputEvent) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("toggle_fullscreen"):
+		Settings.toggle_fullscreen()
+		get_viewport().set_input_as_handled()
+		return
+	if settings_open:
+		if event.is_action_pressed("pause"):
+			close_settings()
+			get_viewport().set_input_as_handled()
+		return
 	if title_open:
 		return
 	if dialogue_active:
@@ -645,40 +665,108 @@ func show_title() -> void:
 	keepsake_box.visible = false
 	prompt.text = ""
 	crosshair.visible = false
+	help_label.visible = false
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-	var buttons := title_screen.find_child("Buttons", true, false)
+	fade.color.a = 0.0
+	_title_menu()
+
+
+func _title_buttons() -> VBoxContainer:
+	var buttons := title_screen.find_child("Buttons", true, false) as VBoxContainer
 	for c in buttons.get_children():
+		buttons.remove_child(c)
 		c.queue_free()
+	return buttons
+
+
+func _title_menu() -> void:
+	var buttons := _title_buttons()
 	var first: Button = null
-	if Game.has_save():
-		first = _button(buttons, "continue", _continue_game)
-	var b := _button(buttons, "sleep", _new_game)
+	var latest := Game.latest_slot()
+	if latest > 0:
+		first = _button(buttons, "continue", func() -> void: _continue_game(latest))
+	var b := _button(buttons, "new dream", func() -> void: _slot_picker("new"))
 	if first == null:
 		first = b
+	if latest > 0:
+		_button(buttons, "load a dream", func() -> void: _slot_picker("load"))
+	_button(buttons, "settings", func() -> void: open_settings(_title_menu))
 	if not OS.has_feature("web"):
 		_button(buttons, "quit", func() -> void: get_tree().quit())
-	fade.color.a = 0.0
 	first.call_deferred("grab_focus")
+
+
+## Three slots. A new dream goes into an empty one, or asks before it takes a
+## used one; loading lists the ones that are used.
+func _slot_picker(mode: String) -> void:
+	var buttons := _title_buttons()
+	var first: Button = null
+	for i in range(1, Game.SLOTS + 1):
+		var summary := Game.slot_summary(i)
+		var used := not summary.is_empty()
+		if mode == "load" and not used:
+			continue
+		var text := "slot %d — %s" % [i, _slot_text(summary)]
+		var slot_i := i
+		var cb: Callable
+		if mode == "load":
+			cb = func() -> void: _continue_game(slot_i)
+		elif used:
+			cb = func() -> void: _confirm_overwrite(slot_i)
+		else:
+			cb = func() -> void: _new_game(slot_i)
+		var b := _button(buttons, text, cb)
+		if first == null:
+			first = b
+	var back := _button(buttons, "back", _title_menu)
+	if first == null:
+		first = back
+	first.call_deferred("grab_focus")
+
+
+func _confirm_overwrite(slot_i: int) -> void:
+	var buttons := _title_buttons()
+	var l := _label(buttons, "slot %d holds a dream. forget it?" % slot_i, 22, "body", Color(0.75, 0.6, 0.5))
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_button(buttons, "keep it", func() -> void: _slot_picker("new"))
+	var yes := _button(buttons, "forget it and dream again", func() -> void: _new_game(slot_i))
+	yes.call_deferred("grab_focus")
+
+
+static func _slot_text(summary: Dictionary) -> String:
+	if summary.is_empty():
+		return "empty"
+	var area := String(summary.get("area", ""))
+	var where := String(AreaRegistry.info(area).get("name", area)) if AreaRegistry.has(area) else "asleep"
+	return "%s · %d keepsake%s · %s" % [where, int(summary.keepsakes), "" if int(summary.keepsakes) == 1 else "s", _fmt_time(float(summary.playtime))]
 
 
 func hide_title() -> void:
 	title_open = false
 	title_screen.visible = false
 	crosshair.visible = true
+	help_label.visible = true
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	_refresh_keepsake()
 
 
-func _new_game() -> void:
-	Game.new_game()
+func _leave_title() -> void:
+	var main := get_parent()
+	if main and main.has_method("tour_stop"):
+		await main.tour_stop()
 	hide_title()
+
+
+func _new_game(slot_i: int = 0) -> void:
+	await _leave_title()
+	Game.new_game(slot_i if slot_i >= 1 else maxi(1, Game.first_free_slot()))
 	fade.color = Color(1, 1, 1, 1)
 	World.travel(AreaRegistry.STARTING_AREA, AreaRegistry.STARTING_SPAWN, {"color": Color.WHITE, "duration": 2.2})
 
 
-func _continue_game() -> void:
-	var d := Game.load_save()
-	hide_title()
+func _continue_game(slot_i: int = 0) -> void:
+	await _leave_title()
+	var d := Game.load_save(slot_i)
 	fade.color = Color(0, 0, 0, 1)
 	var area := String(d.get("area", AreaRegistry.STARTING_AREA))
 	var spawn := String(d.get("spawn", AreaRegistry.STARTING_SPAWN))
@@ -686,3 +774,87 @@ func _continue_game() -> void:
 		area = AreaRegistry.STARTING_AREA
 		spawn = AreaRegistry.STARTING_SPAWN
 	World.travel(area, spawn, {"duration": 1.2})
+
+
+# --- settings ---------------------------------------------------------------
+
+func _build_settings(root: Node) -> void:
+	settings_panel = PanelContainer.new()
+	settings_panel.set_anchors_preset(Control.PRESET_CENTER)
+	settings_panel.offset_left = -300
+	settings_panel.offset_right = 300
+	settings_panel.offset_top = -280
+	settings_panel.offset_bottom = 280
+	settings_panel.visible = false
+	root.add_child(settings_panel)
+	var v := VBoxContainer.new()
+	v.name = "Rows"
+	v.alignment = BoxContainer.ALIGNMENT_CENTER
+	settings_panel.add_child(v)
+
+
+func _settings_rows() -> VBoxContainer:
+	var v := settings_panel.get_node("Rows") as VBoxContainer
+	for c in v.get_children():
+		v.remove_child(c)
+		c.queue_free()
+	return v
+
+
+func _slider(parent: Node, text: String, key: String, lo: float, hi: float, step: float) -> HSlider:
+	var row := HBoxContainer.new()
+	parent.add_child(row)
+	var l := _label(row, text, 22, "body", Color(0.8, 0.76, 0.66))
+	l.custom_minimum_size = Vector2(230, 0)
+	var sl := HSlider.new()
+	sl.min_value = lo
+	sl.max_value = hi
+	sl.step = step
+	sl.value = float(Settings.get_value(key))
+	sl.custom_minimum_size = Vector2(260, 24)
+	sl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sl.focus_mode = Control.FOCUS_ALL
+	sl.value_changed.connect(func(val: float) -> void:
+		Settings.set_value(key, int(val) if step >= 1.0 else val))
+	row.add_child(sl)
+	return sl
+
+
+func open_settings(back: Callable) -> void:
+	_settings_back = back
+	settings_open = true
+	pause_menu.visible = false
+	var v := _settings_rows()
+	var t := _label(v, "settings", 56, "title", Color(0.93, 0.88, 0.72))
+	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var h := _label(v, "how much of the dream is the picture", 20, "body", Color(0.5, 0.48, 0.42))
+	h.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var first := _slider(v, "pixel dither", "dither", 0.0, 1.0, 0.05)
+	_slider(v, "vertex wobble", "wobble", 0.0, 1.0, 0.05)
+	_slider(v, "texture warp", "warp", 0.0, 1.0, 0.05)
+	_slider(v, "pixel size", "pixel", 1.0, 4.0, 1.0)
+	_slider(v, "mouse speed", "mouse", 0.3, 2.5, 0.1)
+	_slider(v, "volume", "volume", 0.0, 1.0, 0.05)
+	var fs := CheckButton.new()
+	fs.text = "fullscreen  (F11)"
+	fs.button_pressed = Settings.is_fullscreen() if DisplayServer.get_name() != "headless" else bool(Settings.get_value("fullscreen"))
+	fs.toggled.connect(func(on: bool) -> void:
+		Settings.values["fullscreen"] = on
+		Settings.set_fullscreen(on, true)
+		Settings.save())
+	v.add_child(fs)
+	_button(v, "as it was dreamt", func() -> void:
+		Settings.reset()
+		open_settings(_settings_back))
+	_button(v, "back", close_settings)
+	if title_open:
+		_title_buttons()
+	settings_panel.visible = true
+	first.call_deferred("grab_focus")
+
+
+func close_settings() -> void:
+	settings_open = false
+	settings_panel.visible = false
+	if _settings_back.is_valid():
+		_settings_back.call()
