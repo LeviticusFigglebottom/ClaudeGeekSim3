@@ -48,10 +48,12 @@ func travel(area_id: String, spawn_id: String = "default", opts: Dictionary = {}
 	travel_started.emit(area_id, spawn_id)
 	var color: Color = opts.get("color", Color.BLACK)
 	var dur: float = float(opts.get("duration", 0.7))
+	var out_dur: float = float(opts.get("out_duration", dur))
+	var in_dur: float = float(opts.get("in_duration", dur))
 	if Game.player and Game.player.has_method("set_frozen"):
 		Game.player.set_frozen(true)
 	if hud and not quiet:
-		await hud.fade_out(color, dur)
+		await hud.fade_out(color, out_dur)
 	_unload_current()
 	var scene_path: String = info(area_id).scene
 	var scene: PackedScene = load(scene_path) as PackedScene if ResourceLoader.exists(scene_path) else null
@@ -84,7 +86,7 @@ func travel(area_id: String, spawn_id: String = "default", opts: Dictionary = {}
 	if Game.player and Game.player.has_method("set_frozen"):
 		Game.player.set_frozen(false)
 	if hud and not quiet:
-		hud.fade_in(dur)
+		hud.fade_in(in_dur)
 		if not opts.get("silent", false):
 			hud.show_area_name(area_name(area_id), String(info(area_id).get("subtitle", "")))
 	traveling = false

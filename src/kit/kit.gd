@@ -702,6 +702,20 @@ static func trigger(parent: Node, pos: Vector3, size: Vector3, on_enter: Callabl
 	parent.add_child(a)
 	var once := bool(opts.get("once", false))
 	var born := Time.get_ticks_msec()
+	if bool(opts.get("continuous", false)):
+		# fire for the player every tenth of a second while they are inside,
+		# not only on the way in (the backwards door needs to see you turn round)
+		var t := Timer.new()
+		t.wait_time = 0.1
+		t.autostart = true
+		a.add_child(t)
+		t.timeout.connect(func() -> void:
+			if Time.get_ticks_msec() - born < 400:
+				return
+			for body in a.get_overlapping_bodies():
+				if body is Player:
+					on_enter.call(body))
+		return a
 	a.body_entered.connect(func(body: Node3D) -> void:
 		if body is Player:
 			if Time.get_ticks_msec() - born < 400:

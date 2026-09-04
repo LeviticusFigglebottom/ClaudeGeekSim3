@@ -197,7 +197,7 @@ func _hall() -> void:
 	# the backwards door (always): a door that only opens to people walking backwards into it
 	Kit.sign(self, "wood/door_dark", _m(9.53, 6.25, 1.1), _yaw(-90.0), Vector2(0.9, 2.1), {"tint": Color(0.6, 0.55, 0.5)})
 	Kit.label(self, "?", _m(9.54, 6.25, 1.95), _yaw(-90.0), 32, Color(0.5, 0.45, 0.4), "display", {"pixel_size": 0.01})
-	var back_trig := Kit.trigger(self, _m(9.95, 6.25, 1.0), Vector3(0.8, 2.2, 1.4), _on_backwards, {"name": "BackwardsTrigger"})
+	var back_trig := Kit.trigger(self, _m(10.1, 6.25, 1.0), Vector3(1.2, 2.2, 1.6), _on_backwards, {"name": "BackwardsTrigger", "continuous": true})
 	back_trig.set_meta("dest", _m(8.0, 6.25))
 	Readable.create(self, _m(9.6, 6.25, 1.1), _yaw(-90.0), "A door with no handle", ["A door with no handle on this side.", "There is no handle on the other side either. You get the feeling it opens for people who are not looking at it."], {"name": "BackDoorRead", "size": Vector3(0.3, 2.0, 1.0)})
 	# the hidden room
@@ -434,8 +434,12 @@ func _big_bathroom(bath_door: Vector3) -> void:
 	Readable.create(self, e + Vector3(2, 1.2, 0), 0.0, "Count the tiles", ["You count the tiles along the long wall.", "You stop at four hundred. The wall does not."], {"name": "BigBathCount", "size": Vector3(1.0, 1.0, 1.0), "note_key": "bath_400", "note_title": "Four hundred tiles", "note_text": "The bathroom's long wall had forty-one tiles. Now you stop counting at four hundred. The bathroom got bigger again."})
 	Usher.spawn(self, origin + Vector3(14, 0, 4), {"appear_delay": 2.0})
 	# walking north through the bathroom doorway lands you in the huge bathroom; and back
-	SeamlessTeleport.create(self, bath_door + Vector3(0, 0, -0.1), _yaw(0.0), e + Vector3(0, 0, 0.6), 0.0, Vector3(1.2, 2.4, 0.5), {"name": "BigBathIn"})
-	SeamlessTeleport.create(self, e + Vector3(0, 0, 0.9), 180.0, bath_door + Vector3(0, 0, 0.5), _yaw(180.0), Vector3(1.6, 2.4, 0.5), {"name": "BigBathOut"})
+	SeamlessTeleport.create(self, bath_door + Vector3(0, 0, -0.1), _yaw(0.0), e + Vector3(0, 0, -1.6), 0.0, Vector3(1.2, 2.4, 0.5), {"name": "BigBathIn"})
+	# the way back: a door in the south wall, and the seam just inside it
+	Props.place(self, "door_white", e + Vector3(0, 0, 0.94), 0.0, 1.0, {"collision": "none"})
+	Kit.label(self, "out", e + Vector3(0, 2.35, 0.9), 0.0, 28, Color(0.5, 0.6, 0.65), "body", {"pixel_size": 0.012})
+	Kit.light(self, e + Vector3(0, 2.4, 0.2), Color(0.9, 1.0, 1.0), 0.9, 5.0)
+	SeamlessTeleport.create(self, e + Vector3(0, 0, 0.35), 180.0, bath_door + Vector3(0, 0, 0.5), _yaw(180.0), Vector3(2.0, 2.4, 0.8), {"name": "BigBathOut"})
 
 
 func _between_walls(hole: Vector3) -> void:
@@ -479,6 +483,12 @@ func _attic(hatch_below: Vector3) -> void:
 	Readable.create(self, win, 0.0, "Look out of the attic window", ["From the attic window you can see the field, and the sky above the field.", "The sky has a light fitting in it. It is switched off. Somebody is being careful about the bill."], {"name": "AtticWindow", "size": Vector3(1.0, 1.0, 0.4), "note_key": "sky_fitting", "note_title": "The light fitting in the sky", "note_text": "From the attic you saw it: the sky over the field has a light fitting in it, switched off."})
 	var hatch_it := Interactable.make(self, hatch + Vector3(0, -0.3, 0), Vector3(1.2, 0.5, 1.2), "The attic hatch", _on_hatch, {"name": "AtticHatch"})
 	hatch_it.set_meta("attic_pos", attic_floor + Vector3(0, 0.1, 0.5))
+	# and from above, the same hatch, the other way
+	var below := hatch_below + Vector3(0, 0.1, 1.2)
+	Interactable.make(self, attic_floor + Vector3(0, 0.15, 0), Vector3(1.4, 0.4, 1.4), "Climb back down through the hatch", func(p: Node, _it: Node) -> void:
+		if p is Player:
+			Audio.sfx("creak", attic_floor, -6.0)
+			(p as Player).global_position = below, {"name": "AtticHatchDown"})
 	if Game.has_flag("photo_returned"):
 		Kit.stairs(self, hatch_below + Vector3(0, 0, 1.2), 0.0, 0.8, 9, 0.33, 0.3, "wood/planks_grey", {"name": "AtticLadder"})
 
@@ -534,9 +544,9 @@ func _on_backwards(p: Node) -> void:
 		player.global_position = dest + Vector3(0, 0.1, 0)
 		Audio.sfx("door_creak_long", dest, -6.0)
 		Game.bump("backwards_entries")
-	elif Game.count("backwards_hint") == 0:
+	elif v.length() > 0.5 and Game.count("backwards_hint") < 2:
 		Game.bump("backwards_hint")
-		Game.toast.emit("The door does not open for people facing it.")
+		Game.toast.emit("The door does not open for people facing it. Turn your back on it and step back.")
 
 
 func _on_backwards_out(p: Node) -> void:

@@ -763,7 +763,7 @@ func _new_game(slot_i: int = 0) -> void:
 	await _leave_title()
 	Game.new_game(slot_i if slot_i >= 1 else maxi(1, Game.first_free_slot()))
 	fade.color = Color(1, 1, 1, 1)
-	World.travel(AreaRegistry.STARTING_AREA, AreaRegistry.STARTING_SPAWN, {"color": Color.WHITE, "duration": 2.2})
+	World.travel(AreaRegistry.STARTING_AREA, AreaRegistry.STARTING_SPAWN, {"color": Color.WHITE, "out_duration": 0.05, "in_duration": 1.6})
 
 
 func _continue_game(slot_i: int = 0) -> void:
