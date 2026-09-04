@@ -60,6 +60,8 @@ func _sky_and_cloud() -> void:
 		var a := k * 61.0 + 20.0
 		var rr := 42.0 + (k % 6) * 11.0
 		var p := Vector3(14, 0, -55) + Kit.polar(rr, a)
+		if _near_walkway(p):
+			continue
 		var top := 4.0 + (k % 7) * 4.0 - 8.0
 		Kit.cylinder(self, p + Vector3(0, -80, 0), 2.0 + (k % 3) * 0.6, 80.0 + top - 0.4, "nature/stalk", {"segments": 8, "tile": 3.0, "solid": false, "tint": Color(0.85, 0.95, 0.85)})
 		Kit.cylinder(self, p + Vector3(0, top - 0.4, 0), 4.0 + (k % 3), 0.4, "nature/hedge", {"segments": 10, "tile": 1.5, "solid": false, "tint": Color(0.8, 1.0, 0.75)})
@@ -100,6 +102,25 @@ func _stalks() -> void:
 			_fence(c + Kit.polar(TOP_R - 0.2, a, 1.5), Vector3(2.2, 3.0, 0.12), -(a + 90.0))
 
 
+## True when a point is within reach of a stalk top or a branch of the way to the keep.
+static func _near_walkway(p: Vector3) -> bool:
+	var pts: Array = STALKS.duplicate()
+	pts.append(Vector3(0, KEEP_Y, -76.0))
+	for i in pts.size():
+		var c: Vector3 = pts[i]
+		if Vector2(p.x - c.x, p.z - c.z).length() < TOP_R + 9.0:
+			return true
+		if i < pts.size() - 1:
+			var d: Vector3 = pts[i + 1]
+			var a2 := Vector2(c.x, c.z)
+			var b2 := Vector2(d.x, d.z)
+			var q := Vector2(p.x, p.z)
+			var t := clampf((q - a2).dot(b2 - a2) / maxf((b2 - a2).length_squared(), 0.001), 0.0, 1.0)
+			if q.distance_to(a2.lerp(b2, t)) < 9.0:
+				return true
+	return false
+
+
 static func _angle_to(from: Vector3, to: Vector3) -> float:
 	return rad_to_deg(atan2(to.z - from.z, to.x - from.x))
 
@@ -122,29 +143,43 @@ func _bridges() -> void:
 	_bridge(e, gate + Vector3(0, 0, 0.6), true)
 
 
+## A branch grown from one stalk to the next: a thick limb you walk along the
+## top of, its edges raised into a lip, leaves hanging off both sides, and a
+## wall you cannot see above the lip. It starts well inside one leaf and ends
+## well inside the next, so there is no seam to fall through.
 func _bridge(a: Vector3, b: Vector3, to_gate: bool = false) -> void:
 	var flat := b - a
 	flat.y = 0.0
 	var dir := flat.normalized()
-	# the leaf starts a hand outside the rim of the top, never in its plane
-	var p0 := a + dir * (TOP_R + 0.05)
-	var p1 := b - (dir * (TOP_R + 0.05) if not to_gate else Vector3.ZERO)
-	var run := (p1 - p0)
+	var right := Vector3(-dir.z, 0, dir.x)
+	var p0 := a + dir * (TOP_R - 1.6)
+	var p1 := b - (dir * (TOP_R - 1.6) if not to_gate else -dir * 0.8)
+	var run := p1 - p0
 	run.y = 0.0
 	var length := run.length()
 	var rise := b.y - a.y
 	var yaw := Kit.dir_to_yaw(dir)
-	Kit.ramp(self, p0, yaw, 2.2, length, rise, "nature/stalk", {"tile": 2.0, "tint": Color(0.8, 1.0, 0.75), "surface": "grass"})
-	# the leaf's edges curl up into rails, and there is a wall you cannot see above them
-	var right := Vector3(-dir.z, 0, dir.x)
-	var mid := (p0 + p1) * 0.5 + Vector3(0, rise * 0.5, 0)
-	var slope := Vector2(length, rise).length()
 	var pitch := rad_to_deg(atan2(rise, length))
+	var slope := Vector2(length, rise).length()
+	var thick := 1.0
+	var w := 3.2
+	# the limb: its top is the way; it sits a hair above the leaves it joins
+	var mid := (p0 + p1) * 0.5 + Vector3(0, rise * 0.5, 0)
+	Kit.box(self, mid + Vector3(0, 0.04 - thick * 0.5, 0), Vector3(w, thick, slope), "nature/stalk", {"rotation": Vector3(pitch, yaw, 0), "tint": Color(0.85, 1.0, 0.8), "tile": 1.5, "surface": "grass"})
 	for sx in [-1.0, 1.0]:
-		Kit.box(self, mid + right * (sx * 1.05) + Vector3(0, 0.5, 0), Vector3(0.14, 1.0, slope), "nature/stalk", {"rotation": Vector3(pitch, yaw, 0), "tint": Color(0.7, 0.9, 0.65), "tile": 2.0})
-		var f := Kit.blocker(self, Vector3.ZERO, Vector3(0.14, 3.2, slope))
-		f.position = mid + right * (sx * 1.05) + Vector3(0, 1.6, 0)
+		Kit.box(self, mid + right * (sx * (w * 0.5 - 0.15)) + Vector3(0, 0.2, 0), Vector3(0.3, 0.4, slope), "nature/hedge", {"rotation": Vector3(pitch, yaw, 0), "tint": Color(0.7, 0.95, 0.65), "tile": 1.2})
+		var f := Kit.blocker(self, Vector3.ZERO, Vector3(0.2, 3.2, slope))
+		f.position = mid + right * (sx * (w * 0.5 + 0.05)) + Vector3(0, 1.6, 0)
 		f.rotation_degrees = Vector3(pitch, yaw, 0)
+	# leaves and tendrils along it, hanging out over the drop
+	var n := int(length / 4.0)
+	for i in n:
+		var t := (i + 0.5) / n
+		var p := p0.lerp(p1, t) + Vector3(0, rise * t, 0)
+		var sx := 1.0 if i % 2 == 0 else -1.0
+		Props.place(self, "beanstalk_leaf", p + right * (sx * (w * 0.5 - 0.2)) + Vector3(0, -0.1, 0), yaw + sx * 80.0 + (i * 13.0), 1.1 + (i % 3) * 0.15, {"collision": "none"})
+		if i % 2 == 1:
+			Kit.cylinder(self, p + right * (-sx * (w * 0.5 + 0.1)) + Vector3(0, -1.2, 0), 0.12, 1.3, "nature/stalk", {"segments": 6, "solid": false, "top_radius": 0.05})
 	Kit.light(self, mid + Vector3(0, 2.5, 0), PINK, 0.6, 10.0)
 
 

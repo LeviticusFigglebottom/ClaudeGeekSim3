@@ -289,21 +289,28 @@ func _on_plinth(_p: Node, _it: Node) -> void:
 	if World.hud == null:
 		return
 	if Game.has_flag("crypt_candle_placed"):
-		await World.hud.say("", ["The black candle stands on the plinth, burning at both ends and the middle, and not getting any shorter.", "The three niches are empty now. The fourth still has its chair."])
+		await World.hud.say("", ["Four black candles stand on the plinth, burning at both ends and the middle, and not getting any shorter.", "The three niches are empty now. The fourth still has its chair."])
 		return
-	if not Game.has_item("candle_stub"):
-		await World.hud.say("", ["A plinth with a ring of old wax on it, where a candle stood for a long time and was taken.", "The three niches with bones in them face it, the way an audience faces a stage that has not been used lately."])
+	var n := Game.item_count("candle_stub")
+	if n < 4:
+		var lines: Array = ["A plinth with a ring of old wax on it, where a candle stood for a long time and was taken."]
+		if n == 0:
+			lines.append("The three niches with bones in them face it, the way an audience faces a stage that has not been used lately.")
+		else:
+			lines.append("You have %d. You set %s down and the niches do not move. They are waiting for four." % [n, "it" if n == 1 else "them"])
+			lines.append("You pick %s up again. Somewhere there is a forge, a chest, and a wall a mouse could get into." % ("it" if n == 1 else "them"))
+		await World.hud.say("", lines)
 		return
-	Game.take_item("candle_stub")
+	Game.take_item("candle_stub", 4)
 	Game.set_flag("crypt_candle_placed", true)
 	await World.hud.say("", [
-		"You stand the black stub in the ring of wax it left. It lights itself, at both ends and the middle, which is not how candles work.",
-		"The three names on the stones outside go quiet in a way you can feel through the floor.",
+		"You stand the four black stubs in a ring in the wax. They light themselves, at both ends and the middle, which is not how candles work.",
+		"The four names on the stones outside go quiet in a way you can feel through the floor.",
 		"In the niches the bones stir, and settle, and slide forward off their shelves into your hands, all three, light as kindling. The fourth niche does not move. The chair in it is still facing out.",
 	])
 	Game.gain_item("bones")
 	Audio.sfx("whisper", null, -6.0)
-	Game.note("crypt_bones", "The candle and the bones", "The black candle from the forge went back on the plinth in the crypt of the four, and the three niches gave up their bones. Bone that light wants breaking. There is an anvil in the forge.")
+	Game.note("crypt_bones", "The candles and the bones", "All four black candles went back on the plinth in the crypt of the four, and the three niches gave up their bones. Bone that light wants breaking. There is an anvil in the forge.")
 
 
 # --- the chapel of the four names --------------------------------------------------------
@@ -374,13 +381,28 @@ func _chapel() -> void:
 	# the crypt beyond
 	var crypt := _c(9, 19)
 	Kit.box(self, crypt + Vector3(0, 0.3, 0), Vector3(1.0, 0.6, 1.0), "stone/blocks_dark", {"tile": 1.0})
-	# the plinth: the black candle from the forge was taken from here and is
-	# owed back; put on it, the three niches give up their bones
+	# the plinth: one black candle stands on it, the fourth name's, and it can
+	# be taken. There are three more like it in the world. Brought back, all
+	# four, the three niches give up their bones
 	if Game.has_flag("crypt_candle_placed"):
-		Props.place(self, "candle_cluster", crypt + Vector3(0, 0.6, 0), 0.0, 0.5, {"collision": "none", "tint": Color(0.15, 0.12, 0.14)})
-		Kit.light(self, crypt + Vector3(0, 1.0, 0), Color(0.6, 0.4, 0.9), 0.7, 4.0)
-	Interactable.make(self, crypt + Vector3(0, 0.75, 0), Vector3(1.2, 1.0, 1.2), "The plinth", _on_plinth, {"name": "CryptPlinth"})
-	Puzzle.declare(self, "crypt_bones", "crypt_candle_placed", ["flag:ossuary_names", "item:candle_stub"], "put the black candle from the forge back on the plinth in the crypt of the four", {"item": "bones"})
+		for i in 4:
+			Props.place(self, "candle_cluster", crypt + Kit.polar(0.28, i * 90.0 + 45.0, 0.6), i * 90.0, 0.45, {"collision": "none", "tint": Color(0.15, 0.12, 0.14)})
+		Kit.light(self, crypt + Vector3(0, 1.0, 0), Color(0.6, 0.4, 0.9), 0.9, 5.0)
+		Interactable.make(self, crypt + Vector3(0, 0.75, 0), Vector3(1.2, 1.0, 1.2), "The plinth", _on_plinth, {"name": "CryptPlinth"})
+	elif Game.has_flag("picked_crypt_candle"):
+		Interactable.make(self, crypt + Vector3(0, 0.75, 0), Vector3(1.2, 1.0, 1.2), "The plinth", _on_plinth, {"name": "CryptPlinth"})
+	else:
+		Pickup.create(self, crypt + Vector3(0, 0.6, 0), {"item": "candle_stub", "requires_flag": "ossuary_names", "key": "picked_crypt_candle", "name": "Pickup_candle_stub"})
+		# once it is taken the plinth is a place again, and says so
+		var said := [false]
+		Kit.trigger(self, crypt + Vector3(0, 1.0, 0), Vector3(3.0, 2.5, 3.0), func(_p: Node) -> void:
+			if said[0] or not Game.has_flag("picked_crypt_candle"):
+				return
+			said[0] = true
+			Interactable.make(self, crypt + Vector3(0, 0.75, 0), Vector3(1.2, 1.0, 1.2), "The plinth", _on_plinth, {"name": "CryptPlinth"})
+			Game.toast.emit("Four niches. One candle, and a ring of wax where it stood. The niches are counting.")
+			Game.note("crypt_count", "The niches are counting", "The candle on the plinth in the crypt of the four was the fourth name's. There are three more like it somewhere: black, burnt from both ends and the middle. The niches want all four back on the plinth."), {"name": "CryptCount", "continuous": true})
+	Puzzle.declare(self, "crypt_bones", "crypt_candle_placed", ["flag:ossuary_names", "item:candle_stub"], "bring all four black candles back to the plinth in the crypt of the four", {"item": "bones"})
 	Readable.create(self, crypt + Vector3(0, 0, -0.85), 180.0, "Read the crypt wall", [
 		"Four niches. Four names. Three of them have bones in.",
 		"The fourth niche is swept clean and there is a chair in it, facing out.",

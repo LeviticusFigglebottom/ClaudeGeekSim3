@@ -739,7 +739,20 @@ func _rumour() -> void:
 	elif Game.has_item("bones"):
 		lines = ["\"Bone that light wants breaking, and there's only one anvil I know of that would take it.\"", "\"Down in the forge. Mind the giant.\""]
 	elif Game.has_item("candle_stub"):
-		lines = ["\"A candle that burns at both ends was taken from somewhere, and the somewhere wants it back.\"", "\"Under the drowned city, past the four names, there's a plinth with a ring of wax on it. Light the four first or the gate won't have you.\""]
+		var have := Game.item_count("candle_stub")
+		lines = ["\"Candles that burn at both ends. There are four of them, they say, and they were all one candle once.\"", "\"Under the drowned city, past the four names, there's a plinth with a ring of wax on it. It wants all four. Light the names first or the gate won't have you.\""]
+		if have < 4:
+			var where: Array = []
+			if not Game.has_flag("picked_crypt_candle"):
+				where.append("one on the plinth itself")
+			if not Game.has_flag("furnace_maiden_opened"):
+				where.append("one in the forge, in the thing with the spikes")
+			if not Game.has_flag("picked_candle_castle"):
+				where.append("one in a chest in a keep")
+			if not Game.has_flag("picked_candle_house"):
+				where.append("one in a wall in a house, if you were small enough")
+			if not where.is_empty():
+				lines.append("\"You've %d. The rest: %s.\"" % [have, ", ".join(where)])
 	elif Game.has_flag("visited_kings_dream"):
 		lines = ["\"Under the hill, in the forge, there's an iron maiden with nobody in it.\"", "\"Open it anyway. The last one who did came out with a candle and a look on his face.\""]
 	elif Game.has_keepsake("wings") and Game.has_keepsake("hourglass"):

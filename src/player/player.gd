@@ -26,6 +26,7 @@ const MOUSE_SENS := 0.0021
 const WAKE_HOLD := 1.6
 const FALL_LIMIT := -90.0
 const STEP_DISTANCE := 2.2
+const STEP_UP := 0.42          # a riser this high is walked, not jumped
 
 const STAND_HEIGHT := 1.7
 const STAND_RADIUS := 0.35
@@ -235,6 +236,8 @@ func _physics_process(delta: float) -> void:
 			velocity.y = maxf(velocity.y - GLIDE_GRAVITY * delta, -GLIDE_MAX_FALL)
 		else:
 			velocity.y -= GRAVITY * delta
+	if on_floor and not noclip:
+		_step_up(delta)
 	move_and_slide()
 
 	_footsteps(delta, on_floor)
@@ -242,6 +245,46 @@ func _physics_process(delta: float) -> void:
 	_track_safe(delta, on_floor)
 	if global_position.y < FALL_LIMIT and not World.traveling:
 		World.fall_out()
+
+
+## Stairs: when the way ahead is blocked by a riser at shin height and is
+## clear a step higher, lift the body onto the step, so stairs are walked
+## and not jumped. Slopes are left to move_and_slide.
+func _step_up(delta: float) -> void:
+	var horiz := Vector3(velocity.x, 0.0, velocity.z)
+	if horiz.length() < 0.3:
+		return
+	var motion := horiz * delta
+	var xf := global_transform
+	var fwd := PhysicsTestMotionParameters3D.new()
+	fwd.from = xf
+	fwd.motion = motion
+	var fres := PhysicsTestMotionResult3D.new()
+	if not PhysicsServer3D.body_test_motion(get_rid(), fwd, fres):
+		return
+	if fres.get_collision_normal().y > 0.35:
+		return
+	var h := STEP_UP * (0.4 if Game.small else 1.0)
+	if test_move(xf, Vector3(0, h, 0)):
+		return
+	var lifted := xf
+	lifted.origin += Vector3(0, h, 0)
+	if test_move(lifted, motion):
+		return
+	lifted.origin += motion
+	var down := PhysicsTestMotionParameters3D.new()
+	down.from = lifted
+	down.motion = Vector3(0, -h, 0)
+	var dres := PhysicsTestMotionResult3D.new()
+	if not PhysicsServer3D.body_test_motion(get_rid(), down, dres):
+		return
+	if dres.get_collision_normal().y < 0.7:
+		return
+	var rise: float = h + dres.get_travel().y
+	if rise < 0.02:
+		return
+	global_position += Vector3(0, rise + 0.01, 0)
+	velocity.y = 0.0
 
 
 func _noclip_move(delta: float) -> void:

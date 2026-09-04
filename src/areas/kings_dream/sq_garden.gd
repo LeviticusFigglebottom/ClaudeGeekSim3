@@ -467,7 +467,7 @@ static func _beanstalk(area: AreaBase, root: Node3D) -> void:
 		var l1 := HILL + Kit.polar(r, a1, HILL_TOP + (i + 1) * rise)
 		var d := l1 - l0
 		d.y = 0.0
-		var steps := 9
+		var steps := 12
 		Kit.stairs(root, l0, Kit.dir_to_yaw(d.normalized()), 1.6, steps, rise / steps, d.length() / steps, "nature/hedge", {"tint": Color(0.75, 1.0, 0.7) if i % 2 == 0 else Color(0.6, 0.9, 0.55), "tile": 1.2, "name": "StalkFlight%d" % i})
 		Kit.floor(root, l0 + Vector3(0, 0.03, 0), Vector2(1.9, 1.9), "nature/hedge", {"tint": Color(0.7, 0.95, 0.65), "tile": 1.2})
 		Props.place(root, "beanstalk_leaf", HILL + Kit.polar(2.0, a0 + 100.0, HILL_TOP + i * rise + 1.2), -(a0 + 100.0) - 90.0, 1.0 + (i % 3) * 0.2, {"collision": "none"})

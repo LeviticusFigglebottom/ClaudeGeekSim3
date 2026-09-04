@@ -6,9 +6,11 @@ he has been told"*. Built in `src/areas/kings_mind/kings_mind.gd`.
 ## Getting there
 
 1. In the Ossuary, light the candles for the four names (`ossuary_names`)
-   so the crypt's gate opens. The Candle Stub from the iron maiden in the
-   Furnace goes back on the plinth in the crypt; the three niches give up
-   their **Bones** (flag `crypt_candle_placed`, item `bones`).
+   so the crypt's gate opens. On the plinth in the crypt is one black Candle
+   Stub; there are three more (the iron maiden in the Furnace, the chest in
+   the Castle, the wall room in the Nowhere House). All four back on the
+   plinth and the three niches give up their **Bones** (flag
+   `crypt_candle_placed`, item `bones`).
 2. Strike the anvil in the Furnace carrying the bones: they break into
    **Bonemeal** (flag `bonemeal_made`, item `bonemeal`).
 3. On top of the pink tower in the Garden of Live Flowers (the King's Dream,
