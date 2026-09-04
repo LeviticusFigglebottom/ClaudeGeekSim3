@@ -877,8 +877,13 @@ static func mouse_gap(parent: Node, pos: Vector3, yaw_deg: float, size: Vector2 
 	root.rotation.y = deg_to_rad(yaw_deg)
 	root.name = "MouseGap"
 	parent.add_child(root)
+	# the hole looks the size it is: the arch of the skirting prop is scaled to
+	# the opening's width, and a dark box fills the wall's thickness behind it
+	# (front and sides only, so from inside the crawl you can see out)
+	var wall_depth := float(opts.get("wall_depth", 0.5))
+	box(root, Vector3(0, size.y * 0.5, wall_depth * 0.5 - 0.03), Vector3(size.x, size.y, wall_depth), "", {"tint": Color(0.02, 0.02, 0.03), "unshaded": true, "solid": false, "faces": ["nz", "px", "nx", "py", "ny"]})
 	if Props.exists("skirting_hole"):
-		Props.place(root, "skirting_hole", Vector3.ZERO, 0.0, size.x / 0.3, {"collision": "none"})
+		Props.place(root, "skirting_hole", Vector3.ZERO, 0.0, size.x / 0.14, {"collision": "none"})
 	else:
 		var q := QuadMesh.new()
 		q.size = size

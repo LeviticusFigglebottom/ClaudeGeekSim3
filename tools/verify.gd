@@ -97,38 +97,52 @@ func _check_registry_and_build() -> void:
 	add_child(holder)
 	World.area_root = holder
 	for id in AreaRegistry.AREAS:
-		var info: Dictionary = AreaRegistry.AREAS[id]
-		var path := String(info.get("scene", ""))
-		if not ResourceLoader.exists(path):
-			fail("area '%s': scene missing: %s" % [id, path])
-			continue
-		var ps := load(path) as PackedScene
-		if ps == null:
-			fail("area '%s': scene does not load" % id)
-			continue
-		var t0 := Time.get_ticks_msec()
-		var inst := ps.instantiate()
-		if not (inst is AreaBase):
-			fail("area '%s': root is not an AreaBase" % id)
-			inst.free()
-			continue
-		MapBuilder.reset_registry()
-		Kit.reset_gaps()
-		holder.add_child(inst)
-		var area: AreaBase = inst
-		var entry := {"spawns": area.spawns.keys(), "doors": [], "pickups": [], "puzzles": [], "readables": 0, "npcs": 0, "hidden": bool(info.get("hidden", false)), "can_wake": area.can_wake}
-		_collect(area, entry)
+		await _build_and_check(holder, id, 1)
+		# areas that are a different place on a return visit are built as those too
+		for n in EXTRA_VISITS.get(id, []):
+			await _build_and_check(holder, id, int(n))
+
+
+## Areas whose later visits build different geometry, and which visits to check.
+const EXTRA_VISITS := {"house": [2, 3], "kings_dream": [2, 3], "sea": [2], "castle": [2]}
+
+
+func _build_and_check(holder: Node3D, id: String, visit: int) -> void:
+	Game.visits[id] = visit - 1
+	var info: Dictionary = AreaRegistry.AREAS[id]
+	var path := String(info.get("scene", ""))
+	if not ResourceLoader.exists(path):
+		fail("area '%s': scene missing: %s" % [id, path])
+		return
+	var ps := load(path) as PackedScene
+	if ps == null:
+		fail("area '%s': scene does not load" % id)
+		return
+	var t0 := Time.get_ticks_msec()
+	var inst := ps.instantiate()
+	if not (inst is AreaBase):
+		fail("area '%s': root is not an AreaBase" % id)
+		inst.free()
+		return
+	MapBuilder.reset_registry()
+	Kit.reset_gaps()
+	holder.add_child(inst)
+	var area: AreaBase = inst
+	var entry := {"spawns": area.spawns.keys(), "doors": [], "pickups": [], "puzzles": [], "readables": 0, "npcs": 0, "hidden": bool(info.get("hidden", false)), "can_wake": area.can_wake}
+	_collect(area, entry)
+	if visit == 1:
 		graph[id] = entry
-		if not area.spawns.has("default"):
-			fail("area '%s' has no 'default' spawn" % id)
-		var dt := Time.get_ticks_msec() - t0
-		ok("area %-12s built in %4d ms: %2d spawns, %2d doors, %2d pickups, %2d puzzles, %2d readables, %2d npcs" % [id, dt, entry.spawns.size(), entry.doors.size(), entry.pickups.size(), entry.puzzles.size(), entry.readables, entry.npcs])
-		# let the physics server register the geometry, then probe it
-		await get_tree().physics_frame
-		await get_tree().physics_frame
-		_check_physics(id, area)
-		holder.remove_child(area)
-		area.free()
+	if not area.spawns.has("default"):
+		fail("area '%s' has no 'default' spawn" % id)
+	var dt := Time.get_ticks_msec() - t0
+	var tag := id if visit == 1 else "%s (visit %d)" % [id, visit]
+	ok("area %-12s built in %4d ms: %2d spawns, %2d doors, %2d pickups, %2d puzzles, %2d readables, %2d npcs" % [tag, dt, entry.spawns.size(), entry.doors.size(), entry.pickups.size(), entry.puzzles.size(), entry.readables, entry.npcs])
+	# let the physics server register the geometry, then probe it
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	_check_physics(id, area)
+	holder.remove_child(area)
+	area.free()
 
 
 ## Physical sanity: every spawn point must fit a standing player, must have

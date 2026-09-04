@@ -44,7 +44,7 @@ func build() -> void:
 	add_spawn("field", _m(11.0, 16.5, 0.1), _yaw(0.0))
 	add_spawn("default", _m(11.0, 16.5, 0.1), _yaw(0.0))
 	add_spawn("porch", _m(11.0, 10.2, 0.1), _yaw(0.0))
-	Dog.maybe_spawn(self, _m(13.0, 9.6, 0.15), true)
+	Dog.maybe_spawn(self, _m(11.0, 8.2, 0.15), true)
 	if visit_count >= 2 and not Game.has_note("house_mirrored"):
 		Game.note("house_mirrored", "The house, the other way round", "Everything is where it was, on the wrong side. Hot is on the left now. Nobody moved the taps.")
 
@@ -128,9 +128,11 @@ func _field() -> void:
 		var dz := maxf(0.0, absf(z) - 13.0)
 		var edge := clampf(Vector2(dx, dz).length() / 6.0, 0.0, 1.0)
 		var h := sin(x * 0.11) * 0.25 + cos(z * 0.09 + x * 0.03) * 0.3
-		return lerpf(-0.08, h - 0.05, edge)
+		# hollows only: the corridor of bedrooms and the enormous bathroom stand
+		# on this field further out, and nothing may rise through their floors
+		return lerpf(-0.14, minf(h - 0.05, -0.14), edge)
 	Kit.terrain(self, Vector3(0, -0.02, 0), Vector2(220, 220), 44, noise_fn, "nature/grass_dark", {"tile": 3.0})
-	Kit.floor(self, Vector3(0, 0.0, 0), Vector2(26, 24), "ground/dirt", {"tile": 3.0})
+	Kit.floor(self, Vector3(0, -0.06, 0), Vector2(26, 24), "ground/dirt", {"tile": 3.0})
 	Kit.scatter(40, rng, Vector3.ZERO, Vector2(100, 100), func(_i: int, p: Vector3) -> void:
 		if p.length() < 20.0 or p.distance_to(Vector3(-3, 0, 24)) < 3.0:
 			# nothing solid lands on the spawn beside the lone door
@@ -198,7 +200,7 @@ func _hall() -> void:
 	# the backwards door (always): a door that only opens to people walking backwards into it
 	Kit.sign(self, "wood/door_dark", _m(9.53, 6.25, 1.1), _yaw(-90.0), Vector2(0.9, 2.1), {"tint": Color(0.6, 0.55, 0.5)})
 	Kit.label(self, "?", _m(9.54, 6.25, 1.95), _yaw(-90.0), 32, Color(0.5, 0.45, 0.4), "display", {"pixel_size": 0.01})
-	var back_trig := Kit.trigger(self, _m(10.1, 6.25, 1.0), Vector3(1.2, 2.2, 1.6), _on_backwards, {"name": "BackwardsTrigger", "continuous": true})
+	var back_trig := Kit.trigger(self, _m(10.2, 6.25, 1.0), Vector3(1.4, 2.2, 1.8), _on_backwards, {"name": "BackwardsTrigger", "continuous": true})
 	back_trig.set_meta("dest", _m(8.0, 6.25))
 	Readable.create(self, _m(9.6, 6.25, 1.1), _yaw(-90.0), "A door with no handle", ["A door with no handle on this side.", "There is no handle on the other side either. You get the feeling it opens for people who are not looking at it."], {"name": "BackDoorRead", "size": Vector3(0.3, 2.0, 1.0)})
 	# the hidden room
@@ -233,7 +235,7 @@ func _living() -> void:
 	Props.place(self, "bookshelf", _m(0.72, 3.4), _yaw(-90.0), 1.0)
 	_journal(_m(1.1, 3.4, 1.2))
 	Props.place(self, "sofa", _m(3.6, 4.2), _yaw(0.0), 1.0)
-	Props.place(self, "rug_house", _m(3.6, 3.1), 0.0, 1.0, {"collision": "none"})
+	Props.place(self, "rug_house", _m(3.6, 3.1, 0.02), 0.0, 1.0, {"collision": "none"})
 	Props.place(self, "lamp_floor", _m(8.4, 4.5), 0.0, 1.0, {"collision": "none"})
 	Kit.light(self, _m(8.4, 4.5, 1.8), Color(1.0, 0.85, 0.6), 1.2, 6.5)
 	Props.place(self, "dresser", _m(6.6, 4.6), _yaw(180.0), 0.6)
@@ -328,9 +330,21 @@ func _corridor_and_basement() -> void:
 	var dx := -1.0 if mirrored else 1.0
 	Kit.floor(self, top + Vector3(dx * 0.4, 0, 0), Vector2(0.8, 1.5), "wall/concrete")
 	Kit.ceiling(self, top + Vector3(dx * 2.6, 2.4, 0), Vector2(5.2, 1.6), "wall/concrete_dark")
-	Kit.wall(self, top + Vector3(0, 0, -0.8), top + Vector3(dx * 5.2, 0, -0.8), 2.4, "wall/concrete", {"thick": 0.2})
-	Kit.wall(self, top + Vector3(dx * 5.2, 0, 0.8), top + Vector3(0, 0, 0.8), 2.4, "wall/concrete", {"thick": 0.2})
-	Kit.box(self, top + Vector3(dx * 2.6, 1.2, 0), Vector3(5.2, 2.4, 1.6), "wall/concrete", {"faces": ["px", "nx", "pz", "nz", "py"], "solid": false, "tint": Color(0.6, 0.6, 0.62)})
+	# the stairwell is a closed shaft: side walls the whole way down outside the
+	# basement room, and above the room's ceiling where it passes over it, with
+	# an end wall over the room, so no sky or field shows through it
+	var room_w := top.x + dx * 2.8
+	Kit.wall(self, Vector3(top.x, -3.2, top.z - 0.8), Vector3(room_w, -3.2, top.z - 0.8), 5.6, "wall/concrete", {"thick": 0.2})
+	Kit.wall(self, Vector3(room_w, -3.2, top.z + 0.8), Vector3(top.x, -3.2, top.z + 0.8), 5.6, "wall/concrete", {"thick": 0.2})
+	Kit.wall(self, Vector3(room_w, -0.7, top.z - 0.8), Vector3(top.x + dx * 5.2, -0.7, top.z - 0.8), 3.1, "wall/concrete", {"thick": 0.2})
+	Kit.wall(self, Vector3(top.x + dx * 5.2, -0.7, top.z + 0.8), Vector3(room_w, -0.7, top.z + 0.8), 3.1, "wall/concrete", {"thick": 0.2})
+	Kit.wall(self, Vector3(top.x + dx * 5.2, -0.7, top.z - 0.9), Vector3(top.x + dx * 5.2, -0.7, top.z + 0.9), 3.1, "wall/concrete_dark", {"thick": 0.2})
+	Kit.light(self, top + Vector3(dx * 3.0, 1.6, 0), Color(0.9, 0.85, 0.7), 0.7, 5.0)
+	# the stairwell's outside shell: every face but the one in the doorway, which
+	# used to be drawn across the opening and made the way down look like a wall
+	Kit.box(self, top + Vector3(dx * 2.6, 1.2, 0), Vector3(5.2, 2.4, 1.6), "wall/concrete", {"faces": ["px" if dx > 0 else "nx", "pz", "nz", "py"], "solid": false, "tint": Color(0.6, 0.6, 0.62)})
+	Kit.light(self, top + Vector3(dx * 0.6, 2.0, 0), Color(0.9, 0.85, 0.7), 0.9, 4.0)
+	Kit.label(self, "down", top + Vector3(dx * 0.05, 2.25, 0), _yaw(90.0), 22, Color(0.55, 0.55, 0.6), "body", {"pixel_size": 0.01})
 	Kit.stairs(self, top + Vector3(dx * 0.8, 0, 0), _yaw(-90.0), 1.4, 10, -0.3, 0.4, "wall/concrete", {"name": "BasementStairs"})
 	var room_c := top + Vector3(dx * 7.3, -3.0, 0)
 	var m := MapBuilder.build(self, [
@@ -471,19 +485,21 @@ func _between_walls(hole: Vector3) -> void:
 func _attic(hatch_below: Vector3) -> void:
 	var hatch := hatch_below + Vector3(0, H, 0)
 	Props.place(self, "attic_hatch" if Props.exists("attic_hatch") else "crate_small", hatch + Vector3(0, -0.02 if Props.exists("attic_hatch") else -0.5, 0), 0.0, 1.0, {"collision": "none"})
+	# under the ridge, short enough that nothing pokes through the slope
 	var attic_floor := hatch + Vector3(0, 0.3, 0)
-	Kit.floor(self, attic_floor + Vector3(0, 0, -1.0), Vector2(4.0, 6.0), "wood/planks_grey", {"tile": 1.5})
-	Kit.ceiling(self, attic_floor + Vector3(0, 2.2, -1.0), Vector2(4.0, 6.0), "wood/planks_dark", {"tile": 1.5})
-	Kit.wall(self, attic_floor + Vector3(-2, 0, 2), attic_floor + Vector3(-2, 0, -4), 2.2, "wood/planks_dark", {"tile": 1.5})
-	Kit.wall(self, attic_floor + Vector3(2, 0, -4), attic_floor + Vector3(2, 0, 2), 2.2, "wood/planks_dark", {"tile": 1.5})
-	Kit.wall(self, attic_floor + Vector3(-2, 0, -4), attic_floor + Vector3(2, 0, -4), 2.2, "wood/planks_dark", {"tile": 1.5})
-	Kit.wall(self, attic_floor + Vector3(2, 0, 2), attic_floor + Vector3(-2, 0, 2), 2.2, "wood/planks_dark", {"tile": 1.5})
-	Props.place(self, "boxes_moving" if Props.exists("boxes_moving") else "crate", attic_floor + Vector3(-1.2, 0, -2.5), 15.0, 1.0)
-	Props.place(self, "crate_small", attic_floor + Vector3(1.2, 0, -3.0), 40.0, 1.0)
-	Props.place(self, "coat_rack", attic_floor + Vector3(1.4, 0, 1.2), 0.0, 1.0)
-	Kit.light(self, attic_floor + Vector3(0, 2.0, -1), Color(1.0, 0.85, 0.6), 0.9, 6.0)
-	Readable.create(self, attic_floor + Vector3(-1.2, 0.8, -2.5), 0.0, "The box of photographs", ["A box of photographs. All of them are of the porch.", "None of them have anyone on it. Not yet."], {"name": "PhotoBox", "size": Vector3(1.0, 0.8, 1.0), "note_key": "photo_box", "note_title": "The box of photographs", "note_text": "A box of photographs of the porch, with nobody on it. Not yet."})
-	var win := attic_floor + Vector3(0, 1.3, -3.9)
+	var ah := 1.7
+	Kit.floor(self, attic_floor + Vector3(0, 0, -0.75), Vector2(4.0, 4.5), "wood/planks_grey", {"tile": 1.5})
+	Kit.ceiling(self, attic_floor + Vector3(0, ah, -0.75), Vector2(4.0, 4.5), "wood/planks_dark", {"tile": 1.5})
+	Kit.wall(self, attic_floor + Vector3(-2, 0, 1.5), attic_floor + Vector3(-2, 0, -3.0), ah, "wood/planks_dark", {"tile": 1.5})
+	Kit.wall(self, attic_floor + Vector3(2, 0, -3.0), attic_floor + Vector3(2, 0, 1.5), ah, "wood/planks_dark", {"tile": 1.5})
+	Kit.wall(self, attic_floor + Vector3(-2, 0, -3.0), attic_floor + Vector3(2, 0, -3.0), ah, "wood/planks_dark", {"tile": 1.5})
+	Kit.wall(self, attic_floor + Vector3(2, 0, 1.5), attic_floor + Vector3(-2, 0, 1.5), ah, "wood/planks_dark", {"tile": 1.5})
+	Props.place(self, "boxes_moving" if Props.exists("boxes_moving") else "crate", attic_floor + Vector3(-1.2, 0, -2.0), 15.0, 0.8)
+	Props.place(self, "crate_small", attic_floor + Vector3(1.2, 0, -2.4), 40.0, 1.0)
+	Props.place(self, "coat_rack", attic_floor + Vector3(1.4, 0, 0.9), 0.0, 0.85)
+	Kit.light(self, attic_floor + Vector3(0, ah - 0.2, -0.8), Color(1.0, 0.85, 0.6), 0.9, 6.0)
+	Readable.create(self, attic_floor + Vector3(-1.2, 0.7, -2.0), 0.0, "The box of photographs", ["A box of photographs. All of them are of the porch.", "None of them have anyone on it. Not yet."], {"name": "PhotoBox", "size": Vector3(1.0, 0.8, 1.0), "note_key": "photo_box", "note_title": "The box of photographs", "note_text": "A box of photographs of the porch, with nobody on it. Not yet."})
+	var win := attic_floor + Vector3(0, 1.0, -2.9)
 	Kit.sign(self, "props/window_night", win, 0.0, Vector2(1.0, 1.0))
 	Readable.create(self, win, 0.0, "Look out of the attic window", ["From the attic window you can see the field, and the sky above the field.", "The sky has a light fitting in it. It is switched off. Somebody is being careful about the bill."], {"name": "AtticWindow", "size": Vector3(1.0, 1.0, 0.4), "note_key": "sky_fitting", "note_title": "The light fitting in the sky", "note_text": "From the attic you saw it: the sky over the field has a light fitting in it, switched off."})
 	var hatch_it := Interactable.make(self, hatch + Vector3(0, -0.3, 0), Vector3(1.2, 0.5, 1.2), "The attic hatch", _on_hatch, {"name": "AtticHatch"})
@@ -503,9 +519,12 @@ func _roof_and_porch() -> void:
 	Kit.ramp(self, Vector3(0, h, 7.9), 0.0, 23.0, 8.0, 3.2, "stone/blocks_dark", {"tile": 1.5})
 	Kit.ramp(self, Vector3(0, h, -7.9), 180.0, 23.0, 8.0, 3.2, "stone/blocks_dark", {"tile": 1.5})
 	Kit.box(self, Vector3(_v(5.0, 0, 0).x, h + 3.8, 0.0), Vector3(1.0, 2.8, 1.0), "brick/dark")
-	# gables
-	Kit.box(self, Vector3(-11.4, h + 1.4, 0), Vector3(0.3, 2.9, 15.0), "wood/planks_wall", {"tint": Color(0.7, 0.65, 0.6), "solid": false})
-	Kit.box(self, Vector3(11.4, h + 1.4, 0), Vector3(0.3, 2.9, 15.0), "wood/planks_wall", {"tint": Color(0.7, 0.65, 0.6), "solid": false})
+	# gables: triangles under the roof's slope, drawn on both sides
+	for gx in [-11.15, 11.15]:
+		var a := Vector3(gx, h, -7.9)
+		var b := Vector3(gx, h + 3.2, 0.0)
+		var c := Vector3(gx, h, 7.9)
+		Kit.quad(self, a, b, c, c, "wood/planks_wall", {"tint": Color(0.7, 0.65, 0.6), "solid": false, "double": true})
 	# porch
 	var door_x := _m(11.0, 0).x
 	var pz := 9.7
@@ -543,13 +562,20 @@ func _on_backwards(p: Node) -> void:
 	var fwd := player.forward()
 	var v := player.velocity
 	v.y = 0.0
-	if v.length() > 0.5 and v.normalized().dot(fwd) < -0.5:
+	# into the hall is the way the door faces; walking backwards into it means
+	# facing into the hall and pressing back. The wall stops the velocity the
+	# moment you touch it, so intent is read from facing and input instead.
+	var into_hall := _v(1.0, 0, 0)
+	var facing_away := fwd.dot(into_hall) > 0.4
+	var backing := Input.is_action_pressed("move_back") and not player.input_locked
+	var moving_back := v.length() > 0.5 and v.normalized().dot(fwd) < -0.5
+	if facing_away and (backing or moving_back):
 		var t: Node = get_node("BackwardsTrigger")
 		var dest: Vector3 = t.get_meta("dest")
 		player.global_position = dest + Vector3(0, 0.1, 0)
 		Audio.sfx("door_creak_long", dest, -6.0)
 		Game.bump("backwards_entries")
-	elif v.length() > 0.5 and Game.count("backwards_hint") < 2:
+	elif not facing_away and Game.count("backwards_hint") < 3 and (v.length() > 0.5 or Input.is_action_pressed("move_forward")):
 		Game.bump("backwards_hint")
 		Game.toast.emit("The door does not open for people facing it. Turn your back on it and step back.")
 
