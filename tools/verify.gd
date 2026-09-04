@@ -396,6 +396,68 @@ func _solve_routes() -> void:
 		if String(k).begins_with("keepsake:"):
 			n_keep += 1
 	ok("route solver: %d/%d areas reachable, %d/%d keepsakes obtainable, %d items/flags" % [reachable.size(), graph.size(), n_keep, Game.KEEPSAKES.size(), have.size() - n_keep])
+	_check_item_payoffs()
+
+
+## An item the player can pick up but no door, puzzle or pickup ever asks for is
+## a dead end in the player's pocket. Warn by name so it is a deliberate choice
+## rather than an oversight.
+func _check_item_payoffs() -> void:
+	var granted: Dictionary = {}
+	var wanted: Dictionary = {}
+	for id in graph:
+		for p in graph[id].pickups:
+			if String(p.item) != "":
+				granted[String(p.item)] = id
+			for r in p.req:
+				if String(r).begins_with("item:"):
+					wanted[String(r).trim_prefix("item:")] = id
+		for z in graph[id].puzzles:
+			if String(z.grants_item) != "":
+				granted[String(z.grants_item)] = id
+			for r in z.req:
+				if String(r).begins_with("item:"):
+					wanted[String(r).trim_prefix("item:")] = id
+		for d in graph[id].doors:
+			for r in d.req:
+				if String(r).begins_with("item:"):
+					wanted[String(r).trim_prefix("item:")] = id
+	# an item can also be spent inside an Interactable callback, which the graph
+	# cannot see, so read the scripts for the calls that consult one
+	for f in _gd_files("res://src"):
+		var src := FileAccess.get_file_as_string(f)
+		if src == "":
+			continue
+		for pat in ["has_item\\(\"([a-z_]+)\"", "item_count\\(\"([a-z_]+)\"", "take_item\\(\"([a-z_]+)\""]:
+			var re := RegEx.create_from_string(pat)
+			for m in re.search_all(src):
+				wanted[m.get_string(1)] = f
+	var orphans: Array = []
+	for i in granted:
+		if not wanted.has(i):
+			orphans.append("%s (from %s)" % [i, granted[i]])
+	if orphans.is_empty():
+		ok("every item the player can gain is asked for somewhere")
+	else:
+		orphans.sort()
+		warn("item(s) with no lock to open: %s" % ", ".join(orphans))
+
+
+func _gd_files(dir_path: String, out: Array = []) -> Array:
+	var d := DirAccess.open(dir_path)
+	if d == null:
+		return out
+	d.list_dir_begin()
+	var n := d.get_next()
+	while n != "":
+		var p := dir_path.path_join(n)
+		if d.current_is_dir():
+			_gd_files(p, out)
+		elif n.ends_with(".gd"):
+			out.append(p)
+		n = d.get_next()
+	d.list_dir_end()
+	return out
 
 
 func _met(reqs: Array, have: Dictionary) -> bool:

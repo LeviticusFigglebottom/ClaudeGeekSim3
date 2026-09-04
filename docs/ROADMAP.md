@@ -14,6 +14,16 @@ roughly in order of value:
 * **NPC schedules.** The barkeep, the fishwife and the hermit could move
   between realms at different real-world hours (`Game.is_night()` exists).
 * **The dog's own dream.** Feed it in three realms; it leads you somewhere.
+* **A lock for the two pocket items.** The Paper Rose and the Candle Stub can
+  both be picked up (the rose in the castle library and, at mouse size, under
+  the tavern floor; the stub in the castle chest, the ossuary crypt, the
+  house's between-walls room and the Furnace's iron maiden) and neither is
+  asked for by anything. Two hooks are already written in the fiction and want
+  only a consumer: the torn page the rose is folded from "was about a king
+  dreaming of a garden", so the rose belongs in the sleeping King's hand; and
+  the ossuary altar already lights candles for four names, so the black stub
+  is the fifth, for the name nobody wrote. `tools/verify.sh` warns by name
+  about any gainable item with no lock, so this cannot go quiet again.
 * **The Waiting Halls' numbers** could call other players' numbers (a shared
   leaderboard of people who were called and never came back).
 * **Endings**: crown the King; put the knife back in the drawer; sit down in the
@@ -23,9 +33,11 @@ roughly in order of value:
 * Rendered portals (SubViewport cameras) for true see-through non-euclidean
   doors; the seam system is the fallback.
 * A photo mode; the F12 screenshot is a start.
-* Accessibility: hold-to-interact toggle, larger UI scale, reduced flicker.
+* Accessibility: hold-to-interact toggle, larger UI scale. (Dither, vertex
+  wobble, affine warp, pixel size, colour depth and interactable glow are all
+  sliders now; flicker follows those.)
 * Gamepad support (input actions exist; add joypad events).
-* Save slots and a "dream log" export.
+* A "dream log" export. (Three save slots and a settings panel are in.)
 
 ## Pipeline
 * Palette-shift generators so one texture family yields all realms.
@@ -33,6 +45,14 @@ roughly in order of value:
 * Sound: procedural drone synth at runtime (AudioStreamGenerator) layered on
   the baked loops; positional reverb zones.
 * A `tools/gen_assets/README` with a gallery contact sheet regenerated in CI.
+
+## Done since the first pass
+* The Furnace's small iron door behind the cut gallows rope now climbs into the
+  Last Lamp's cellar, and the freed prisoner turns up in the taproom.
+* The Clocktower landing no longer roofs over its own stair.
+* Both mouse-holes are real openings a small player fits through, and the
+  verifier crawls them at that size.
+* Web export and a Vercel deployment, verified in a real headless browser.
 
 ## Known rough edges
 * The sleeping faces of the Slow Sea are flat cards with a square backing;
@@ -42,9 +62,6 @@ roughly in order of value:
 * Riding moving platforms and climbing the Clocktower spiral are validated
   numerically (gap/rise) but not by the headless playtest, which only walks
   the flat, the Anteroom and the bed.
-* The Furnace's small iron door (behind the cut gallows rope) opens onto
-  stairs that are "not finished being dreamt": a hook for a way up into the
-  Last Lamp's cellar.
 * The Waiting Halls' number display is a Label3D over a small prop; a proper
   seven-segment texture would read better at pixel scale 3.
 * The Keep of Hours: the King has two states (on the throne, then in bed); a
