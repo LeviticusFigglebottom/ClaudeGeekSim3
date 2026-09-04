@@ -73,9 +73,8 @@ the Hallway stair (three descents) → `catacombs:from_stairs`.
 * The corridor in the Cistern that only goes on gives up after three passes.
 
 ## Planned, not built
-* `kings_dream` — The King's Dream. In from the stone telephone in the Keep's
-  dream bedroom (`castle:DreamPhone`, needs Moth Wings and Hourglass), out to
-  `castle:from_dream` and `nexus:from_kings_dream`. Holds the third Paper Rose.
-  Spec: `docs/areas/KINGS_DREAM.md`.
-* The descent below the Anteroom's well, built as an extension of `nexus`, and
-  the six endings that read from it. Spec: `docs/ENDINGS.md`.
+* `kings_dream` — The King's Dream. In by answering the stone telephone in the
+  Keep's dream bedroom (`castle:DreamPhone`, needs Moth Wings and Hourglass),
+  out to `nexus:from_kings_dream`. Eight biome squares joined by seam brooks,
+  every prior realm quoted in one of them, the third Paper Rose hidden in the
+  hedge maze of the first. Spec: `docs/areas/KINGS_DREAM.md`.

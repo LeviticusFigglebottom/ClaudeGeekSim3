@@ -14,25 +14,23 @@ roughly in order of value:
 * **NPC schedules.** The barkeep, the fishwife and the hermit could move
   between realms at different real-world hours (`Game.is_night()` exists).
 * **The dog's own dream.** Feed it in three realms; it leads you somewhere.
-* **The King's Dream**, a tenth realm reached by answering the stone telephone
-  in the Keep's dream bedroom, gated on the Moth Wings and the Hourglass.
-  Fully specified in `docs/areas/KINGS_DREAM.md`; not built.
-* **Six endings and the descent down the well**, chosen by which threads of
-  optional content the player finished rather than by a menu. Fully specified
-  in `docs/ENDINGS.md`; not built. That document also supersedes the note
-  below about the two pocket items: the Candle Stub becomes the fifth candle
-  on the Ossuary altar and the Paper Rose becomes a set of three for the
-  sleeping King.
+* **The King's Dream**, a tenth realm and the largest area in the game: a
+  fragmented Wonderland of eight biome squares divided by brooks, quoting
+  every realm the player has already walked through, reached by answering the
+  stone telephone in the Keep's dream bedroom and gated on the Moth Wings and
+  the Hourglass. It hides the third Paper Rose. Fully specified in
+  `docs/areas/KINGS_DREAM.md`; not built.
+* **Endings.** Undesigned, except for one decided rule: every ending needs all
+  nine keepsakes, and holding the nine with no optional content finished gives
+  the bad ending. See `docs/ENDINGS.md`.
 * **A lock for the two pocket items.** The Paper Rose and the Candle Stub can
-  both be picked up (the rose in the castle library and, at mouse size, under
-  the tavern floor; the stub in the castle chest, the ossuary crypt, the
-  house's between-walls room and the Furnace's iron maiden) and neither is
-  asked for by anything. Two hooks are already written in the fiction and want
-  only a consumer: the torn page the rose is folded from "was about a king
-  dreaming of a garden", so the rose belongs in the sleeping King's hand; and
-  the ossuary altar already lights candles for four names, so the black stub
-  is the fifth, for the name nobody wrote. `tools/verify.sh` warns by name
-  about any gainable item with no lock, so this cannot go quiet again.
+  both be picked up and neither is asked for by anything. The rose is in the
+  castle library and, at mouse size, under the tavern floor, with a third
+  specified in the King's Dream; the stub is in the castle chest, the ossuary
+  crypt, the house's between-walls room and the Furnace's iron maiden. What
+  they open is undecided and belongs with the endings, which are also
+  undecided. `tools/verify.sh` warns by name about any gainable item with no
+  lock, so this cannot go quiet again.
 * **The Waiting Halls' numbers** could call other players' numbers (a shared
   leaderboard of people who were called and never came back).
 * **Endings**: crown the King; put the knife back in the drawer; sit down in the
