@@ -28,7 +28,7 @@ const MINT := Color(0.78, 0.96, 0.9)
 
 static func build(area: AreaBase, root: Node3D, ctx: Dictionary) -> Dictionary:
 	var d: Dictionary = ctx.def
-	var state := {"shelves": [], "labels": [], "boat": null, "t": 0.0}
+	var state := {"shelves": [], "labels": [], "boat": null, "t": 0.0, "area": area}
 	# the near bank (sand), the river bed, and the quay
 	Kit.floor(root, Vector3(0, 0, (BANK_Z + KD.HALF) * 0.5), Vector2(KD.SQ, KD.HALF - BANK_Z), String(d.ground), {"tint": d.tint, "tile": 2.0, "thick": 0.2})
 	Kit.floor(root, Vector3(0, BED_Y, (BANK_Z + QUAY_Z) * 0.5), Vector2(KD.SQ, BANK_Z - QUAY_Z), "ground/mud", {"tint": Color(0.7, 0.65, 0.8), "tile": 2.0, "thick": 0.2})
@@ -133,6 +133,9 @@ static func _shop(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 
 
 static func _freeze(state: Dictionary, frozen: bool) -> void:
+	var area: Node = state.get("area")
+	if area != null and area.has_meta("river_face"):
+		KD.set_face(area.get_meta("river_face"), "awake" if frozen else "sleep")
 	for s in state.shelves:
 		(s.goods as Node3D).visible = true
 	for r in state.labels:
@@ -194,7 +197,8 @@ static func _island(area: AreaBase, root: Node3D) -> void:
 	Kit.floor(root, top, Vector2(1.6, 1.6), "stone/blocks_sea", {"tint": Color(0.95, 0.9, 0.95), "tile": 1.0})
 	Kit.floor(root, (top + c + Vector3(0, ISLAND_TOP, 0)) * 0.5, Vector2(1.4, 3.6), "stone/blocks_sea", {"tint": Color(0.95, 0.9, 0.95), "tile": 1.0, "yaw": Kit.dir_to_yaw((c - top).normalized()) + 90.0})
 	Kit.ring(root, c + Vector3(0, ISLAND_TOP + 0.02, 0), 0.0, 2.4, 10, "stone/blocks_sea", {"tint": Color(1.0, 0.9, 0.95), "solid": false})
-	Props.place(root, "face_sea_sleep", c + Vector3(-4.5, BED_Y + 1.0, 2.0), 30.0, 0.9, {"collision": "none", "rotation": Vector3(25, 30, 0)})
+	var face := KD.face_on_stem(root, c + Vector3(-4.5, BED_Y + 1.2, 2.0), 30.0, 1.1, "sleep", Color(0.9, 0.85, 1.0))
+	area.set_meta("river_face", face)
 	Kit.light(root, c + Vector3(0, ISLAND_TOP + 2.5, 0), MINT, 1.2, 12.0)
 	Readable.create(root, c + Vector3(0, ISLAND_TOP, -1.6), 0.0, "Look across", [
 		"From the top of the rock the far bank is a tiled wall with a ledge on top, and on the ledge, one green thing standing up.",

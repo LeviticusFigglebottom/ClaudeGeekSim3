@@ -56,6 +56,10 @@ static func build(area: AreaBase, root: Node3D, ctx: Dictionary) -> Dictionary:
 	out["on_process"] = func(delta: float) -> void:
 		_tick(area, state, delta)
 	out["on_freeze"] = func(frozen: bool) -> void:
+		if state.has("saucer"):
+			var sc: Dictionary = state.saucer
+			(sc.sleep as Node3D).visible = not frozen
+			(sc.awake as Node3D).visible = frozen
 		if frozen and not state.seated:
 			Game.toast.emit("The table stops. The cups stop. The empty chair, for once, stays where it is.")
 	# the ring leaves paths to every gate along the diagonals; the gates are standard
@@ -113,7 +117,13 @@ static func _table(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 		Kit.ring(top, place + Vector3(0, 0.01, 0), 0.0, 0.14, 8, "", {"tint": Color(0.98, 0.98, 0.95), "solid": false})
 		Kit.cylinder(top, place, 0.07, 0.07, "", {"tint": [Color(0.98, 0.9, 0.92), Color(0.9, 0.95, 1.0), Color(1.0, 0.98, 0.85)][i % 3], "solid": false, "segments": 6})
 	# the sleeper's saucer face, from the Slow Sea, on the table
-	Props.place(top, "face_sea_sleep", Kit.polar(R_IN + 1.2, 160.0, TABLE_H + 0.02), 0.0, 0.1, {"collision": "none", "rotation": Vector3(-80, 160, 0)})
+	var saucer := {"root": null, "state": "sleep"}
+	for kind in ["sleep", "awake"]:
+		var f := Props.place(top, "face_sea_" + kind, Kit.polar(R_IN + 1.2, 160.0, TABLE_H + 0.02), 0.0, 0.1, {"collision": "none", "rotation": Vector3(-80, 160, 0), "name": "Saucer_" + kind})
+		f.visible = kind == "sleep"
+		saucer[kind] = f
+	saucer["sad"] = saucer["sleep"]
+	state["saucer"] = saucer
 	# lights round the table, still, so the candles seem to pass under them
 	for i in 8:
 		var a := i * 45.0 + 10.0

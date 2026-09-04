@@ -1,7 +1,13 @@
 # The King's Dream
 
-**Status: designed, not built.** This document is the spec. No code for this
-area exists. Read `docs/AREA_AUTHORING.md` first; everything here assumes its
+**Status: built.** This document is the spec the area was built to. Two
+things were changed by instruction during the build: the way in is the
+sleeping King in the Keep (woken, with the tapestry behind him cut, holding
+both keepsakes; he hints otherwise), not the stone telephone; and there is
+no Anteroom arch back in. The way out still lands beside the Anteroom's
+well, at a plain spawn. The code is in `src/areas/kings_dream/`, one file per
+square plus `kd.gd` for what the squares share; `tools/brooks_test.gd` walks
+every seam under `tools/verify.sh`. Read `docs/AREA_AUTHORING.md` first; everything here assumes its
 contract, its yaw convention, its kit and its checklist.
 
 Area id `kings_dream`. Display name **The King's Dream**, subtitle

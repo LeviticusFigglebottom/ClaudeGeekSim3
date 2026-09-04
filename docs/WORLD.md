@@ -72,9 +72,18 @@ the Hallway stair (three descents) → `catacombs:from_stairs`.
 * Ring the great bell at the top of the Clocktower with the Small Bell in hand.
 * The corridor in the Cistern that only goes on gives up after three passes.
 
-## Planned, not built
-* `kings_dream` — The King's Dream. In by answering the stone telephone in the
-  Keep's dream bedroom (`castle:DreamPhone`, needs Moth Wings and Hourglass),
-  out to `nexus:from_kings_dream`. Eight biome squares joined by seam brooks,
-  every prior realm quoted in one of them, the third Paper Rose hidden in the
-  hedge maze of the first. Spec: `docs/areas/KINGS_DREAM.md`.
+## The King's Dream
+* `kings_dream` — The King's Dream. In through the sleeping King of the Keep
+  of Hours once he has been woken (three whispers) and the tapestry behind
+  him cut, holding the Moth Wings and the Hourglass; without them he says
+  what is missing. Out through the cloth at the banquet of the eighth square,
+  to `nexus:from_kings_dream`, a spawn by the well with no door of its own.
+  Eight biome squares a hundred and thirty metres apart in world space and
+  a brook's width apart to walk, joined by seams; only the square you stand
+  in is drawn. Every prior realm is quoted in one of them. The third Paper
+  Rose stands in the hedge maze of the garden, which spells a word from the
+  air. Two brooks run backwards to a square already crossed, changed; on
+  even visits the board is dealt in a different order and two of the forward
+  brooks run back. The Wings are used four times and the Hourglass five.
+  Spec: `docs/areas/KINGS_DREAM.md`; the entrance differs from the spec by
+  request (the King, not the stone telephone; no Anteroom arch).

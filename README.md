@@ -62,6 +62,7 @@ for the full graph and `docs/AREA_AUTHORING.md` for how to add one):
 | **The Waiting Halls** | a yellow office where your number is never called until it is |
 | **The Clocktower** | a spiral of steps and two great gears; every hour is the same hour |
 | **The Static**, **the Other Anteroom**, **the Workshop** | between channels; the mirror side; every prop on a plinth |
+| **The King's Dream** | eight hedged squares joined by brooks that are seams, every realm above quoted by a sleeping man who has only heard them described; in through the woken King, out through a tablecloth |
 
 ## Verifying without a screen
 

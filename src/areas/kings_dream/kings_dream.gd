@@ -18,35 +18,35 @@ const SEAM_SIZE := Vector3(KD.SQ + 2.0, 8.0, 1.4)
 ## One entry per square, in the order of the ranks of the book. Index is the
 ## square's fixed place in world space; the order they are walked in changes.
 const DEFS := [
-	{"id": "garden", "rank": "the second square", "name": "the Garden of Live Flowers", "y": 0.0,
+	{"id": "garden", "ambience": "forest", "rank": "the second square", "name": "the Garden of Live Flowers", "y": 0.0,
 		"ground": "nature/grass_dream", "tint": Color(1.0, 1.0, 0.92), "hedge": Color(1.0, 1.0, 0.95),
 		"water": Color(0.9, 0.78, 1.0, 0.75), "paint": Color(0.62, 0.8, 0.32),
 		"fog": Color("#f6c9b8"), "fog_density": 0.009, "ambient": Color("#f8ddc8"), "bg": Color("#4a2a58"), "sun": Color("#fff2cf"), "sky": Color(1.0, 1.0, 1.0)},
-	{"id": "carriage", "rank": "the third square", "name": "the Carriage", "y": 9.0,
+	{"id": "carriage", "ambience": "corridor", "rank": "the third square", "name": "the Carriage", "y": 9.0,
 		"ground": "ground/gravel", "tint": Color(0.95, 0.9, 0.85), "hedge": Color(0.85, 0.9, 0.75),
 		"water": Color(0.8, 0.8, 0.9, 0.75), "paint": Color(0.55, 0.5, 0.45),
 		"fog": Color("#d9c1a6"), "fog_density": 0.013, "ambient": Color("#e6d0b8"), "bg": Color("#4a3040"), "sun": Color("#ffe8c0"), "sky": Color(0.95, 0.85, 0.8)},
-	{"id": "wood", "rank": "the fourth square", "name": "the Wood Where Things Have No Names", "y": -7.0,
+	{"id": "wood", "ambience": "hallway", "rank": "the fourth square", "name": "the Wood Where Things Have No Names", "y": -7.0,
 		"ground": "wall/hallway_grey", "tint": Color(0.9, 0.9, 0.95), "hedge": Color(0.7, 0.72, 0.8),
 		"water": Color(0.7, 0.7, 0.8, 0.8), "paint": Color(0.42, 0.42, 0.48),
 		"fog": Color("#c4bccd"), "fog_density": 0.02, "ambient": Color("#cfc8dc"), "bg": Color("#2a2434"), "sun": Color("#e0dcf0"), "sky": Color(0.75, 0.72, 0.85)},
-	{"id": "river", "rank": "the fifth square", "name": "the Shop and the River", "y": 4.0,
+	{"id": "river", "ambience": "cistern", "rank": "the fifth square", "name": "the Shop and the River", "y": 4.0,
 		"ground": "ground/sand", "tint": Color(1.0, 0.98, 0.9), "hedge": Color(0.9, 1.0, 0.9),
 		"water": Color(0.75, 0.62, 1.0, 0.8), "paint": Color(0.6, 0.78, 0.8),
 		"fog": Color("#bfe3dc"), "fog_density": 0.011, "ambient": Color("#d4ece8"), "bg": Color("#1e3a44"), "sun": Color("#fff3dd"), "sky": Color(0.8, 1.0, 0.95)},
-	{"id": "wall", "rank": "the sixth square", "name": "the Wall", "y": 16.0,
+	{"id": "wall", "ambience": "city", "rank": "the sixth square", "name": "the Wall", "y": 16.0,
 		"ground": "stone/cobble_city", "tint": Color(0.95, 0.95, 1.0), "hedge": Color(0.75, 0.85, 0.8),
 		"water": Color(0.6, 0.7, 0.85, 0.85), "paint": Color(0.45, 0.5, 0.6),
 		"fog": Color("#a8b6c8"), "fog_density": 0.012, "ambient": Color("#c0c8d8"), "bg": Color("#2a2f3a"), "sun": Color("#dfe4f0"), "sky": Color(0.75, 0.8, 0.9)},
-	{"id": "table", "rank": "the seventh square", "name": "the Tea Table", "y": -12.0,
+	{"id": "table", "ambience": "tavern", "rank": "the seventh square", "name": "the Tea Table", "y": -12.0,
 		"ground": "nature/grass_pale", "tint": Color(1.0, 0.95, 0.75), "hedge": Color(1.0, 0.95, 0.7),
 		"water": Color(1.0, 0.9, 0.7, 0.8), "paint": Color(0.82, 0.72, 0.4),
 		"fog": Color("#f0d6a0"), "fog_density": 0.032, "ambient": Color("#f6e2b8"), "bg": Color("#5a3a20"), "sun": Color("#ffe0a0"), "sky": Color(1.0, 0.9, 0.7)},
-	{"id": "trial", "rank": "the eighth square, nearly", "name": "the Croquet Ground", "y": 6.0,
+	{"id": "trial", "ambience": "furnace", "rank": "the eighth square, nearly", "name": "the Croquet Ground", "y": 6.0,
 		"ground": "ground/red_dream", "tint": Color(1.0, 0.9, 0.9), "hedge": Color(0.9, 0.6, 0.55),
 		"water": Color(1.0, 0.6, 0.55, 0.8), "paint": Color(0.7, 0.22, 0.2),
 		"fog": Color("#e06a5a"), "fog_density": 0.013, "ambient": Color("#f0a090"), "bg": Color("#3a0a10"), "sun": Color("#ffb090"), "sky": Color(1.0, 0.65, 0.6)},
-	{"id": "eighth", "rank": "the eighth square", "name": "the Eighth Square", "y": 22.0,
+	{"id": "eighth", "ambience": "nexus", "rank": "the eighth square", "name": "the Eighth Square", "y": 22.0,
 		"ground": "stone/blocks_nexus", "tint": Color(1.0, 1.0, 1.05), "hedge": Color(0.8, 0.8, 1.0),
 		"water": Color(0.7, 0.7, 1.0, 0.8), "paint": Color(0.35, 0.32, 0.55),
 		"fog": Color("#c8bfe6"), "fog_density": 0.011, "ambient": Color("#d8d0f0"), "bg": Color("#1a1430"), "sun": Color("#e8e0ff"), "sky": Color(0.85, 0.8, 1.0)},
@@ -274,6 +274,7 @@ func _set_current(i: int, animate: bool) -> void:
 		if n:
 			n.visible = (k == i)
 	var d: Dictionary = sq[i].def
+	Audio.set_ambience(String(d.get("ambience", "sea")))
 	if env == null:
 		return
 	if _palette_tween:
