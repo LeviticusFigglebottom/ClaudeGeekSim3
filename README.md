@@ -135,15 +135,20 @@ src/data/areas.gd        the area registry (single source of truth for the verif
 src/shaders/             PS1 surface shaders, sky dome, water, static, mirror, post-fx
 assets/                  generated textures, models, audio; fonts (OFL)
 tools/                   verification, screenshots, asset generators
-docs/                    DESIGN, WORLD (the map of everything), AREA_AUTHORING, ROADMAP
+docs/                    HANDOFF (start here), DESIGN, WORLD (the map of
+                         everything), AREA_AUTHORING, ENDINGS, areas/
 ```
 
 ## Documentation
 
+* [`docs/HANDOFF.md`](docs/HANDOFF.md) — start here if you are picking the
+  project up: what it is, how to build and verify it, the conventions, and the
+  one piece of work outstanding.
 * [`docs/DESIGN.md`](docs/DESIGN.md) — pillars, the look, the systems.
 * [`docs/WORLD.md`](docs/WORLD.md) — every area, every connection, every keepsake and its route.
 * [`docs/AREA_AUTHORING.md`](docs/AREA_AUTHORING.md) — how to add a realm in an afternoon.
-* [`docs/ROADMAP.md`](docs/ROADMAP.md) — what the next iterations are for.
+* [`docs/areas/KINGS_DREAM.md`](docs/areas/KINGS_DREAM.md) — the specification
+  for the next area, a fragmented Wonderland of eight squares.
 
 ## Licence notes
 
