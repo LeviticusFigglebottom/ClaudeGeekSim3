@@ -316,10 +316,23 @@ func _exit() -> void:
 func on_enter(spawn_id: String, n: int) -> void:
 	super.on_enter(spawn_id, n)
 	Game.set_flag("visited_kings_dream", true)
+	if not World.travel_started.is_connected(_on_travel_started):
+		World.travel_started.connect(_on_travel_started)
 	if spawn_id == "from_king":
 		_fall()
 	if n == 1:
 		Game.note("kings_dream_in", "The King's dream", "You went into the King's sleep and it was a garden, and the garden was a square on a board. He has never been to any of the places in it. He has only heard them described.")
+
+
+## Holding R works here. It should feel like the wrong thing to do: you are
+## leaving somebody else's sleep while they are still in it.
+func _on_travel_started(area_id: String, _spawn_id: String) -> void:
+	if World.travel_started.is_connected(_on_travel_started):
+		World.travel_started.disconnect(_on_travel_started)
+	if area_id == "apartment" and World.current_area_id == "kings_dream":
+		Game.bump("dream_woken_out")
+		Game.toast.emit("You wake out of somebody else's sleep. It is like leaving a room while someone is still talking.")
+		Game.note("dream_woke_out", "Waking from the King's dream", "You held R inside the King's dream and woke in the flat. He did not. Somewhere he is still dreaming the square you left, with nobody in it.")
 
 
 ## The rabbit hole. The King lets you in from a long way up: you fall for a

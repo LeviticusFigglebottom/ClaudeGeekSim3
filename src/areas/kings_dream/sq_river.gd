@@ -113,7 +113,7 @@ static func _shop(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 				] if side < 0 else [
 					"MOONLIGHT (EMPTY). The label is the one from the Last Lamp, in the same hand, with the price crossed out.",
 					"Where the price was, somebody has written: what have you got?",
-				], {"name": "ShelfLabel%d" % int(side), "size": Vector3(0.6, 1.0, 2.2), "note_key": "dream_label", "note_title": "A label, read", "note_text": "With the hour held, the shelves of the shop that sells nothing stayed full long enough to read a label: a bottle of nothing, cold to hold, that everybody wants very badly. Not for sale. Not, strictly, here."})
+				], {"name": "ShelfLabel%d" % int(side), "size": Vector3(0.6, 1.0, 2.2), "note_key": "dream_label", "note_title": "A label, read", "note_text": "With the hour held, the shelves of the shop that sells nothing stayed full long enough to read a label: a bottle of nothing, cold to hold, that everybody wants very badly. Not for sale. Not, strictly, here.", "flag_on_read": "dream_label_read"})
 				r.enabled = false
 				state.labels.append(r)
 	Puzzle.declare(area, "dream_shelves", "dream_label_read", ["keepsake:hourglass"], "hold the hour in the shop that sells nothing and read one label")
@@ -142,7 +142,6 @@ static func _freeze(state: Dictionary, frozen: bool) -> void:
 		(r as Readable).enabled = frozen
 	if frozen:
 		Game.toast.emit("The shelves stay full. You could read a label, if you were quick, which you no longer need to be.")
-		Game.set_flag("dream_label_read", true) if false else null
 
 
 # --- the deck that drifts ---------------------------------------------------------------
