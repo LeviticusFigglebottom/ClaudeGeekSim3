@@ -62,6 +62,19 @@ def chess_queen(rng):
 reg("chess_queen", chess_queen)
 
 
+def chess_king(rng):
+    m = MeshBuilder()
+    _piece_base(m, IVORY)
+    m.lathe([(0.2, 0.14), (0.12, 0.35), (0.09, 0.72), (0.18, 0.84), (0.12, 0.9), (0.14, 1.0), (0.0, 1.0)], 10, "flat", CREAM, smooth=True, cap_bottom=False)
+    # the cross
+    m.box((0, 1.1, 0), (0.05, 0.2, 0.05), "flat", IVORY)
+    m.box((0, 1.13, 0), (0.15, 0.05, 0.05), "flat", IVORY)
+    return single("chess_king", m, {"collision": "cylinder"})
+
+
+reg("chess_king", chess_king)
+
+
 def chess_knight(rng):
     m = MeshBuilder()
     _piece_base(m, IVORY)

@@ -1,54 +1,71 @@
 # Endings
 
-**Status: three ends exist as choices; their scenes are not made.** The
-fourth, the M ending, is designed in outline only and is not to be built
-yet. Everything below that is marked open is open.
+**Status: four roads. Three have their choice in the game; the fourth has
+its start. No ending scene is made yet.**
 
-## The three that exist
+## Who is who
 
-Each is reached by a confirmation that defaults to "No", says *(an ending)*
-in the option text, and asks a second time ("There is no coming back from
-this one. Are you sure?", "No" first). Nothing is chosen by accident.
+The Usher is the player's own projection, the consciousness walking these
+places. The King is the body in the bed. M. is the visitor who sits by it.
+The dream's board is the game between the body and the consciousness, and
+the eighth square is where it is decided.
 
-| Ending | Where | Flag | Goes to |
-|---|---|---|---|
-| **The promotion** (limbo) | the cloth at the banquet, eighth square of the King's Dream, once the banquet has begun | `promotion_taken`, then `ending_limbo` on the last square | The Last Rank, `docs/areas/PROMOTION.md`: eight squares from BORN to a square with nothing on it. Staying is the ending. |
-| **The plug** (unplugged) | the same cloth, third option | `plug_pulled`, then `ending_unplugged` at the socket | Off Air, `docs/areas/STATIC_END.md`: the same eight things, grey and sinking, each watched by a set showing snow; at the end the Usher on a bed with your face, and the plug. Pulling it is the ending. |
-| **The memorial** | the King in his bed in the King's Mind, after the third rose (`roses_all_placed`) | `ending_memorial` | Nowhere yet. Staying with him is the ending: a memorial to yourself. |
+## The four roads
+
+Every choice defaults to "No" or "Do nothing", says *(an ending)* in the
+option text, and asks a second time ("There is no coming back from this
+one. Are you sure?", "No" first). Nothing is chosen by accident.
+
+| Road | Where | Choice | Flag | Goes to |
+|---|---|---|---|---|
+| **Concede** (unplugged) | the board in the rotunda at the eighth square, once the banquet has begun | "Concede. Lay the king down, and pull the plug." | `plug_pulled`, then `ending_unplugged` at the socket | Off Air, `docs/areas/STATIC_END.md`: the same life told grey and sinking, each thing watched by a set showing snow; the Usher on a bed at the end, and the plug. Accepting death. |
+| **Checkmate** (limbo) | the same board | "Checkmate. The pawn to the eighth, and stay on the board." | `promotion_taken`, then `ending_limbo` on the last square | The Last Rank, `docs/areas/PROMOTION.md`: eight squares from BORN to a square with nothing on it. The King and the Usher stay separated; the consciousness stays a piece. |
+| **M** | the King in his bed in the King's Mind, after the third rose (`roses_all_placed`) | "Sit with him." | `ending_m` | Nowhere yet. You were M all along: the one who came every day, read to him and brought the roses. Finished as a choice; its scene is next. |
+| **Whole** | the well in the Anteroom, holding all nine keepsakes | "Hold them over the well." (not an ending itself) | `cistern_drained` | The Cistern drains. At the bottom of the empty bath is a drain the size of a door, warm air coming up out of it once for every four breaths. **The way down through it, and the ending (the King united with his consciousness, waking), is not made and not yet specified.** |
+
+The board's third option, "Do nothing. Leave the board as it is.", is the
+default and is always allowed. The cloth on the banquet table is only the
+way back to the Anteroom.
 
 The Last Rank and Off Air are the same life told twice, and that is the
 point: on the board it is kept and lit, and the board keeps you; off air it
 is grey and going under, and it ends. Keep the distinction legible if either
 is touched.
 
+## The rotunda at the eighth square
+
+Still the mirrored Anteroom with twelve doors of static. In it: an empty
+hospital bed with a dent in the pillow, the most familiar thing in the
+room; a monitor beside it showing snow, its cable running to a socket on
+the pillar behind; a chair with a letter from M on the seat; and the
+chessboard on its table, a game nearly over (your pawn on the seventh, the
+red king in the corner), your chair pulled out on the south side. Once the
+banquet has begun the Usher comes and stands across the board.
+
 ## What plays now
 
 `src/core/ending.gd`, `Ending.play(kind, title, lines, color)`: sets
-`ending_<kind>`, bumps `endings`, says the lines, fades to the colour, writes
-a journal note saying the scene is not made yet, and wakes the player in the
-flat with a toast saying so. **The ending scenes are the next thing to make**
-and should replace the tail of that function. `Game.stats` (doors, wakes,
-falls, distance, playtime) survives a save and is there for them.
+`ending_<kind>`, bumps `endings`, says the lines, fades to the colour,
+writes a journal note saying the scene is not made yet, and wakes the player
+in the flat with a toast saying so. **The ending scenes are the next thing to
+make** and should replace the tail of that function. `Game.stats` (doors,
+wakes, falls, distance and playtime) survives a save and is there for them.
 
-## The M ending
+## Hints
 
-Designed in outline, not built, not to be built until the details are
-settled: the cistern ties into the mirror world, opens something there (the
-roof, the ascending platforms), and leads to a hospital with the context of
-the Usher's circumstances and the M ending. The Usher is the player's own
-projection; the King is the body in the bed; M. is the visitor. Nothing in
-the cistern, the Other Anteroom or the Static reads any of this yet.
+The Barkeep's "A rumour" in the Last Lamp tells the candle-to-roses thread
+in order until the ways part. Once the banquet has begun, or the roses are
+in, or the player holds all nine, it asks which rumour: the board, the bed
+in his head, or the well, each keyed to how far that road has been walked,
+and offers another afterwards.
 
 ## Open
 
-* **The nine keepsakes rule.** An earlier decision said every ending requires
-  all nine keepsakes and that holding only the nine gives the worst ending.
-  None of the three choices checks the keepsakes. Whether the rule still
-  stands, and which of the three is the "bad" one, is undecided.
-* **The well** at the bottom of the Anteroom (`nexus.gd`, three text states,
-  no fourth, no descent). It may be scrapped as an ending and become an area
-  in a later pass.
+* **The fourth road's end**: what is under the drain, and how the King and
+  the Usher are made whole. Not to be designed here.
+* **The well's other text states** still say "something is still missing";
+  the nine-keepsake state now leads somewhere.
 * **The Paper Crown** has no use in the dream since the crowning was removed.
 * **Which ending counts as finishing the game**, and whether the others stay
-  reachable afterwards (all three currently return the player to the flat
-  with their flag set).
+  reachable afterwards (all currently return the player to the flat with
+  their flag set).

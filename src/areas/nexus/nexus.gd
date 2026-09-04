@@ -41,6 +41,10 @@ func build() -> void:
 	var well := Props.place(self, "well", Vector3.ZERO, 0.0, 1.3, {"collision": "cylinder"})
 	well.name = "Well"
 	Readable.create(self, Vector3(0, 0, 0), 0.0, "Look into the well", [], {"name": "WellLook", "size": Vector3(2.8, 1.2, 2.8), "on_read": _on_well, "sound": "drip"})
+	var all_nine: Array = []
+	for k in Game.KEEPSAKES.keys():
+		all_nine.append("keepsake:" + String(k))
+	Puzzle.declare(self, "nexus_well", "cistern_drained", all_nine, "hold all nine keepsakes over the well in the Anteroom at once")
 	Kit.light(self, Vector3(0, 2.5, 0), Color(0.5, 0.6, 1.0), 1.2, 9.0)
 	# plaque
 	Kit.box(self, Vector3(0, 0.5, 4.2), Vector3(1.2, 1.0, 0.4), "stone/blocks_nexus")
@@ -216,15 +220,29 @@ func _door(d: Array) -> void:
 	add_spawn("from_" + id, Kit.polar(R - 3.2, angle, 0.1), yaw)
 
 
+## The well keeps count of the keepsakes. With all nine held over it at once
+## it lets go of something at the bottom, and the Cistern begins to drain:
+## the start of the fourth road, whose end is not made yet.
 func _on_well(_r: Node) -> void:
 	var n := Game.keepsakes.size()
 	var lines: Array = []
-	if n == 0:
+	if Game.has_flag("cistern_drained"):
+		lines = ["The well is not dry any more, and it is open at the bottom. Far down, water is going somewhere, a great deal of it, in no hurry.", "It is the sound of a bath the size of a cathedral emptying. It began when you held the nine things over it, and it is not finished."]
+	elif n == 0:
 		lines = ["The well is dry. At the bottom, very far down, something is arranged in a circle: nine empty places.", "You are holding nothing. It notices."]
 	elif n < 9:
 		lines = ["The well is dry. Nine places at the bottom, %d of them no longer empty." % n, "You are not sure when you put anything down there. Perhaps holding a thing is the same as putting it down, here."]
 	else:
-		lines = ["Nine places, nine things. The bottom of the well is a door now.", "It is not open yet. Something is still missing, and it is not a thing."]
+		if World.hud:
+			await World.hud.say("", ["Nine places, nine things. The bottom of the well is a door now.", "It is not open yet. It is waiting for all nine at once, and there is only one way to hold nine things at once over a well."])
+			var i: int = await World.hud.ask("", "Hold all nine over the well? Whatever is under the water will be under the water no longer.", ["Not yet.", "Hold them over the well."])
+			if i != 1:
+				return
+		Game.set_flag("cistern_drained", true)
+		Audio.sfx("drip", global_position, -2.0)
+		lines = ["You hold them over the well, all nine, and the well takes the count, and something at the bottom gives.", "Not a door opening. A plug coming out. Far below, water begins to move, a very great deal of it, in no hurry: the sound of a bath the size of a cathedral emptying.", "The Cistern. Whatever was under the water will be there when it has gone."]
+		Game.note("well_open", "The well let go", "With all nine keepsakes held over it at once, the well let go of something at the bottom, and far below a great deal of water began to move. The Cistern is draining. Whatever was under the water will be there when it has gone.")
+		Game.toast.emit("Far below, a very great deal of water begins to move.")
 	if World.hud:
 		await World.hud.say("", lines)
 	Game.note("well", "The well in the Anteroom", "A dry well with nine places at the bottom. It keeps count of what you carry.")

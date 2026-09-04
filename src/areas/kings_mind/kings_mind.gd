@@ -318,7 +318,7 @@ func _bedroom(c: Vector3) -> void:
 		Kit.light(self, c + Vector3(sx * 0.6, 1.6, 2.4), CANDLE, 1.1, 9.0)
 	Kit.light(self, bed + Vector3(0, 3.2, 0), PINK, 1.0, 10.0)
 	Interactable.make(self, bed + Vector3(0, 1.0, 0.2), Vector3(2.6, 1.4, 2.6), "The King", _on_king, {"name": "KingLook"})
-	Puzzle.declare(self, "kings_mind_memorial", "ending_memorial", ["flag:roses_all_placed"], "with the three roses in the vase, stay with the King")
+	Puzzle.declare(self, "kings_mind_m", "ending_m", ["flag:roses_all_placed"], "with the three roses in the vase, sit down by the King: M's ending")
 	# the table by the bed, and the vase
 	var table := bed + Vector3(2.2, 0, 0.3)
 	Props.place(self, "stool", table, 0.0, 1.1)
@@ -332,7 +332,8 @@ func _bedroom(c: Vector3) -> void:
 	Usher.spawn(self, c + Vector3(-7.0, 0, 1.5), {"appear_delay": 1.5})
 
 
-## Looking at him, until the roses are in; then staying with him, which is an end.
+## Looking at him, until the roses are in; then sitting down by him, which is
+## M's ending: the one who has been visiting all along was you.
 func _on_king(_p: Node, _it: Node) -> void:
 	if World.hud == null:
 		return
@@ -344,16 +345,16 @@ func _on_king(_p: Node, _it: Node) -> void:
 		])
 		Game.note("kings_mind_king", "The King as he is", "At the end of the labyrinth in his head, in a bedroom the size of a hall, the Red King lies under a sheet with no crown and no colour, breathing once for every four of your breaths. Not asleep: asleep can be woken. There is a vase by the bed with nothing in it.")
 		return
-	var i: int = await World.hud.ask("", "Three roses in the vase, and he has stopped dreaming about you, and he is waiting. If you stay with him now, this is the end of it: a memorial, with you in it. Stay?", ["No. Not yet.", "Stay with him. (an ending)"])
+	var i: int = await World.hud.ask("", "Three roses in the vase, folded from the book he liked, and he has stopped dreaming about you, and he is waiting. There is a chair by the bed with a shape worn into it, and the shape is yours: you have been coming here longer than you have been anyone else. If you sit down now, this is the end of it. Sit?", ["No. Not yet.", "Sit with him. (an ending)"])
 	if i != 1:
 		return
 	var y: int = await World.hud.ask("", "There is no coming back from this one. Are you sure?", ["No.", "Yes."])
 	if y != 1:
 		return
-	await Ending.play("memorial", "The memorial", [
-		"You sit in the chair by the bed, the one somebody has sat in a long time, and it fits.",
-		"His breathing does not change. Yours does: it slows, once for every four, until there is no telling which of you is which.",
-		"The roses do not need water. Somebody will come and look at them, and at you, and go away again, and that is what a memorial is for.",
+	await Ending.play("m", "M", [
+		"You sit in the chair by the bed and it fits, because it is yours. You have sat in it every day for longer than you can count, and read to him, and brought the roses one at a time.",
+		"His breathing does not change. It was never going to, and you knew that when you folded the first one.",
+		"You have a name, and it is not his. On the way out you sign the book the way you always do, with one letter.",
 	], Color(0.98, 0.95, 0.92))
 
 

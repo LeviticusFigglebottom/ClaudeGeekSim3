@@ -16,7 +16,7 @@ class_name MapBuilder
 ##   characters listed in opts.floors are floor cells with another texture
 ##
 ## opts: cell (2.0), height (3.0), origin (Vector3 of the map's top-left corner),
-## y (0.0), floor, wall, ceiling ("" for none), water, door_h (2.2), tile,
+## y (0.0), floor, wall, ceiling ("" for none), water, no_water, door_h (2.2), tile,
 ## floors {ch: tex}, walls {ch: tex}, no_ceiling "chars", open_edges (bool),
 ## wall_tops (bool), tint (Color), name
 ##
@@ -269,8 +269,10 @@ static func build(parent: Node, rows: Array, opts: Dictionary = {}) -> Dictionar
 			cs.position = s[0]
 			wbody.add_child(cs)
 		root.add_child(wbody)
-	for wc in water_cells:
-		Kit.water(root, wc + Vector3(0, -0.15, 0), Vector2(cell, cell), water_tex, opts.get("water_opts", {}))
+	# opts.no_water keeps the dropped floors of '~' cells but draws no water over them
+	if not bool(opts.get("no_water", false)):
+		for wc in water_cells:
+			Kit.water(root, wc + Vector3(0, -0.15, 0), Vector2(cell, cell), water_tex, opts.get("water_opts", {}))
 
 	var result := {
 		"markers": markers, "cells": grid, "cell": cell, "origin": origin, "root": root,

@@ -11,14 +11,14 @@ flat.
 
 ## Getting there
 
-At the banquet on the eighth square of the King's Dream, once the banquet
-has begun, taking hold of the cloth offers "Pull the plug. (an ending)" as
-the third option; it asks again before going. Pulling sets `plug_pulled`
-and travels to `static_end:from_banquet`. The cable it means runs from
-under the cloth at the player's place to a socket in the rotunda wall,
-built once the banquet has begun.
+At the board in the rotunda of the eighth square of the King's Dream, once
+the banquet has begun, "The board" asks for your move. "Concede. Lay the
+king down, and pull the plug. (an ending)" asks again, "No" first, then sets
+`plug_pulled` and travels to `static_end:from_banquet`. The plug it means is
+the cable from the monitor beside the empty hospital bed in that room to the
+socket on the pillar behind it.
 
-The route is declared on the cloth (`kings_dream_plug`, done flag
+The route is declared on the cloth's square (`kings_dream_plug`, done flag
 `ending_unplugged`, requires `flag:dream_banquet_begun`).
 
 ## The place

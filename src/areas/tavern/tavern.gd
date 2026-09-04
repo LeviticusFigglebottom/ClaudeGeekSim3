@@ -714,6 +714,48 @@ func _barkeep_talk(_p: Node, _npc: Node) -> bool:
 ## that would help, sideways, and never says where he heard it.
 func _rumour() -> void:
 	Game.bump("rumours")
+	if Game.has_flag("dream_banquet_begun") or Game.has_flag("roses_all_placed") or Game.keepsakes.size() >= 9:
+		await _rumour_paths()
+		return
+	await World.hud.say("The Barkeep", _rose_rumour())
+
+
+## Where the ways part, more than one rumour is going: ask which.
+func _rumour_paths() -> void:
+	while true:
+		var i: int = await World.hud.ask("The Barkeep", "\"More than one rumour going, these days. Which?\"", ["The board at the end of his dream", "The bed in his head", "The well in the room with the doors", "Never mind"])
+		var lines: Array = []
+		match i:
+			0:
+				if not Game.has_flag("dream_reached_eighth"):
+					lines = ["\"Past the eighth brook there's a room like the one with the doors, and in it a bed with nobody in it, a letter, and a game on a table that's nearly over.\"", "\"Wings and a stopped clock to get there. You know that part.\""]
+				elif not Game.has_flag("dream_banquet_begun"):
+					lines = ["\"A game on a table, nearly over: a pawn on the seventh and a king in the corner. It's not your move till you've stood in the middle of that room, where the well ought to be.\"", "\"Then the dinner starts, and then it is.\""]
+				else:
+					lines = ["\"Two moves left and neither comes back. Put the king down, or take the pawn across.\"", "\"Either way's an end, they say. The bed in that room's empty for a reason, and the letter on the chair tells you the rest.\"", "He looks at the door. \"Or do nothing. Nobody ever lost by doing nothing. Nobody woke up by it, either.\""]
+			1:
+				if Game.has_flag("roses_all_placed"):
+					lines = ["\"Three flowers in the glass and he's stopped dreaming. There's a chair by that bed with a shape worn in it, and they say the shape's yours.\"", "\"Sit in it, and that's that story told. It was never his.\""]
+				else:
+					lines = _rose_rumour()
+			2:
+				if Game.has_flag("cistern_drained"):
+					lines = ["\"The well let go of something, and the god's bath is going down its own drain. When it's down there's a way through the bottom, they say. Nobody's said to where.\"", "\"Take everything you've got. You'll be putting it together, not down.\""]
+				elif Game.keepsakes.size() >= 9:
+					lines = ["\"Nine things, nine places. The well in the room with the doors has been counting them. Hold all nine over it at once and it stops counting and starts something else.\"", "\"Something under a lot of water, is the rumour.\""]
+				else:
+					lines = ["\"Nine things, nine places. You've %d. The well in the room with the doors keeps count; when it gets to nine it'll want them all at once.\"" % Game.keepsakes.size(), "\"What it does then, nobody's been in a position to say.\""]
+			_:
+				await World.hud.say("The Barkeep", ["\"Suit yourself.\""])
+				return
+		await World.hud.say("The Barkeep", lines)
+		var again: int = await World.hud.ask("The Barkeep", "\"Another?\"", ["No, that's all.", "Another."])
+		if again != 1:
+			return
+
+
+## The one rumour, in order, for the thread from the candles to the King's bed.
+func _rose_rumour() -> Array:
 	var lines: Array = []
 	var roses := Game.count("roses_placed")
 	if Game.has_flag("roses_all_placed"):
@@ -766,7 +808,7 @@ func _rumour() -> void:
 		lines = ["\"To get into somebody's sleep you'd want to fly, and you'd want to stop the clocks. One without the other's no use.\""]
 	else:
 		lines = ["\"Nine things, nine places. Hold one of them and the doors know you.\"", "He does not say which doors. He may not know."]
-	await World.hud.say("The Barkeep", lines)
+	return lines
 
 
 func _riddle() -> void:

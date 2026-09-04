@@ -104,11 +104,15 @@ func _check_registry_and_build() -> void:
 
 
 ## Areas whose later visits build different geometry, and which visits to check.
-const EXTRA_VISITS := {"house": [2, 3], "kings_dream": [2, 3], "sea": [2], "castle": [2]}
+const EXTRA_VISITS := {"house": [2, 3], "kings_dream": [2, 3], "sea": [2], "castle": [2], "cistern": [2]}
+## Flags set before building a given visit, for geometry that a flag changes.
+const VISIT_FLAGS := {"cistern": {2: ["cistern_drained"]}}
 
 
 func _build_and_check(holder: Node3D, id: String, visit: int) -> void:
 	Game.visits[id] = visit - 1
+	for f in VISIT_FLAGS.get(id, {}).get(visit, []):
+		Game.set_flag(String(f), true)
 	var info: Dictionary = AreaRegistry.AREAS[id]
 	var path := String(info.get("scene", ""))
 	if not ResourceLoader.exists(path):

@@ -277,11 +277,12 @@ Render screenshots at every step and look at them.
 
 ## 9. Things that are not your job
 
-* **Endings are not yours to design.** `docs/ENDINGS.md` records the three
-  that exist as choices (the promotion, the plug, the memorial), the M ending
-  that is outlined and not to be built yet, and what is open. Do not invent
-  endings and do not build the well descent. The ending scenes themselves are
-  the next job and are stubbed in `src/core/ending.gd`.
+* **Endings are not yours to design.** `docs/ENDINGS.md` records the four
+  roads: concede and checkmate at the board, M at the King's bed, and the
+  fourth that starts at the well and stops at the drain in the emptied
+  Cistern with its end unspecified. Do not invent endings and do not build
+  the way down through that drain. The ending scenes themselves are the
+  next job and are stubbed in `src/core/ending.gd`.
 * There is no roadmap and no backlog. Known imperfections that are not worth
   your time: some faces on the Slow Sea are flat sprites, round moving
   platforms use box collision, the Drowned City's main street does not flood

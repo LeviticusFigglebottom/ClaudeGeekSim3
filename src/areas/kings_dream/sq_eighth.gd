@@ -2,12 +2,14 @@ class_name KDEighth
 extends RefCounted
 ## The eighth square. A rotunda that is the Anteroom, but the twelve doors are
 ## all open and all show static, and the room is, subtly, the mirrored one:
-## the doors run the other way round and the plaque reads backwards. At the
-## centre nothing is put on your head, and the banquet starts anyway: the
-## candles grow to the ceiling, the food introduces itself and everything
-## accelerates. Once it has begun the Usher stands across the table and a
-## cable runs from under the cloth to the wall. The way out is to take hold
-## of the cloth and pull; the two other things the cloth can mean are ends.
+## the doors run the other way round and the plaque reads backwards. In it,
+## besides the banquet: an empty hospital bed you know from somewhere, a
+## chair beside it with a letter from M, and a chessboard on a table with a
+## game nearly over. At the centre nothing is put on your head, and the
+## banquet starts anyway: the candles grow, the food introduces itself,
+## everything accelerates, and the Usher comes to the board. Then it is your
+## move, and the two moves are ends: concede (the plug) or checkmate (the
+## last rank). Doing nothing is allowed. The cloth is only the way back.
 ##
 ## Quotes the Anteroom, the Static, the Other Anteroom and the Workshop. The
 ## brook beyond the rotunda runs back to the wood.
@@ -27,9 +29,11 @@ static func build(area: AreaBase, root: Node3D, ctx: Dictionary) -> Dictionary:
 	_rotunda(area, root, state)
 	_banquet(area, root, state)
 	_plinth(area, root)
+	_bed(area, root)
+	_board(area, root, state)
 	var out := {}
 	out["exit"] = {"pos": Vector3(0, 0, -5.3), "yaw": 0.0}
-	out["usher"] = Vector3(2.4, 0, 2.6)
+	# no vanishing Usher here: once the banquet begins he stands at the board
 	out["on_process"] = func(delta: float) -> void:
 		_tick(state, delta)
 	return out
@@ -197,9 +201,8 @@ static func _banquet(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 		_dress_banquet(state)
 
 
-## Once the banquet has begun: the Usher across the table, the closest he has
-## ever stood, and a cable from under the cloth at your place to a socket in
-## the wall between two of the doors. Two things to pull.
+## Once the banquet has begun: the Usher comes to the board, the closest he
+## has ever stood, and stands across it from your chair.
 static func _dress_banquet(state: Dictionary) -> void:
 	if state.dressed:
 		return
@@ -207,25 +210,141 @@ static func _dress_banquet(state: Dictionary) -> void:
 	var root: Node3D = state.root
 	if root == null or not is_instance_valid(root):
 		return
-	var tp := CENTRE + Vector3(0, 0, -7.0)
-	Props.place(root, "usher", tp + Vector3(0, 0, -3.4), 180.0, 1.0, {"collision": "none", "name": "UsherAtTable"})
-	Kit.light(root, tp + Vector3(0, 2.6, -3.0), COLD, 0.6, 5.0)
-	Readable.create(root, tp + Vector3(0, 1.4, -3.4), 180.0, "The Usher", [
-		"Across the table, at last, near enough to see. A coat, a hat, and under the hat a face you know from the mirror in the flat.",
-		"He is not pointing at you. He is pointing at the edge of the cloth, where a cable goes under it, and where it comes out again and runs to the wall.",
-	], {"name": "UsherLook", "size": Vector3(1.4, 2.8, 1.2), "note_key": "usher_table", "note_title": "The Usher at the table", "note_text": "At the banquet the Usher stood across the table from you, the closest he has ever been, with your face. He pointed at the cloth, and at the cable that runs from under it to the wall."})
-	# a plate on the face of the pillar between two doors, the cable going up into it
-	var socket := CENTRE + Kit.polar(R - 2.2, 45.0, 0.5)
-	Kit.box(root, socket, Vector3(0.5, 0.5, 0.12), "metal/plate", {"solid": false, "tint": Color(0.55, 0.55, 0.6), "rotation": Vector3(0, 45, 0)})
-	Kit.box(root, socket + Kit.polar(-0.08, 45.0), Vector3(0.2, 0.2, 0.1), "metal/iron", {"solid": false, "tint": Color(0.15, 0.15, 0.17), "rotation": Vector3(0, 45, 0)})
-	Kit.light(root, socket + Kit.polar(-1.2, 45.0, 0.6), COLD, 0.5, 4.0)
-	var pts := [tp + Vector3(1.6, 0.05, 1.45), tp + Vector3(5.6, 0.05, 0.4), CENTRE + Kit.polar(R - 4.0, 45.0, 0.05), socket + Kit.polar(-0.16, 45.0)]
+	var ct := BOARD
+	Props.place(root, "usher", ct + Vector3(0, 0, -1.9), 180.0, 1.0, {"collision": "none", "name": "UsherAtBoard"})
+	Kit.light(root, ct + Vector3(0, 2.8, -1.6), COLD, 0.6, 5.0)
+	Readable.create(root, ct + Vector3(0, 1.4, -1.9), 180.0, "The Usher", [
+		"Across the board, at last, near enough to see. A coat, a hat, and under the hat a face you know from the mirror in the flat.",
+		"He is not pointing at you. He is pointing at the pawn on the seventh, and then, without hurry, at the bed.",
+	], {"name": "UsherLook", "size": Vector3(1.4, 2.8, 1.2), "note_key": "usher_board", "note_title": "The Usher at the board", "note_text": "Once the banquet began the Usher came and stood across the board from your chair, the closest he has ever been, with your face. He pointed at the pawn on the seventh rank, and at the bed."})
+
+
+# --- the bed, and the letter ---------------------------------------------------------------
+
+const BED := Vector3(-7.0, 0, 3.6)
+const BOARD := Vector3(6.6, 0, 2.0)
+
+## An empty hospital bed, made up, that is the most familiar thing in the
+## room; a monitor beside it showing snow, with a cable to a socket on the
+## pillar; and a chair by it with a letter from M.
+static func _bed(area: AreaBase, root: Node3D) -> void:
+	var b := BED
+	Props.place(root, "bed_iron", b, 90.0, 1.0)
+	# the drip stand at the foot, the monitor on its post at the head
+	Kit.cylinder(root, b + Vector3(1.2, 0, 0.9), 0.03, 1.9, "metal/brass", {"segments": 6})
+	Kit.box(root, b + Vector3(1.2, 1.75, 0.9), Vector3(0.18, 0.3, 0.1), "fabric/sheet", {"solid": false, "tint": Color(0.9, 0.95, 1.0)})
+	Kit.cylinder(root, b + Vector3(1.2, 0.02, 0.9), 0.3, 0.04, "metal/plate", {"segments": 8, "solid": false})
+	var post := b + Vector3(-0.6, 0, -1.1)
+	Kit.cylinder(root, post, 0.04, 1.1, "metal/iron", {"segments": 6, "tint": Color(0.5, 0.5, 0.55)})
+	Kit.cylinder(root, post + Vector3(0, 0.02, 0), 0.3, 0.04, "metal/plate", {"segments": 8, "solid": false})
+	var tv := Props.place(root, "tv_crt", post + Vector3(0, 1.1, 0), 180.0, 0.55, {"collision": "none"})
+	var screen := Props.part(tv, "Screen")
+	if screen is MeshInstance3D:
+		(screen as MeshInstance3D).set_surface_override_material(0, Kit.static_mat({"brightness": 0.8, "scale": 100.0}))
+	Kit.light(root, post + Vector3(0, 1.8, 0.6), Color(0.8, 0.85, 1.0), 0.7, 5.0)
+	Kit.light(root, b + Vector3(0, 3.0, 0), Color(0.9, 0.92, 1.0), 0.8, 7.0)
+	# the socket on the pillar behind the bed, and the cable to it
+	var a := 165.0
+	var socket := CENTRE + Kit.polar(R - 2.2, a, 0.5)
+	Kit.box(root, socket, Vector3(0.5, 0.5, 0.12), "metal/plate", {"solid": false, "tint": Color(0.55, 0.55, 0.6), "rotation": Vector3(0, 90.0 - a, 0)})
+	Kit.box(root, socket + Kit.polar(-0.08, a), Vector3(0.2, 0.2, 0.1), "metal/iron", {"solid": false, "tint": Color(0.15, 0.15, 0.17), "rotation": Vector3(0, 90.0 - a, 0)})
+	Kit.light(root, socket + Kit.polar(-1.2, a, 0.6), COLD, 0.5, 4.0)
+	var pts := [post + Vector3(0, 0.05, 0), Vector3(-9.4, 0.05, 2.7), socket + Kit.polar(-0.16, a)]
 	for k in pts.size() - 1:
 		_cable(root, pts[k], pts[k + 1])
-	Readable.create(root, socket + Kit.polar(-0.6, 45.0), Kit.yaw_to_center(45.0), "The socket", [
-		"A socket in the wall between two of the doors, and the cable in it, and the cable warm.",
+	Readable.create(root, socket + Kit.polar(-0.6, a), Kit.yaw_to_center(a), "The socket", [
+		"A socket on the pillar behind the bed, and the cable from the monitor in it, and the cable warm.",
 		"Everything in the room that hisses is on the other end of it.",
 	], {"name": "SocketLook", "size": Vector3(1.0, 1.0, 1.0)})
+	Readable.create(root, b + Vector3(0, 0.9, 0), 90.0, "The bed", [
+		"An iron bed with hospital corners, made up and empty, a dent in the pillow the shape of a head. It is the most familiar thing in the room and you could not say from where.",
+		"The monitor beside it shows snow. The cable from it runs to the wall. Nobody is in the bed, and it does not feel like nobody.",
+	], {"name": "BedLook", "size": Vector3(2.6, 1.4, 1.6), "note_key": "dream_bed", "note_title": "The empty bed", "note_text": "In the rotunda at the end of the dream stands an empty hospital bed you know from somewhere, a dent in the pillow, a monitor beside it showing snow, and a cable from the monitor to the wall. A chair by it has a letter on the seat, signed M."})
+	# the chair, and the letter on it
+	var ch := b + Vector3(0.4, 0, -1.9)
+	Props.place(root, "chair", ch, 180.0, 1.0)
+	var q := QuadMesh.new()
+	q.size = Vector2(0.3, 0.3)
+	Kit.add_mesh(root, q, Kit.mat("signs/note_m", {"double": true}), ch + Vector3(0, 0.49, 0.05), {"solid": false, "rotation": Vector3(-90, 0, 0)})
+	Readable.create(root, ch + Vector3(0, 0.7, 0), 0.0, "A letter on the chair", [
+		"A folded page on the seat, in a hand you know from a note in a house and from the tiles of a shower. It is not addressed.",
+		"\"I sat here again today. I read to you; you did not hear, or you did and it was a garden. The roses are from the book you liked. I have stopped asking them how long. Whatever you decide, I was here.\"",
+		"It is signed with one letter: M.",
+	], {"name": "LetterM", "size": Vector3(1.0, 1.0, 1.0), "note_key": "letter_m", "note_title": "The letter from M", "note_text": "On the chair by the empty bed at the end of the dream, a letter, signed M: I sat here again today. I read to you. The roses are from the book you liked. Whatever you decide, I was here."})
+	area.rng.randf()
+
+
+# --- the board -----------------------------------------------------------------------------
+
+const WHITE := "stone/marble_white"
+const BLACK := "stone/marble_black"
+const IVORY := Color(0.95, 0.93, 0.85)
+const RED := Color(0.85, 0.2, 0.25)
+
+## A chessboard the size of a table, with a game nearly over on it: your pawn
+## on the seventh, his king in the corner. Your chair on the south side.
+static func _board(area: AreaBase, root: Node3D, state: Dictionary) -> void:
+	var ct := BOARD
+	Kit.box(root, ct + Vector3(0, 0.86, 0), Vector3(2.3, 0.08, 2.3), "wood/planks_dark", {"tile": 1.0})
+	for sx in [-1.0, 1.0]:
+		for sz in [-1.0, 1.0]:
+			Kit.box(root, ct + Vector3(sx * 1.0, 0.41, sz * 1.0), Vector3(0.12, 0.82, 0.12), "wood/planks_dark", {"solid": false})
+	Kit.box(root, ct + Vector3(0, 0.905, 0), Vector3(2.02, 0.03, 2.02), "wood/planks_dark", {"solid": false, "tint": Color(0.6, 0.55, 0.5)})
+	var sq := 0.24
+	for f in 8:
+		for r in 8:
+			var p := ct + Vector3((f - 3.5) * sq, 0.93, (3.5 - r) * sq)
+			Kit.box(root, p, Vector3(sq, 0.02, sq), WHITE if (f + r) % 2 == 1 else BLACK, {"solid": false, "faces": ["py"], "tile": sq})
+	# file a is the west, rank 1 is your side
+	var at := func(file: int, rank: int) -> Vector3:
+		return ct + Vector3((file - 3.5) * sq, 0.94, (3.5 - (rank - 1)) * sq)
+	var pieces := [["chess_pawn", 4, 7, false], ["chess_king", 5, 6, false], ["chess_queen", 1, 3, false], ["chess_king", 7, 8, true], ["chess_pawn", 6, 7, true], ["chess_knight", 0, 5, true]]
+	for pc in pieces:
+		var model := String(pc[0])
+		if not Props.exists(model):
+			model = "chess_pawn"
+		Props.place(root, model, at.call(int(pc[1]), int(pc[2])), 0.0 if not pc[3] else 180.0, 0.3, {"collision": "none", "tint": RED if pc[3] else IVORY})
+	# the taken pieces, lying by the board
+	for k in 4:
+		Props.place(root, ["chess_pawn", "chess_knight", "chess_pawn", "chess_pawn"][k], ct + Vector3(-1.35 + k * 0.2, 0.96, 1.25 - (k % 2) * 0.3), k * 70.0, 0.26, {"collision": "none", "tint": IVORY if k % 2 == 0 else RED, "rotation": Vector3(90, k * 70.0, 0)})
+	Kit.light(root, ct + Vector3(0, 2.6, 0), Color(1.0, 0.95, 0.85), 1.0, 7.0)
+	Props.place(root, "chair", ct + Vector3(0, 0, 1.75), 0.0, 1.0)
+	Interactable.make(root, ct + Vector3(0, 1.1, 0), Vector3(2.5, 1.2, 2.5), "The board", func(_p: Node, _it: Node) -> void:
+		_on_board(state), {"name": "Board"})
+	Puzzle.declare(area, "dream_board", "", ["flag:dream_banquet_begun"], "once the banquet has begun, sit at the board: it is your move")
+
+
+## Your move. "Do nothing" comes first and is selected, so nothing is chosen
+## by accident; the other two say they are ends and ask again.
+static func _on_board(state: Dictionary) -> void:
+	if World.hud == null:
+		return
+	if not Game.has_flag("dream_banquet_begun"):
+		await World.hud.say("", [
+			"A board the size of a table, and a game on it nearly over: your pawn on the seventh, his king in the corner, and nothing else on it that matters.",
+			"It is not your move. Not yet. The chair on your side has been pulled out.",
+		])
+		Game.note("dream_board", "The board", "In the rotunda at the end of the dream, a chessboard on a table with a game nearly over: your pawn on the seventh rank, the red king in the corner. A chair pulled out on your side.")
+		return
+	var i: int = await World.hud.ask("", "Your move, and it is the last one either way. The pawn to the eighth is mate, and a pawn that gets there stays there. Or the king lies down, and that is the plug. The Usher waits. Neither can be taken back, and the board says so. Doing nothing is allowed.", [
+		"Do nothing. Leave the board as it is.",
+		"Concede. Lay the king down, and pull the plug. (an ending)",
+		"Checkmate. The pawn to the eighth, and stay on the board. (an ending)",
+	])
+	if i != 1 and i != 2:
+		return
+	var y: int = await World.hud.ask("", "There is no coming back from this one. Are you sure?", ["No.", "Yes."])
+	if y != 1:
+		return
+	state.speed = 0.0
+	if i == 1:
+		Game.set_flag("plug_pulled", true)
+		Game.note("plug", "Concede", "At the board at the end of the dream you laid the king down. The monitor by the empty bed went to a dot, and the doors went to snow and stayed there.")
+		World.travel("static_end", "from_banquet", {"color": Color.WHITE, "duration": 1.8})
+	else:
+		Game.set_flag("promotion_taken", true)
+		Game.note("promotion", "Checkmate", "At the board at the end of the dream you took the pawn to the eighth rank. A pawn that reaches the last rank is promoted: it becomes whatever it is told to be, and it never leaves the board.")
+		World.travel("promotion", "from_banquet", {"color": Color(0.1, 0.06, 0.14), "duration": 1.8})
 
 
 ## A straight run of cable between two points, in the square's own space

@@ -1128,6 +1128,7 @@ def build_catalog():
     reg("signs/note_tavern", lambda r: _note(r, ["RIDDLE (for a", "coin):", "", "I have doors", "but no house,", "a well but no", "water, and", "everyone waits", "in me.", "  What am I?"]))
     reg("signs/note_king", lambda r: _note(r, ["The King sleeps", "so the Keep", "may stand.", "", "Wake him and", "the hours", "will fall out", "of the clock", "like teeth.", "  - the Steward"], ink="#4a1a1a"))
     reg("signs/note_offices", lambda r: _note(r, ["MEMO", "", "Your number", "will be called.", "", "Your number", "was called.", "", "Your number", "will be called."]))
+    reg("signs/note_m", lambda r: _note(r, ["I sat here", "again today.", "I read to you.", "The roses are", "from the book", "you liked.", "", "Whatever you", "decide, I was", "here.    - M."], ink="#2a3050"))
     reg("signs/book_cover", lambda r: sign(["A HOUSE", "OF", "HALLWAYS"], "#2a1a2a", "#c9a227", size=(64, 96), kind="display", font_size=11, frame_color="#c9a227"))
     reg("signs/book_cover_2", lambda r: sign(["ON", "SLEEPING", "KINGS"], "#1a2a3a", "#c9c2b0", size=(64, 96), kind="display", font_size=11, frame_color="#8a8478"))
     reg("signs/label_moonlight", lambda r: sign(["MOONLIGHT", "do not open", "in daylight"], "#e8e4dc", "#2a2a40", size=(64, 48), kind="body", font_size=11))

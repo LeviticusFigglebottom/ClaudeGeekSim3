@@ -14,7 +14,7 @@ the verifier (`tools/verify.sh`) checks all of them.
 | `apartment` | Flat 5½ (waking) | wake (`bed`), hallway (`closet`), corridor (`front`), mirror_nexus (`mirror`) | bed → `nexus:default`; closet → `hallway:entrance` (needs `has_woken`); front door → `corridor:flat_door` (needs `door_code`); bathroom mirror → `mirror_nexus:default` (needs shard sight) | tape measure (kitchen drawer, after first waking); TV face easter egg; flat 7 mirrored variant (`in_flat_seven`) |
 | `corridor` | The Halden Arms | apartment (`flat_door`), offices (`from_stairs`) | 5½ → `apartment:front`; 7 → `apartment:front` (mirrored); stairs → `offices:from_stairs`; lift (3 calls) → `static:lift` | looping corridor, knock-backs |
 | `hallway` | The Hallway | apartment (`entrance`), house (`side`), nexus/catacombs (`end`, `stairs`) | closet → `apartment:closet`; side door (after measuring) → `house:field`; big door → `nexus:from_hallway`; stair (3 loops) → `catacombs:from_stairs` | measurement puzzle → `door_code`; lantern inscriptions; growth; loop |
-| `nexus` | The Anteroom | every realm (`from_<id>`), hallway (`from_hallway`), mirror_nexus (`from_mirror`), workshop (`from_workshop`) | twelve doors → `<realm>:from_nexus`; workshop (13 bells) | bell unlocks castle door; the well counts keepsakes |
+| `nexus` | The Anteroom | every realm (`from_<id>`), hallway (`from_hallway`), mirror_nexus (`from_mirror`), workshop (`from_workshop`) | twelve doors → `<realm>:from_nexus`; workshop (13 bells) | bell unlocks castle door; the well counts keepsakes, and with all nine held over it lets go: the Cistern drains (`cistern_drained`) |
 | `forest` | The Hollow Wood | nexus (`from_nexus`), city (`road`), catacombs (`well_top`), tavern back door (`clearing`) | gate → `nexus:from_forest`; road → `city:west_gate`; well (rain) → `catacombs:from_well` | **Lantern** (hermit hut; light 3 braziers in stone order); **moonlight** (canopy, needs wings); standing stones; giant trees |
 | `city` | The Drowned City | nexus, forest (`west_gate`), catacombs (`sewer_top`), clocktower (`from_tower`), tavern back door (`alley`) | gate → `nexus:from_city`; west gate → `forest:road`; sewer (lantern) → `catacombs:from_sewer`; tower door (tower key) → `clocktower:from_city` | **Bell** (cathedral crypt, bell-order puzzle); **tower key** (palace, stone knights admit the crowned); wrapping streets |
 | `tavern` | The Last Lamp | nexus, sea (`from_sea`), furnace (`from_furnace`, the cellar) | door → `nexus:from_tavern`; back door → random of `forest:clearing`, `city:alley`, `house:field`, `sea:shore`; inn bed → `sea:from_tavern`; mouse gap → undertavern; cellar iron door (rope cut) → `furnace:from_tavern` | riddle → **coin**; moonlight trade → **Umbrella**; bard, patrons, barkeep |
@@ -23,7 +23,7 @@ the verifier (`tools/verify.sh`) checks all of them.
 | `sea` | The Slow Sea | tavern (`from_tavern`), nexus, tavern back door (`shore`) | pier door → `nexus:from_sea`; sleeping shore → `tavern:from_sea` | **Moth Wings** (highest platform; clockwork platforms); giant faces; colour-shifting sky |
 | `catacombs` | The Ossuary | forest (`from_well`), city (`from_sewer`), hallway (`from_stairs`), nexus | ladder → `forest:well_top`; grate → `city:sewer_top`; door → `nexus:from_catacombs` | **Mirror Shard** (reflecting pool; needs lantern to find the way); gravestone name puzzle; lantern-only paths |
 | `furnace` | The Furnace | mirror_nexus (`from_mirror`), nexus, tavern cellar (`from_tavern`) | iron door → `nexus:from_furnace`; mirror gate (shard) → `mirror_nexus:from_furnace`; small iron door (after the rope) → `tavern:from_furnace` | **Kitchen Knife** (the chained giant holds it out); the pit of slow fire (fall in: the Static); the forge and the Stoker; **candle stub** (iron maiden); the choir that sings one note (the bell stops it); the gallows rope (knife) opens every cage |
-| `cistern` | The Cistern | house (`from_basement`), nexus | drain ladder → `house:basement`; tiled door → `nexus:from_cistern` | **torn page** (follow the reading voice to the showers); the great sunken bath and its writing on the bottom; the lifeguard who climbed down; the corridor that only goes on (three passes → the glass float); the umbrella makes it rain indoors; higher water on the second visit |
+| `cistern` | The Cistern | house (`from_basement`), nexus | drain ladder → `house:basement`; tiled door → `nexus:from_cistern` | **torn page** (follow the reading voice to the showers); the great sunken bath and its writing on the bottom; the lifeguard who climbed down; the corridor that only goes on (three passes → the glass float); the umbrella makes it rain indoors; higher water on the second visit; once the well has let go, no water at all: the bath empty, what it was keeping on the bottom, the rest of the writing, and a drain the size of a door (the fourth road, unfinished) |
 | `offices` | The Waiting Halls | corridor (`from_stairs`), house (`from_house`), nexus | fire door → `corridor:from_stairs`; door 5½ (once your number is called) → `nexus:from_offices`; STAFF ONLY → `house:from_offices`; door 0604 (door code) → `hallway:end`; door 0001 → the same waiting room | **missing photo** (archive drawer marked 5½); take a number, wait three times; **dog biscuit** (vending machine, B4); the corridor of cubicles that goes round; the photocopier that prints a face; the shadow at the desk |
 | `clocktower` | The Clocktower | city (`from_city`), nexus (`from_nexus`, both at the bottom) | ground doors → `city:from_tower` and `nexus:from_clocktower`; top door → `nexus:from_clocktower` | **Hourglass** (top of the spiral; two great gears to ride, the wings make it easy); the clock whose hands move only when unseen; the great bell stops the works; the keeper; a chest with a clock hand with your name on it |
 | `static` | The Static | falling out of any world (`default`), corridor lift (`lift`), nexus | a screen → `nexus:from_static` | the Usher's home; nothing stays |
@@ -95,18 +95,18 @@ the Hallway stair (three descents) → `catacombs:from_stairs`.
   Bonemeal (four Candle Stubs on the crypt plinth in the Ossuary → Bones;
   the anvil in the Furnace → Bonemeal). Beanstalks in cloud, a keep with
   walls of grey matter and a labyrinth of bookshelves, the King in a coma
-  and a vase for the three Paper Roses. After the third rose, the King
-  offers the memorial ending. Spec: `docs/areas/KINGS_MIND.md`.
-* `promotion` — The Last Rank. From the cloth at the banquet, once the
-  banquet has begun, by accepting the promotion. One rank of eight squares,
-  BORN to a square with nothing on it; standing on the last is the ending.
-  Spec: `docs/areas/PROMOTION.md`.
-* `static_end` — Off Air. From the same cloth, by pulling the plug. The
+  and a vase for the three Paper Roses. After the third rose, sitting with
+  the King is M's ending. Spec: `docs/areas/KINGS_MIND.md`.
+* `promotion` — The Last Rank. From the board in the rotunda at the eighth
+  square, once the banquet has begun, by playing checkmate. One rank of
+  eight squares, BORN to a square with nothing on it; standing on the last
+  is the ending. Spec: `docs/areas/PROMOTION.md`.
+* `static_end` — Off Air. From the same board, by conceding: the plug. The
   same eight things, grey and sinking, each watched by a set showing snow;
   the Usher on a bed at the end, and the plug. Pulling it is the ending.
   Spec: `docs/areas/STATIC_END.md`.
 
-All three endings are confirmations that default to "No"; their scenes are
-not made yet (`docs/ENDINGS.md`). Neither `promotion` nor `static_end` has
-a door back: holding R wakes you, as everywhere, and the solver reaches
-them through the routes declared on the cloth.
+All the choices default to "No" or "Do nothing"; no ending scene is made
+yet (`docs/ENDINGS.md`). Neither `promotion` nor `static_end` has a door
+back: holding R wakes you, as everywhere, and the solver reaches them
+through the routes declared on the eighth square.

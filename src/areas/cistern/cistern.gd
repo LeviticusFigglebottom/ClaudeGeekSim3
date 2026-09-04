@@ -19,6 +19,7 @@ const W := 28
 const D := 22
 
 var water_level := 0.12
+var drained := false          # the well in the Anteroom has been given all nine keepsakes
 var float_node: Node3D = null
 var _float_spots: Array = []
 var _float_i := 0
@@ -27,6 +28,7 @@ var voice_step := 0
 
 
 func build() -> void:
+	drained = Game.has_flag("cistern_drained")
 	water_level = 0.12 if visit_count < 2 else 0.3
 	Realm.apply(self, "cistern", {"ambient_energy": 1.0})
 	_plan()
@@ -39,6 +41,7 @@ func build() -> void:
 	_presences()
 	Puzzle.declare(self, "cistern_loops", "cistern_shell_found", [], "walk the corridor that only goes on until it gives up")
 	Puzzle.declare(self, "cistern_page", "", [], "follow the voice reading aloud through the flooded corridors", {"item": "page"})
+	Puzzle.declare(self, "cistern_great_drain", "", ["flag:cistern_drained"], "with the water gone, the drain at the bottom of the great bath")
 
 
 # --- coordinates: plan metres -> world -------------------------------------------------------
@@ -58,6 +61,8 @@ func _lamp(x: float, z: float, energy: float = 1.1, reach: float = 11.0, y: floa
 
 ## Flooded floor: a water plane over a rectangle of cells (x0, z0 inclusive; x1, z1 exclusive).
 func _flood(x0: int, z0: int, x1: int, z1: int) -> void:
+	if drained:
+		return
 	var c := _m((x0 + x1) * 0.5 * CELL, (z0 + z1) * 0.5 * CELL, water_level)
 	Kit.water(self, c, Vector2((x1 - x0) * CELL, (z1 - z0) * CELL), "nature/water_cistern", {"tint": Color(1, 1, 1, 0.55), "subdiv": 6})
 
@@ -102,7 +107,7 @@ func _plan() -> void:
 		"cell": CELL, "height": H, "origin": ORIGIN, "door_h": 3.0, "tile": 2.0,
 		"floor": "wall/tile_white", "wall": "wall/tile_cyan", "ceiling": "wall/plaster_white",
 		"water": "nature/water_cistern", "water_floor": "wall/tile_cyan",
-		"water_opts": {"tint": Color(1, 1, 1, 0.6), "subdiv": 2},
+		"water_opts": {"tint": Color(1, 1, 1, 0.6), "subdiv": 2}, "no_water": drained,
 		"rooms": rooms, "outer_faces": true, "name": "Cistern",
 	})
 
@@ -157,7 +162,7 @@ func _pool_hall() -> void:
 	Readable.create(self, _m((bx0 + bx1) * 0.5, bz1 + 3.6, 2.2), 0.0, "The lifeguard's log", ["LOG. Day one: nobody drowned.", "Day two: nobody drowned.", "Day four hundred: nobody drowned. I have started to wonder whether that is the point of me.", "Day (illegible): somebody came up."], {"name": "LifeguardLog", "size": Vector3(1.2, 1.6, 1.2), "note_key": "cistern_log", "note_title": "The lifeguard's log", "note_text": "Nobody drowned in the Cistern for four hundred days. Then somebody came up."})
 	NPC.create(self, _m((bx0 + bx1) * 0.5 + 2.4, bz1 + 3.2), 0.0, "The Lifeguard", {
 		"model": "figure_shadow", "face_player": true, "flee_knife": true,
-		"lines": ["You are not supposed to be in the water in your clothes.", "You are not supposed to be in the water.", "Nobody is supposed to be in the water. That is what the water is for."],
+		"lines": ["Nobody is in the water. There is no water.", "Somebody came up. Now somebody has to go down. I do not think it is me.", "I do not know what I am for now."] if drained else ["You are not supposed to be in the water in your clothes.", "You are not supposed to be in the water.", "Nobody is supposed to be in the water. That is what the water is for."],
 		"reactions": {
 			"umbrella": ["An umbrella. Indoors. The god used to hate that.", "It would rain, to make a point."],
 			"mouse": ["Small things go down the drain. That is where the small things went."],
@@ -167,9 +172,12 @@ func _pool_hall() -> void:
 	})
 	# the far wall: a great drain and the god's tap
 	Props.place(self, "fountain_head", _m(bx1 + 4.0, bz0 - 1.95, 2.4), 180.0, 2.0, {"collision": "none"})
-	Kit.particles(self, _m(bx1 + 4.0, bz0 - 1.4, 1.6), "rain", Vector3(0.3, 0.8, 0.3), 30)
-	Kit.water(self, _m(bx1 + 4.0, bz0 - 0.9, 0.06), Vector2(3.0, 2.0), "nature/water_cistern", {"tint": Color(1, 1, 1, 0.5), "subdiv": 2})
-	Readable.create(self, _m(bx1 + 4.0, bz0 - 1.5, 2.0), 180.0, "The tap", ["A tap the size of a door, dripping.", "The drip takes a long time to fall, and when it lands it is already gone."], {"name": "GodTap", "size": Vector3(1.6, 1.6, 1.0), "sound": "drip"})
+	if drained:
+		Readable.create(self, _m(bx1 + 4.0, bz0 - 1.5, 2.0), 180.0, "The tap", ["A tap the size of a door, not dripping.", "It has stopped. Nothing here has ever stopped before."], {"name": "GodTap", "size": Vector3(1.6, 1.6, 1.0)})
+	else:
+		Kit.particles(self, _m(bx1 + 4.0, bz0 - 1.4, 1.6), "rain", Vector3(0.3, 0.8, 0.3), 30)
+		Kit.water(self, _m(bx1 + 4.0, bz0 - 0.9, 0.06), Vector2(3.0, 2.0), "nature/water_cistern", {"tint": Color(1, 1, 1, 0.5), "subdiv": 2})
+		Readable.create(self, _m(bx1 + 4.0, bz0 - 1.5, 2.0), 180.0, "The tap", ["A tap the size of a door, dripping.", "The drip takes a long time to fall, and when it lands it is already gone."], {"name": "GodTap", "size": Vector3(1.6, 1.6, 1.0), "sound": "drip"})
 	Props.place(self, "drain_grate", _m(bx0 - 3.0, bz1 + 1.0, 0.01), 0.0, 1.5, {"collision": "none"})
 	Readable.create(self, _m(bx0 - 3.0, bz1 + 1.0, 0.3), 0.0, "A drain", ["Hair, and a ring, and the sound of a much bigger room underneath."], {"name": "Drain1", "size": Vector3(1.2, 0.5, 1.2)})
 	# a float that is somewhere else when you look back
@@ -180,6 +188,8 @@ func _pool_hall() -> void:
 	Readable.create(self, _m((bx0 + bx1) * 0.5, (bz0 + bz1) * 0.5, -0.4), 0.0, "Tiles on the bottom", ["Spelled out in darker tiles on the bottom of the bath: A HUNDRED YEARS IS NOT LONG TO HOLD YOUR BREATH.", "The tiles continue under the ladder, where you cannot read them."], {"name": "BottomTiles", "size": Vector3(4.0, 0.6, 2.0), "note_key": "cistern_bottom", "note_title": "The bottom of the bath", "note_text": "Written in darker tiles on the bottom of the great bath: A HUNDRED YEARS IS NOT LONG TO HOLD YOUR BREATH."})
 	if visit_count >= 2 and Props.exists("figure_shadow"):
 		Props.place(self, "figure_shadow", _m((bx0 + bx1) * 0.5, bz1 + 3.6, 1.7), 0.0, 0.8, {"collision": "none", "name": "ChairShadow"})
+	if drained:
+		_dry_bottom(bx0, bx1, bz0, bz1)
 	# lamps
 	for i in 4:
 		for j in 3:
@@ -188,6 +198,40 @@ func _pool_hall() -> void:
 	Kit.particles(self, _m((bx0 + bx1) * 0.5, (bz0 + bz1) * 0.5, 1.5), "motes", Vector3(10.0, 1.5, 6.0), 40)
 	Kit.label(self, "DEEP END", _m(bx1 - 1.0, bz0 - 1.98, 2.6), 180.0, 36, Color(0.3, 0.5, 0.55), "display", {"pixel_size": 0.012})
 	Kit.label(self, "DEEP END", _m(bx0 + 1.0, bz0 - 1.98, 2.6), 180.0, 36, Color(0.3, 0.5, 0.55), "display", {"pixel_size": 0.012})
+
+
+## The bottom of the great bath with the water gone: what it was keeping, and
+## the drain the size of a door that was under all of it. The way down through
+## it is the fourth road, and its end is not made yet.
+func _dry_bottom(bx0: float, bx1: float, bz0: float, bz1: float) -> void:
+	var cx := (bx0 + bx1) * 0.5
+	var cz := (bz0 + bz1) * 0.5
+	var c := _m(cx, cz, -0.59)
+	Kit.cylinder(self, c - Vector3(0, 0.03, 0), 1.5, 0.025, "stone/blocks_dark", {"solid": false, "segments": 24, "mat": Kit.flat(Color(0.02, 0.02, 0.03), {"unshaded": true})})
+	Props.place(self, "drain_grate", c + Vector3(0, 0.01, 0), 0.0, 3.2, {"collision": "none", "name": "GreatDrainGrate"})
+	Kit.light(self, c + Vector3(0, 1.6, 0), Color(0.5, 0.7, 0.75), 0.9, 8.0)
+	Interactable.make(self, c + Vector3(0, 0.5, 0), Vector3(3.2, 1.2, 3.2), "The drain at the bottom", _on_great_drain, {"name": "GreatDrain"})
+	# what the water was keeping
+	var kept := ["bottle", "mug", "teacup_stack", "shell", "candle", "bottle", "mug"]
+	for k in kept.size():
+		var p := _m(bx0 + 2.0 + k * 3.1, bz0 + 1.2 + (k % 3) * 2.6, -0.6)
+		Props.place(self, String(kept[k]), p, k * 50.0, 0.9, {"collision": "none"})
+	Readable.create(self, _m(bx0 + 4.0, bz0 + 2.4, -0.3), 0.0, "What the water was keeping", [
+		"Under where the water was: a shoe, a ring, cups, a key with no number, a great many small things that went down and did not fit down the drain.",
+		"A tide mark on the inside of the bath, one, at the very top. It was full once and never fuller.",
+		"Under the ladder the tiles go on: ...TO HOLD YOUR BREATH. THE OTHER HALF OF YOU IS HOLDING IT TOO.",
+	], {"name": "DryBottom", "size": Vector3(4.0, 1.0, 3.0), "note_key": "cistern_dry", "note_title": "The bath, empty", "note_text": "The great bath in the Cistern has drained. On the bottom, what the water was keeping, and the rest of the writing under the ladder: the other half of you is holding it too. In the middle, a drain the size of a door."})
+
+
+func _on_great_drain(_p: Node, _it: Node) -> void:
+	if World.hud == null:
+		return
+	await World.hud.say("", [
+		"The drain at the bottom of the bath, the size of a door, with no water over it for the first time in a hundred years.",
+		"Air comes up out of it, warm, in a slow rhythm: once for every four of your breaths. Whatever is down there is breathing, and you know the rate.",
+		"The way down through it is not made yet.",
+	])
+	Game.note("cistern_great_drain", "The drain the size of a door", "At the bottom of the emptied bath in the Cistern is a drain the size of a door. Warm air comes up out of it once for every four of your breaths. The way down through it is not made yet.")
 
 
 # --- the flooded corridors -------------------------------------------------------------------------
@@ -343,3 +387,6 @@ func on_enter(spawn_id: String, n: int) -> void:
 		Game.note("cistern", "The Cistern", "A bathhouse for something the size of a god. White tile, cyan tile, water on every floor. The lifeguard has climbed down from the chair.")
 	if n == 2:
 		Game.note("cistern_higher", "Higher water", "The water in the Cistern is higher the second time. The corridor that only went on has decided to go through.")
+	if drained and not Game.has_note("cistern_drained"):
+		Game.note("cistern_drained", "The Cistern, drained", "The water has gone out of the Cistern, all of it, down the drain at the bottom of the great bath. The tap has stopped. The lifeguard does not know what he is for.")
+		Game.toast.emit("The water has gone. All of it.")

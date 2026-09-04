@@ -11,15 +11,15 @@ sets `ending_limbo`, fades, and for now wakes the player in the flat.
 
 ## Getting there
 
-At the banquet on the eighth square of the King's Dream, once the banquet
-has begun (`dream_banquet_begun`, set by standing at the centre), taking
-hold of the cloth asks three things. "No" is first and selected by default.
-"Accept the promotion" and "Pull the plug" both say *(an ending)* and both
-ask again, "No" first, before they go anywhere. Accepting sets
-`promotion_taken` and travels to `promotion:from_banquet`.
+At the board in the rotunda of the eighth square of the King's Dream, once
+the banquet has begun (`dream_banquet_begun`, set by standing at the
+centre), "The board" asks for your move. "Do nothing" is first and selected.
+"Checkmate. The pawn to the eighth, and stay on the board. (an ending)"
+asks again, "No" first, then sets `promotion_taken` and travels to
+`promotion:from_banquet`.
 
-The route is declared on the cloth (`kings_dream_promotion`, done flag
-`ending_limbo`, requires `flag:dream_banquet_begun`).
+The route is declared on the cloth's square (`kings_dream_promotion`, done
+flag `ending_limbo`, requires `flag:dream_banquet_begun`).
 
 ## The place
 

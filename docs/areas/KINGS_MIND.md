@@ -49,13 +49,15 @@ roses are in the castle library, under the tavern floor (the Tin Mouse), and
 the hedge maze of the Garden (the Wings). After the third, flag
 `roses_all_placed`: he has stopped dreaming about you and is waiting.
 
-## The King
+## The King, and M
 
 "The King" (`KingLook`) is a look before the third rose. After it, it asks
-"Stay with him. (an ending)", "No" first, then asks again, and plays the
-`memorial` ending (`ending_memorial`): a memorial to yourself. Its scene is
-not made yet; see `docs/ENDINGS.md`. Declared as `kings_mind_memorial`,
-requires `flag:roses_all_placed`.
+"Sit with him. (an ending)", "No" first, then asks again, and plays the `m`
+ending (`ending_m`): the chair by the bed has a shape worn into it and the
+shape is yours. You were M all along, the visitor who read to him and
+brought the roses one at a time; you sign the book on the way out with one
+letter. Finished as a choice; its scene is not made yet (`docs/ENDINGS.md`).
+Declared as `kings_mind_m`, requires `flag:roses_all_placed`.
 
 ## Hints
 
