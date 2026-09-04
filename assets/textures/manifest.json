@@ -641,6 +641,36 @@
   "surface": "stone",
   "w": 128
  },
+ "signs/kd_between": {
+  "alpha": false,
+  "h": 48,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/kd_charge": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/kd_menu": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 96
+ },
+ "signs/kd_rules": {
+  "alpha": false,
+  "h": 96,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/kd_shop": {
+  "alpha": false,
+  "h": 96,
+  "surface": "stone",
+  "w": 128
+ },
  "signs/king_asleep": {
   "alpha": false,
   "h": 64,
