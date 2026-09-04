@@ -568,6 +568,8 @@ func _confirm_choice() -> void:
 func _lock_player(locked: bool) -> void:
 	if Game.player:
 		Game.player.input_locked = locked
+		if not locked:
+			Game.player.interact_cooldown = 0.35
 
 
 # --- journal ---------------------------------------------------------------
@@ -783,8 +785,8 @@ func _build_settings(root: Node) -> void:
 	settings_panel.set_anchors_preset(Control.PRESET_CENTER)
 	settings_panel.offset_left = -300
 	settings_panel.offset_right = 300
-	settings_panel.offset_top = -280
-	settings_panel.offset_bottom = 280
+	settings_panel.offset_top = -330
+	settings_panel.offset_bottom = 330
 	settings_panel.visible = false
 	root.add_child(settings_panel)
 	var v := VBoxContainer.new()
@@ -833,6 +835,8 @@ func open_settings(back: Callable) -> void:
 	_slider(v, "vertex wobble", "wobble", 0.0, 1.0, 0.05)
 	_slider(v, "texture warp", "warp", 0.0, 1.0, 0.05)
 	_slider(v, "pixel size", "pixel", 1.0, 4.0, 1.0)
+	_slider(v, "colour depth", "levels", 8.0, 256.0, 8.0)
+	_slider(v, "glow on things you can use", "aura", 0.0, 1.0, 0.05)
 	_slider(v, "mouse speed", "mouse", 0.3, 2.5, 0.1)
 	_slider(v, "volume", "volume", 0.0, 1.0, 0.05)
 	var fs := CheckButton.new()

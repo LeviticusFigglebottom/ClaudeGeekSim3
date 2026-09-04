@@ -188,3 +188,7 @@ ps1_warp={
 "type": "float",
 "value": 1.0
 }
+aura_opacity={
+"type": "float",
+"value": 0.6
+}

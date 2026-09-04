@@ -59,6 +59,8 @@ var yaw := 0.0
 var pitch := 0.0
 var frozen := false
 var input_locked := false
+## Set when a conversation closes, so the key that closed it does not open the next one.
+var interact_cooldown := 0.0
 var focus: Node = null
 var wake_hold := 0.0
 var bob_t := 0.0
@@ -93,6 +95,9 @@ func _ready() -> void:
 ## container forwards events. Mouse motion arrives from the HUD (root viewport).
 func _poll_actions() -> void:
 	if frozen or input_locked or not _in_play():
+		return
+	if interact_cooldown > 0.0:
+		interact_cooldown -= get_physics_process_delta_time()
 		return
 	if Input.is_action_just_pressed("interact"):
 		try_interact()

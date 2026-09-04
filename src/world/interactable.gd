@@ -11,6 +11,9 @@ extends Area3D
 @export var one_shot := false
 var used := false
 var on_interact: Callable
+## The glow kind ("" for none); derived from the subclass unless set.
+var aura_kind := "auto"
+var _aura_box: Array = []
 
 
 func _init() -> void:
@@ -50,7 +53,30 @@ func add_box(size: Vector3, offset: Vector3 = Vector3.ZERO) -> CollisionShape3D:
 	cs.shape = bs
 	cs.position = offset
 	add_child(cs)
+	_aura_box = [size, offset]
+	call_deferred("_ensure_aura")
 	return cs
+
+
+func _ensure_aura() -> void:
+	if not is_inside_tree() or _aura_box.is_empty() or get_node_or_null("Aura") != null:
+		return
+	var kind := aura_kind
+	if kind == "auto":
+		var script: Script = get_script()
+		var cls := String(script.get_global_name()).to_lower() if script else ""
+		match cls:
+			"readable": kind = "readable"
+			"pickup": kind = "pickup"
+			"door", "mirror", "bed": kind = "door"
+			"npc": kind = "npc"
+			"switch", "brazier": kind = "switch"
+			_: kind = "generic"
+		if "walk_through" in self and get("walk_through"):
+			kind = ""
+	if kind == "":
+		return
+	Aura.attach(self, _aura_box[0], _aura_box[1], kind)
 
 
 ## Quick interactable: a box you can look at that runs `cb.call(player, interactable)`.

@@ -67,6 +67,7 @@ static func create(parent: Node, pos: Vector3, yaw_deg: float, size: Vector3, op
 		c.on_cut = opts.on_cut
 	c.add_box(size, opts.get("offset", Vector3(0, size.y * 0.5, 0)))
 	parent.add_child(c)
+	Aura.attach(c, size, opts.get("offset", Vector3(0, size.y * 0.5, 0)), "cuttable")
 	c.collision_layer = Kit.L_WORLD | Kit.L_CUTTABLE | Kit.L_INTERACT
 	if opts.has("model"):
 		Props.place(c, String(opts.model), opts.get("model_offset", Vector3.ZERO), 0.0, float(opts.get("scale", 1.0)), {"collision": "none"})

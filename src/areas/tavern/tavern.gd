@@ -433,7 +433,7 @@ func _cellar() -> void:
 	Kit.box(self, Vector3(-1.0, 1.1, -12.0), Vector3(2.0, 3.4, 4.0), "brick/dark", {"tile": 1.5})
 	Kit.box(self, Vector3(-3.0, 1.1, -14.15), Vector3(2.0, 3.4, 0.3), "brick/dark", {"tile": 1.5})
 	Kit.ceiling(self, Vector3(-3.0, 2.8, -12.0), Vector2(2.0, 4.0), "wood/planks_dark")
-	Kit.light(self, Vector3(-3.0, 1.2, -11.0), WARM, 0.6, 5.0)
+	Kit.light(self, Vector3(-3.0, 1.2, -11.0), WARM, 0.3, 4.0)
 	# what is kept down here
 	Props.place(self, "keg", Vector3(-5.2, y, -20.8), 90.0, 1.0)
 	Props.place(self, "keg", Vector3(-5.2, y, -19.6), 90.0, 1.0)
@@ -453,6 +453,16 @@ func _cellar() -> void:
 		"That one is empty. Somebody has been drinking ahead.",
 	], {"name": "KegLabels", "size": Vector3(1.2, 1.4, 2.4), "offset": Vector3(0, 0.2, 0),
 		"note_key": "cellar_kegs", "note_title": "The cellar of the Last Lamp", "note_text": "Kegs labelled by year, out of order. One year has not happened yet and is already empty."})
+	# the small iron door in the north wall: warm, and bolted from below until
+	# the rope in the Furnace is cut
+	Door.create(self, Vector3(-3.0, y, -19.86), 180.0, "furnace", "from_tavern", {"kind": "iron", "label": "A small iron door. Warm.", "name": "FurnaceDoor", "requires_flag": "gallows_cut", "locked_text": "An iron door, warm to the touch, bolted from the other side. Something a long way below is humming.", "fade_color": Color(0.2, 0.02, 0.02), "fade_duration": 1.2, "sound": "door_heavy"})
+	add_spawn("from_furnace", Vector3(-3.0, y + 0.1, -18.5), 180.0)
+	if Game.has_flag("gallows_cut"):
+		NPC.create(self, Vector3(-4.4, y, -17.6), 70.0, "The one who was humming", {
+			"name": "Hummer", "model": "patron_seated", "face_player": true, "flee_knife": false,
+			"lines": ["Told you. The tab stands.", "I came up the stairs that are not all there. Do not look down on the third one. There is no third one.", "The barkeep has not noticed I am back. I am taking that as a kindness."],
+			"reactions": {"knife": ["Put that away. It has done its bit."], "bell": ["Ring that upstairs. He will pretend not to hear it."], "umbrella": ["Weather. Indoors. Now I have seen everything twice."]},
+		})
 	Readable.create(self, Vector3(-1.0, y + 0.95, -16.0), 0.0, "An empty bottle", [
 		"An ordinary bottle, uncorked, kept apart from the others.",
 		"Whatever was in it was not a liquid. The inside of the glass is still faintly bright.",

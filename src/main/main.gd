@@ -108,6 +108,12 @@ func _apply_debug_args() -> void:
 			for k in a.trim_prefix("--flag=").split(","):
 				if k != "":
 					Game.set_flag(k, true)
+		elif a.begins_with("--setting="):
+			var kv := a.trim_prefix("--setting=").split(":")
+			if kv.size() == 2:
+				Settings.values[kv[0]] = float(kv[1])
+				Settings.apply(kv[0])
+				_apply_settings()
 		elif a.begins_with("--visits="):
 			var parts := a.trim_prefix("--visits=").split(":")
 			if parts.size() == 2:
@@ -191,6 +197,7 @@ func _apply_settings() -> void:
 		var m := postfx_rect.material as ShaderMaterial
 		m.set_shader_parameter("pixel_size", float(px))
 		m.set_shader_parameter("dither_strength", 0.55 * clampf(float(Settings.get_value("dither")), 0.0, 1.5))
+		m.set_shader_parameter("levels", clampf(float(Settings.get_value("levels")), 8.0, 256.0))
 
 
 # --- the title tour ----------------------------------------------------------

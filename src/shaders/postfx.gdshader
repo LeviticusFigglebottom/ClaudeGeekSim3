@@ -4,7 +4,7 @@ shader_type canvas_item;
 
 uniform sampler2D screen_tex : hint_screen_texture, filter_nearest, repeat_disable;
 uniform float dither_strength : hint_range(0.0, 2.0) = 0.55;
-uniform float levels : hint_range(4.0, 64.0) = 32.0;
+uniform float levels : hint_range(4.0, 256.0) = 32.0;
 uniform float vignette : hint_range(0.0, 1.0) = 0.3;
 uniform float scanline : hint_range(0.0, 0.5) = 0.07;
 uniform float pixel_size : hint_range(1.0, 6.0) = 3.0;

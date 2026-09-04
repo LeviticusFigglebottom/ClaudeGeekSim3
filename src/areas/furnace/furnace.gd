@@ -18,6 +18,9 @@ const D := 22
 const PIT_DEPTH := 3.0
 
 var giant: Node3D = null
+var prisoner: NPC = null
+var prisoner_cage: Node3D = null
+var hanging_cages: Array = []
 var choir: Array = []
 var choir_singing := true
 var _sing_t := 0.0
@@ -37,7 +40,7 @@ func build() -> void:
 	_cages()
 	Puzzle.declare(self, "furnace_knife", "", [], "the knife is in the chained giant's open hand; it is holding it out to you")
 	Puzzle.declare(self, "furnace_maiden", "furnace_maiden_opened", [], "open the iron maiden in the forge", {"item": "candle_stub"})
-	Puzzle.declare(self, "furnace_gallows", "gallows_cut", ["keepsake:knife"], "cut the rope on the gallows in the cage corridor")
+	Puzzle.declare(self, "furnace_gallows", "gallows_cut", ["keepsake:knife"], "cut the rope on the gallows in the cage corridor; a small iron door opens on stairs up to the Last Lamp's cellar", {"route": "tavern:from_furnace"})
 
 
 # --- coordinates -----------------------------------------------------------------------
@@ -308,14 +311,14 @@ func _cages() -> void:
 	]
 	for i in cage_spots.size():
 		var s: Vector2 = cage_spots[i]
-		Props.place(self, "cage", _m(s.x, s.y, 2.2), i * 40.0, 1.0, {"collision": "none"})
+		hanging_cages.append(Props.place(self, "cage", _m(s.x, s.y, 2.2), i * 40.0, 1.0, {"collision": "none"}))
 		Props.place(self, "chain_hanging", _m(s.x, s.y, H - 0.1), 0.0, 1.0, {"collision": "none"})
 		Readable.create(self, _m(s.x, s.y, 2.6), 0.0, "A cage", lines[i], {"name": "Cage%d" % i, "size": Vector3(1.6, 2.0, 1.6)})
 		_fire(_m(s.x, s.y, 4.2), 0.7, 6.0, Color(1.0, 0.4, 0.25))
 	# the caged patron
-	Props.place(self, "cage", _m(53.0, 38.0, 0.0), 0.0, 1.6, {"collision": "box"})
-	NPC.create(self, _m(53.0, 38.0), 0.0, "Somebody in a cage", {
-		"model": "patron_seated", "face_player": true, "flee_knife": false,
+	prisoner_cage = Props.place(self, "cage", _m(53.0, 38.0, 0.0), 0.0, 1.6, {"collision": "box", "name": "PrisonerCage"})
+	prisoner = NPC.create(self, _m(53.0, 38.0), 0.0, "Somebody in a cage", {
+		"name": "Prisoner", "model": "patron_seated", "face_player": true, "flee_knife": false,
 		"lines": ["I was at the Last Lamp. I went out the back door. You know how it is.", "They put me in here for the singing. I was not singing. I was humming. There is a difference and I have explained it.", "If you see the barkeep, tell him my tab stands."],
 		"reactions": {
 			"knife": ["That would do it. The lock is only rope. Everything here is only rope, if you have the right knife.", "(You cannot reach the rope from here. Try the gallows; it is the same rope.)"],
@@ -325,21 +328,70 @@ func _cages() -> void:
 	})
 	# the gallows and the rope
 	Props.place(self, "gallows", _m(53.0, 32.0), 0.0, 1.0)
-	Cuttable.create(self, _m(53.0, 32.0, 2.0), 0.0, Vector3(0.4, 2.2, 0.4), {"tex": "metal/chain", "flag": "gallows_cut", "cut_text": "Cut the rope", "name": "GallowsRope", "on_cut": func(_rope: Node) -> void:
-		Game.note("furnace_rope", "The rope", "You cut the rope on the gallows in the Furnace. Every cage in the corridor swung open at once. The one who was humming did not leave. He said the tab stands.")
-		Game.toast.emit("Every cage in the corridor swings open at once.")})
+	Cuttable.create(self, _m(53.0, 32.0, 2.0), 0.0, Vector3(0.4, 2.2, 0.4), {"tex": "metal/chain", "flag": "gallows_cut", "cut_text": "Cut the rope", "name": "GallowsRope", "on_cut": _on_rope_cut})
 	Readable.create(self, _m(53.0, 31.0, 1.0), 0.0, "The gallows", ["A gallows with one rope. The rope runs up through a ring and away along the ceiling to every cage in the corridor.", "Cut it and nothing will hang from anything."], {"name": "GallowsRead", "size": Vector3(1.6, 1.4, 1.0)})
 	Props.place(self, "spike_cluster", _m(49.0, 36.0), 70.0, 0.8)
 	Props.place(self, "bone_pile", _m(57.0, 38.5), 0.0, 1.0, {"collision": "none"})
 	_fire(_m(53.0, 36.0, 4.5), 1.6, 12.0, Color(1.0, 0.5, 0.3))
 	_fire(_m(53.0, 26.0, 4.5), 1.4, 12.0, Color(1.0, 0.5, 0.3))
 	Kit.sign(self, "signs/graffiti_door", _m(57.94, 30.0, 1.8), 90.0, Vector2(1.6, 0.4))
+	add_spawn("from_tavern", _m(56.3, 36.0, 0.1), 90.0)
 	if Game.has_flag("gallows_cut"):
-		var opened := Props.place(self, "door_iron", _m(57.8, 36.0), 90.0, 0.8, {"collision": "none"})
-		var leaf := Props.part(opened, "Leaf")
-		if leaf:
-			leaf.rotation.y = deg_to_rad(80.0)
-		Readable.create(self, _m(57.4, 36.0, 1.2), 90.0, "A small iron door, open", ["A door you did not notice while it was shut. Behind it, stairs going up, and up, and a smell of tavern.", "(The stairs are not finished being dreamt. Next time.)"], {"name": "SmallIronDoor", "size": Vector3(0.6, 2.0, 1.2)})
+		_open_cages(false)
+
+
+func _on_rope_cut(_rope: Node) -> void:
+	Game.note("furnace_rope", "The rope", "You cut the rope on the gallows in the Furnace. Every cage in the corridor swung open at once, and behind a door that had not been a door, stairs went up towards a smell of tavern. The one who was humming went up them first. He said the tab stands.")
+	Game.toast.emit("Every cage in the corridor swings open at once.")
+	_open_cages(true)
+
+
+## The cages lift on their chains, the prisoner is a prisoner no longer, and the
+## small iron door is there to be used. `animated` on the cut itself; on a
+## return visit it is simply so.
+func _open_cages(animated: bool) -> void:
+	for c in hanging_cages:
+		if not is_instance_valid(c):
+			continue
+		if animated:
+			var tw := create_tween()
+			tw.tween_property(c, "position:y", c.position.y + 0.5, 1.6).set_trans(Tween.TRANS_SINE)
+			tw.parallel().tween_property(c, "rotation:y", c.rotation.y + deg_to_rad(70.0), 2.2).set_trans(Tween.TRANS_SINE)
+		else:
+			c.position.y += 0.5
+	if is_instance_valid(prisoner_cage):
+		if animated:
+			var tw := create_tween()
+			tw.tween_property(prisoner_cage, "position:y", prisoner_cage.position.y + 2.6, 2.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		else:
+			prisoner_cage.queue_free()
+	if is_instance_valid(prisoner):
+		if animated:
+			prisoner.lines = ["Ah. There it goes.", "I will not say thank you. I will say: the tab stands, and there is a way up now, behind the door that was not a door.", "Mind the stairs. They are not all there."]
+			prisoner.reactions = {"knife": ["Put that away. It has done its bit."]}
+			prisoner.prompt = "Talk to the one who was humming"
+			get_tree().create_timer(12.0).timeout.connect(_prisoner_leaves)
+		else:
+			prisoner.queue_free()
+			Readable.create(self, _m(53.0, 38.0, 1.0), 0.0, "An open cage", ["The cage he was in. Warm still, and a tune in it that is not the choir's note.", "The door beside it is open. So is the one in the Last Lamp's cellar."], {"name": "OpenCage", "size": Vector3(1.6, 1.6, 1.6)})
+	_iron_door()
+
+
+func _prisoner_leaves() -> void:
+	if not is_inside_tree() or not is_instance_valid(prisoner):
+		return
+	prisoner.queue_free()
+	Audio.sfx("door_heavy", _m(57.8, 36.0, 1.0), -8.0)
+	Game.toast.emit("He goes up the stairs, humming. It is not the same note.")
+
+
+## A door in the corridor's east wall that was not a door until the rope was
+## cut. It goes up to the cellar of the Last Lamp.
+func _iron_door() -> void:
+	if get_node_or_null("SmallIronDoor") != null:
+		return
+	Door.create(self, _m(57.84, 36.0), 90.0, "tavern", "from_furnace", {"kind": "iron", "label": "A small iron door, and stairs going up", "name": "SmallIronDoor", "fade_color": Color(0.12, 0.07, 0.03), "fade_duration": 1.2, "sound": "door_heavy", "sets_flag": "furnace_stairs_used"})
+	_fire(_m(56.8, 36.0, 2.4), 1.0, 6.0, Color(1.0, 0.8, 0.5))
 
 
 # --- callbacks and hooks ------------------------------------------------------------------------------

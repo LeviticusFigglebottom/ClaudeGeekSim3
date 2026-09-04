@@ -27,7 +27,8 @@ The game autosaves when you change areas, into one of **three save slots**
 (`user://anteroom_save_<n>.json`); a new dream picks an empty slot, or asks
 before it takes a used one. **Settings** (Esc or the title screen) has sliders
 for how much PS1 the picture has — pixel dither, vertex wobble, texture warp,
-pixel size — plus mouse speed, volume and fullscreen; they live in
+pixel size, colour depth — the glow on things you can use, plus mouse speed,
+volume and fullscreen; they live in
 `user://settings.json`, apart from the saves. The title screen drifts through
 the realms behind the menu.
 

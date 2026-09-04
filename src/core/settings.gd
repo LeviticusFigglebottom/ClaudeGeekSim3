@@ -12,6 +12,8 @@ const DEFAULTS := {
 	"wobble": 0.8,       # vertex snapping (0 = no wobble)
 	"warp": 0.7,         # affine texture warp (0 = perspective-correct)
 	"pixel": 3,          # render at 1/pixel of the window
+	"levels": 32,        # colour steps per channel in the post-process (256 = none)
+	"aura": 0.6,         # how visible the glow on things you can use is
 	"fullscreen": true,
 	"mouse": 1.0,
 	"volume": 1.0,
@@ -51,6 +53,8 @@ func apply(key: String) -> void:
 			RenderingServer.global_shader_parameter_set("ps1_wobble", clampf(float(v), 0.0, 1.0))
 		"warp":
 			RenderingServer.global_shader_parameter_set("ps1_warp", clampf(float(v), 0.0, 1.0))
+		"aura":
+			RenderingServer.global_shader_parameter_set("aura_opacity", clampf(float(v), 0.0, 1.0))
 		"fullscreen":
 			set_fullscreen(bool(v), false)
 		"volume":
