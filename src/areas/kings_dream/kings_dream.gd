@@ -41,7 +41,7 @@ const DEFS := [
 	{"id": "table", "rank": "the seventh square", "name": "the Tea Table", "y": -12.0,
 		"ground": "nature/grass_pale", "tint": Color(1.0, 0.95, 0.75), "hedge": Color(1.0, 0.95, 0.7),
 		"water": Color(1.0, 0.9, 0.7, 0.8), "paint": Color(0.82, 0.72, 0.4),
-		"fog": Color("#f0d6a0"), "fog_density": 0.015, "ambient": Color("#f6e2b8"), "bg": Color("#5a3a20"), "sun": Color("#ffe0a0"), "sky": Color(1.0, 0.9, 0.7)},
+		"fog": Color("#f0d6a0"), "fog_density": 0.032, "ambient": Color("#f6e2b8"), "bg": Color("#5a3a20"), "sun": Color("#ffe0a0"), "sky": Color(1.0, 0.9, 0.7)},
 	{"id": "trial", "rank": "the eighth square, nearly", "name": "the Croquet Ground", "y": 6.0,
 		"ground": "ground/red_dream", "tint": Color(1.0, 0.9, 0.9), "hedge": Color(0.9, 0.6, 0.55),
 		"water": Color(1.0, 0.6, 0.55, 0.8), "paint": Color(0.7, 0.22, 0.2),

@@ -169,7 +169,6 @@ def carriage_window(rng):
     for y in (-0.6, 0.6):
         m.box((0, y, -0.03), (1.08, 0.08, 0.06), "flat", frame)
     m.box((0, 0.18, -0.03), (1.0, 0.05, 0.05), "flat", frame)
-    m.card((0, 0, -0.02), (0.96, 1.12), "glow:#f4dcc4", WHITE, yaw=PI, double=False)
     m.box((0, -0.68, -0.08), (1.2, 0.06, 0.16), "flat", (0.55, 0.45, 0.3))
     return single("carriage_window", m, {"collision": "none", "mount": "wall"})
 
