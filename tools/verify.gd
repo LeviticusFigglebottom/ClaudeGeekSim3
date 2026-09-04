@@ -113,6 +113,7 @@ func _check_registry_and_build() -> void:
 			inst.free()
 			continue
 		MapBuilder.reset_registry()
+		Kit.reset_gaps()
 		holder.add_child(inst)
 		var area: AreaBase = inst
 		var entry := {"spawns": area.spawns.keys(), "doors": [], "pickups": [], "puzzles": [], "readables": 0, "npcs": 0, "hidden": bool(info.get("hidden", false)), "can_wake": area.can_wake}
@@ -183,6 +184,57 @@ func _check_physics(id: String, area: AreaBase) -> void:
 			fail("area '%s' doorway at %s (%s) is blocked by %s" % [id, dw.pos, dw.map, solid])
 	if blocked == 0:
 		ok("area %-12s %d doorways clear, %d spawns probed" % [id, MapBuilder.doorways.size(), area.spawns.size()])
+	_check_mouse_gaps(id, space)
+
+
+## A mouse-hole is only a hole if the small player fits through it and lands on
+## something. Player.SMALL_HEIGHT is 0.5 and SMALL_RADIUS 0.14, so we sweep a
+## slightly smaller capsule from the mouth to `depth` metres beyond it.
+func _check_mouse_gaps(id: String, space: PhysicsDirectSpaceState3D) -> void:
+	if Kit.mouse_gaps.is_empty():
+		return
+	var cap := CapsuleShape3D.new()
+	cap.height = 0.5
+	cap.radius = 0.13
+	var q := PhysicsShapeQueryParameters3D.new()
+	q.shape = cap
+	q.collision_mask = 1 | 256          # world, but NOT big-only (16)
+	var clear := 0
+	for g in Kit.mouse_gaps:
+		var pos: Vector3 = g.pos
+		var fwd: Vector3 = Basis(Vector3.UP, deg_to_rad(float(g.yaw))) * Vector3(0, 0, -1)
+		var depth: float = float(g.depth)
+		var stuck: Array = []
+		var no_floor: Array = []
+		var steps := 12
+		for i in range(-1, steps + 1):
+			# march both ways: the crawl may run behind the mouth or in front of it
+			for sgn in [1.0, -1.0]:
+				var p: Vector3 = pos + fwd * (sgn * depth * float(i) / float(steps))
+				if i < 0:
+					p = pos
+				q.transform = Transform3D(Basis(), p + Vector3(0, 0.26, 0))
+				if space.intersect_shape(q, 1).size() > 0:
+					stuck.append([sgn, p])
+				var ray := PhysicsRayQueryParameters3D.create(p + Vector3(0, 0.3, 0), p + Vector3(0, -1.5, 0), 1 | 256 | 512)
+				if space.intersect_ray(ray).is_empty():
+					no_floor.append([sgn, p])
+				if i < 0:
+					break
+		# at least one of the two directions has to be walkable end to end
+		var bad_fwd := 0
+		var bad_back := 0
+		for e in stuck + no_floor:
+			if float(e[0]) > 0.0:
+				bad_fwd += 1
+			else:
+				bad_back += 1
+		if bad_fwd > 0 and bad_back > 0:
+			fail("area '%s' mouse-hole at %s has no crawlable side: %d blocked ahead, %d behind (the small player is 0.5 m tall)" % [id, pos, bad_fwd, bad_back])
+		else:
+			clear += 1
+	if clear == Kit.mouse_gaps.size():
+		ok("area %-12s %d mouse-hole(s) crawlable at small size" % [id, clear])
 
 
 static func _under_door(n: Node) -> bool:

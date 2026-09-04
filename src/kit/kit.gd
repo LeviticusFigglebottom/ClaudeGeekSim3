@@ -858,8 +858,20 @@ static func big_only(node: Node) -> void:
 
 
 ## A mouse-hole: a dark arch in a wall that only the small player can enter.
-## Places an invisible BigOnly blocker in the opening.
-static func mouse_gap(parent: Node, pos: Vector3, yaw_deg: float, size: Vector2 = Vector2(0.45, 0.4)) -> Node3D:
+## Places an invisible BigOnly blocker in the opening, and (unless opts.carve is
+## false) punches a real opening through whatever box collision already stands
+## there, so the small player has somewhere to go. opts.carve_depth sets how far
+## through the wall to cut (default 1.5 m, enough for any wall in the game).
+## Mouse-holes made since reset_gaps(); the verifier crawls each one at
+## small-player size to prove there is somewhere to go. {pos, yaw, size, depth}
+static var mouse_gaps: Array = []
+
+
+static func reset_gaps() -> void:
+	mouse_gaps = []
+
+
+static func mouse_gap(parent: Node, pos: Vector3, yaw_deg: float, size: Vector2 = Vector2(0.45, 0.4), opts: Dictionary = {}) -> Node3D:
 	var root := Node3D.new()
 	root.position = pos
 	root.rotation.y = deg_to_rad(yaw_deg)
@@ -875,9 +887,90 @@ static func mouse_gap(parent: Node, pos: Vector3, yaw_deg: float, size: Vector2 
 		mi.material_override = flat(Color(0.02, 0.02, 0.03), {"unshaded": true})
 		mi.position = Vector3(0, size.y * 0.5, -0.02)
 		root.add_child(mi)
+	# carve first, so the big-only blocker we are about to add is not itself cut
+	if bool(opts.get("carve", true)):
+		var n := carve_gap(parent, pos, yaw_deg, size, float(opts.get("carve_depth", 1.5)))
+		if n == 0 and bool(opts.get("expect_carve", true)):
+			push_warning("mouse_gap at %s cut nothing; the hole may be blocked by non-box collision" % pos)
 	var b := blocker(root, Vector3(0, size.y * 0.5, 0), Vector3(size.x, size.y, 0.3), L_BIG_ONLY)
 	b.name = "BigOnlyBlocker"
+	mouse_gaps.append({"pos": pos, "yaw": yaw_deg, "size": size, "depth": float(opts.get("crawl", 3.0))})
 	return root
+
+
+## Cut a rectangular opening through every axis-aligned box collider that stands
+## in the way, so a mouse-hole in a MapBuilder wall is actually passable.
+## The hole is `size` wide and tall with its floor at pos.y. `depth` is only how
+## far along the yaw's axis a box has to reach to count as in the way; every box
+## that does is bored through its whole thickness. Each blocked box is replaced by the pieces of
+## itself that fall outside the hole. Returns how many boxes were cut.
+static func carve_gap(area: Node, pos: Vector3, yaw_deg: float, size: Vector2, depth: float = 1.5) -> int:
+	var fwd := Basis(Vector3.UP, deg_to_rad(yaw_deg)) * Vector3(0, 0, -1)
+	var thru := 0 if absf(fwd.x) >= absf(fwd.z) else 2   # index of the axis we bore along
+	var across := 2 if thru == 0 else 0
+	var lo := Vector3(pos.x, pos.y, pos.z)
+	var hi := Vector3(pos.x, pos.y + size.y, pos.z)
+	lo[across] -= size.x * 0.5
+	hi[across] += size.x * 0.5
+	lo[thru] -= depth * 0.5
+	hi[thru] += depth * 0.5
+	var cut := 0
+	for cs in _box_shapes(area):
+		var xf: Transform3D = cs.global_transform
+		var bs: BoxShape3D = cs.shape
+		# only handle axis-aligned boxes; anything rotated is left alone
+		if absf(xf.basis.x.y) > 0.01 or absf(xf.basis.z.y) > 0.01:
+			continue
+		var half := (xf.basis * (bs.size * 0.5)).abs()
+		var c := xf.origin
+		var bmin := c - half
+		var bmax := c + half
+		if bmin.x >= hi.x or bmax.x <= lo.x or bmin.y >= hi.y or bmax.y <= lo.y or bmin.z >= hi.z or bmax.z <= lo.z:
+			continue
+		var body: Node = cs.get_parent()
+		var pieces: Array = []
+		# above and below the hole keep the box's full footprint
+		if bmax.y > hi.y:
+			pieces.append([Vector3(bmin.x, hi.y, bmin.z), Vector3(bmax.x, bmax.y, bmax.z)])
+		if bmin.y < lo.y:
+			pieces.append([Vector3(bmin.x, bmin.y, bmin.z), Vector3(bmax.x, lo.y, bmax.z)])
+		# either side of it, only over the hole's own height
+		var y0 := maxf(bmin.y, lo.y)
+		var y1 := minf(bmax.y, hi.y)
+		if bmin[across] < lo[across]:
+			var a := Vector3(bmin.x, y0, bmin.z)
+			var bb := Vector3(bmax.x, y1, bmax.z)
+			bb[across] = lo[across]
+			pieces.append([a, bb])
+		if bmax[across] > hi[across]:
+			var a2 := Vector3(bmin.x, y0, bmin.z)
+			a2[across] = hi[across]
+			pieces.append([a2, Vector3(bmax.x, y1, bmax.z)])
+		var parent_xf: Transform3D = (body as Node3D).global_transform
+		for pc in pieces:
+			var pmin: Vector3 = pc[0]
+			var pmax: Vector3 = pc[1]
+			var sz := pmax - pmin
+			if sz.x <= 0.005 or sz.y <= 0.005 or sz.z <= 0.005:
+				continue
+			var ncs := CollisionShape3D.new()
+			var nbs := BoxShape3D.new()
+			nbs.size = sz
+			ncs.shape = nbs
+			body.add_child(ncs)
+			ncs.global_position = (pmin + pmax) * 0.5
+			ncs.global_basis = parent_xf.basis.orthonormalized()
+		cs.queue_free()
+		cut += 1
+	return cut
+
+
+static func _box_shapes(node: Node, out: Array = []) -> Array:
+	if node is CollisionShape3D and (node as CollisionShape3D).shape is BoxShape3D:
+		out.append(node)
+	for c in node.get_children():
+		_box_shapes(c, out)
+	return out
 
 
 # --- round rooms -------------------------------------------------------------

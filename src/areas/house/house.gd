@@ -313,7 +313,7 @@ func _bedroom_b() -> void:
 	Readable.create(self, _m(20.6, 6.6, 1.2), _yaw(0.0), "A crayon drawing", ["A crayon drawing of the house. A crayon drawing of a tall man beside the house.", "The tall man is drawn in one colour, then the other colour, down the middle."], {"name": "Crayon", "size": Vector3(0.5, 0.5, 0.2), "note_key": "crayon", "note_title": "The crayon drawing", "note_text": "A child drew the house, and beside it the tall one, half in each colour."})
 	Kit.light(self, _m(19.2, 8.5, H - 0.2), Color(1.0, 0.8, 0.9), 1.0, 5.0)
 	var hole := _m(21.48, 9.5)
-	Kit.mouse_gap(self, hole, _yaw(90.0), Vector2(0.45, 0.4))
+	Kit.mouse_gap(self, hole, _yaw(90.0), Vector2(0.62, 0.75))
 	_between_walls(hole)
 
 
@@ -446,18 +446,22 @@ func _between_walls(hole: Vector3) -> void:
 	var dirx := -1.0 if mirrored else 1.0
 	var start := hole + Vector3(dirx * 0.3, 0, 0)
 	var len := 6.0
-	Kit.floor(self, start + Vector3(dirx * len * 0.5, 0, 0), Vector2(len, 0.5), "wood/planks_dark", {"tile": 0.5})
-	Kit.ceiling(self, start + Vector3(dirx * len * 0.5, 0.45, 0), Vector2(len, 0.5), "wood/planks_dark", {"tile": 0.5})
-	Kit.wall(self, start + Vector3(0, 0, -0.25), start + Vector3(dirx * len, 0, -0.25), 0.45, "wood/planks_dark", {"tile": 0.5})
-	Kit.wall(self, start + Vector3(dirx * len, 0, 0.25), start + Vector3(0, 0, 0.25), 0.45, "wood/planks_dark", {"tile": 0.5})
+	var ch := 0.8   # headroom: the small player is 0.5 m tall, so 0.45 used to wedge shut
+	# a floor under the carved wall itself, or the crawl opens onto nothing
+	Kit.floor(self, hole + Vector3(dirx * 0.8, 0, 0), Vector2(1.6, 0.7), "wood/planks_dark", {"tile": 0.5})
+	Kit.floor(self, start + Vector3(dirx * len * 0.5, 0, 0), Vector2(len, 0.7), "wood/planks_dark", {"tile": 0.5})
+	Kit.ceiling(self, start + Vector3(dirx * len * 0.5, ch, 0), Vector2(len, 0.7), "wood/planks_dark", {"tile": 0.5})
+	Kit.wall(self, start + Vector3(0, 0, -0.35), start + Vector3(dirx * len, 0, -0.35), ch, "wood/planks_dark", {"tile": 0.5})
+	Kit.wall(self, start + Vector3(dirx * len, 0, 0.35), start + Vector3(0, 0, 0.35), ch, "wood/planks_dark", {"tile": 0.5})
 	var room := start + Vector3(dirx * (len + 1.0), 0, 0)
 	Kit.floor(self, room, Vector2(2.0, 2.0), "wood/planks_dark", {"tile": 0.5})
-	Kit.ceiling(self, room + Vector3(0, 0.45, 0), Vector2(2.0, 2.0), "wood/planks_dark", {"tile": 0.5})
-	Kit.wall(self, room + Vector3(-1, 0, -1), room + Vector3(1, 0, -1), 0.45, "wood/planks_dark", {"tile": 0.5})
-	Kit.wall(self, room + Vector3(1, 0, -1), room + Vector3(1, 0, 1), 0.45, "wood/planks_dark", {"tile": 0.5})
-	Kit.wall(self, room + Vector3(1, 0, 1), room + Vector3(-1, 0, 1), 0.45, "wood/planks_dark", {"tile": 0.5})
-	Kit.wall(self, room + Vector3(-1, 0, 1), room + Vector3(-1, 0, -1), 0.45, "wood/planks_dark", {"tile": 0.5})
-	Kit.light(self, room + Vector3(0, 0.35, 0), Color(1.0, 0.8, 0.5), 0.5, 2.5)
+	Kit.ceiling(self, room + Vector3(0, ch, 0), Vector2(2.0, 2.0), "wood/planks_dark", {"tile": 0.5})
+	Kit.wall(self, room + Vector3(-1, 0, -1), room + Vector3(1, 0, -1), ch, "wood/planks_dark", {"tile": 0.5})
+	Kit.wall(self, room + Vector3(1, 0, -1), room + Vector3(1, 0, 1), ch, "wood/planks_dark", {"tile": 0.5})
+	Kit.wall(self, room + Vector3(1, 0, 1), room + Vector3(-1, 0, 1), ch, "wood/planks_dark", {"tile": 0.5})
+	Kit.wall(self, room + Vector3(-1, 0, 1), room + Vector3(-1, 0, -1), ch, "wood/planks_dark", {"tile": 0.5})
+	Kit.light(self, room + Vector3(0, ch - 0.15, 0), Color(1.0, 0.8, 0.5), 0.6, 3.0)
+	Kit.light(self, start + Vector3(dirx * len * 0.5, ch - 0.15, 0), Color(1.0, 0.75, 0.45), 0.4, 3.5)
 	Props.place(self, "candle", room + Vector3(0.5, 0, 0.4), 0.0, 0.5, {"collision": "none"})
 	Readable.create(self, room + Vector3(-0.4, 0.15, -0.4), 0.0, "A very small note", ["THE HOUSE KEEPS ITS SPARE ROOMS IN HERE.", "PLEASE DO NOT TAKE MORE THAN ONE."], {"name": "SpareRooms", "size": Vector3(0.3, 0.2, 0.3), "note_key": "spare_rooms", "note_title": "Between the walls", "note_text": "Behind the skirting board, a passage for someone very small. The house keeps its spare rooms there. Please do not take more than one."})
 	Pickup.create(self, room + Vector3(0.4, 0, -0.3), {"item": "candle_stub", "requires_keepsake": "mouse", "name": "WallCandle", "key": "picked_candle_house"})

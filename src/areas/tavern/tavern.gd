@@ -78,18 +78,21 @@ func _ground_floor() -> void:
 	Kit.box(self, Vector3(2.0, H - 0.32, 3.0), Vector3(0.3, 0.34, 10.0), "wood/planks_dark", {"solid": false})
 	Kit.box(self, Vector3(6.0, H - 0.15, -5.0), Vector3(0.3, 0.3, 6.0), "wood/planks_dark", {"solid": false})
 	# the back wall behind the bar is built by hand so it can have a hole in it
-	Kit.box(self, Vector3(6.0, 1.95, -8.15), Vector3(8.0, 2.9, 0.3), "wall/plaster_tavern")
-	Kit.box(self, Vector3(3.85, 0.25, -8.15), Vector3(3.7, 0.5, 0.3), "wall/plaster_tavern")
-	Kit.box(self, Vector3(8.15, 0.25, -8.15), Vector3(3.7, 0.5, 0.3), "wall/plaster_tavern")
-	Kit.box(self, Vector3(6.0, 0.62, -8.02), Vector3(8.0, 0.16, 0.06), "wood/planks_dark", {"solid": false})
-	Kit.mouse_gap(self, Vector3(6.0, 0, -8.0), 180.0, Vector2(0.6, 0.6))
+	# the opening is 0.8 m tall: the small player is 0.5 m, and 0.5 wedged shut
+	Kit.box(self, Vector3(6.0, 2.1, -8.15), Vector3(8.0, 2.6, 0.3), "wall/plaster_tavern")
+	Kit.box(self, Vector3(3.825, 0.4, -8.15), Vector3(3.65, 0.8, 0.3), "wall/plaster_tavern")
+	Kit.box(self, Vector3(8.175, 0.4, -8.15), Vector3(3.65, 0.8, 0.3), "wall/plaster_tavern")
+	Kit.box(self, Vector3(3.825, 0.9, -8.02), Vector3(3.65, 0.16, 0.06), "wood/planks_dark", {"solid": false})
+	Kit.box(self, Vector3(8.175, 0.9, -8.02), Vector3(3.65, 0.16, 0.06), "wood/planks_dark", {"solid": false})
+	Kit.mouse_gap(self, Vector3(6.0, 0, -8.0), 180.0, Vector2(0.7, 0.78), {"carve": false})
 	# the mouse tunnel behind the wall
-	Kit.floor(self, Vector3(6.0, 0, -10.2), Vector2(0.6, 4.0), "wood/planks_dark")
-	Kit.ceiling(self, Vector3(6.0, 0.6, -10.2), Vector2(0.6, 4.0), "wood/planks_dark")
-	Kit.box(self, Vector3(5.55, 0.3, -10.2), Vector3(0.3, 0.6, 4.0), "wood/planks_dark")
-	Kit.box(self, Vector3(6.45, 0.3, -10.2), Vector3(0.3, 0.6, 4.0), "wood/planks_dark")
-	Kit.box(self, Vector3(6.0, 0.3, -12.35), Vector3(0.6, 0.6, 0.3), "wood/planks_dark")
-	Kit.light(self, Vector3(6.0, 0.45, -10.0), WARM, 0.5, 3.0)
+	Kit.floor(self, Vector3(6.0, 0, -10.2), Vector2(0.7, 4.0), "wood/planks_dark")
+	Kit.ceiling(self, Vector3(6.0, 0.8, -10.2), Vector2(0.7, 4.0), "wood/planks_dark")
+	Kit.box(self, Vector3(5.5, 0.4, -10.2), Vector3(0.3, 0.8, 4.0), "wood/planks_dark")
+	Kit.box(self, Vector3(6.5, 0.4, -10.2), Vector3(0.3, 0.8, 4.0), "wood/planks_dark")
+	Kit.box(self, Vector3(6.0, 0.4, -12.35), Vector3(0.7, 0.8, 0.3), "wood/planks_dark")
+	Kit.light(self, Vector3(6.0, 0.65, -10.0), WARM, 0.5, 3.0)
+	Kit.light(self, Vector3(6.0, 0.65, -11.6), WARM, 0.4, 2.5)
 	SeamlessTeleport.link(self, Vector3(6.0, 0, -12.0), 0.0, UT + Vector3(0, 0, 11.4), 0.0, Vector3(2.0, 2.0, 0.4), {"name": "MouseSeam", "on_teleport": _on_mouse_seam})
 
 	# --- the bar ---
