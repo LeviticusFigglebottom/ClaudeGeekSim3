@@ -201,11 +201,21 @@ static func _trackbed(area: AreaBase, root: Node3D, d: Dictionary) -> void:
 		var foot := Vector3(8.2, y, 36.0 * side - 5.6 * side)
 		Kit.stairs(root, foot, 180.0 if side > 0 else 0.0, 1.8, 12, -y / 12.0, 0.45, "wall/concrete", {"tile": 1.0, "name": "TrackStair%d" % int(side)})
 		Kit.light(root, Vector3(8.2, y + 3.0, 33.0 * side), LAMP, 0.9, 8.0)
+		# invisible walls the height of a man above the hedges and along the
+		# stair's sides, so the only ways off a strip are the gangway and the steps
+		for seg in [[-KD.HALF - 1.2, -3.2], [3.2, 7.3], [9.1, KD.HALF + 1.2]]:
+			var x0: float = seg[0]
+			var x1: float = seg[1]
+			Kit.blocker(root, Vector3((x0 + x1) * 0.5, 2.5, hz), Vector3(x1 - x0, 5.0, 0.8))
+		for sx in [7.25, 9.15]:
+			Kit.blocker(root, Vector3(sx, 0.5, 33.5 * side), Vector3(0.1, 7.0, 6.2))
 	# rails either side of the gangway and across its ends beside the coachwork,
 	# so the way into the carriage is a way and not an edge
 	for sx in [-1.0, 1.0]:
 		Kit.box(root, Vector3(sx * 3.1, 0.5, 35.2), Vector3(0.1, 1.0, 2.6), "metal/iron")
 		Kit.box(root, Vector3(sx * 2.6, 0.5, 34.05), Vector3(0.9, 1.0, 0.1), "metal/iron")
+		Kit.blocker(root, Vector3(sx * 3.1, 1.5, 35.2), Vector3(0.1, 3.0, 2.6))
+		Kit.blocker(root, Vector3(sx * 2.6, 1.5, 34.05), Vector3(0.9, 3.0, 0.1))
 	Readable.create(root, Vector3(0, y + 0.5, 30.0), 0.0, "The track", [
 		"Sleepers and two rails, going both ways into the fog. The rails are warm. Nothing is on them; the train is beside them, which is not where trains go.",
 		"Steps at either end lead back up to the strips. Somebody expected people to fall.",
@@ -381,6 +391,8 @@ static func _platform(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 	for sx in [-1.0, 1.0]:
 		Kit.box(root, p + Vector3(sx * 5.0, 0.5, 0.75), Vector3(0.1, 1.0, 2.5), "metal/iron")
 		Kit.box(root, p + Vector3(sx * 3.6, 0.5, 1.95), Vector3(2.8, 1.0, 0.1), "metal/iron")
+		Kit.blocker(root, p + Vector3(sx * 5.0, 1.5, 0.75), Vector3(0.1, 3.0, 2.5))
+		Kit.blocker(root, p + Vector3(sx * 3.6, 1.5, 1.95), Vector3(2.8, 3.0, 0.1))
 	Props.place(root, "waiting_chairs", p + Vector3(-3.6, 0, 0.9), 90.0, 1.0)
 	Props.place(root, "lantern_post_city", p + Vector3(3.8, 0, 0.6), 0.0, 1.0, {"collision": "cylinder"})
 	Kit.light(root, p + Vector3(3.8, 3.0, 0.6), Color(1.0, 0.9, 0.75), 1.1, 9.0)
