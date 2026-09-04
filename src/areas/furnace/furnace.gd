@@ -244,12 +244,16 @@ func _forge() -> void:
 	Props.place(self, "anvil", c + Vector3(-2.0, 0, 0), 0.0, 1.0)
 	Interactable.make(self, c + Vector3(-2.0, 0.6, 0), Vector3(1.2, 0.8, 0.8), "Strike the anvil", func(_p: Node, it: Node) -> void:
 		Audio.sfx("stone_grind", it.global_position, -4.0)
+		if Game.has_item("bones"):
+			_break_bones()
+			return
 		Game.bump("anvil_strikes")
 		if Game.count("anvil_strikes") == 7:
 			Game.toast.emit("On the seventh strike the anvil rings like a bell, and somewhere above, a dog barks.")
 			Game.note("furnace_anvil", "The anvil", "Struck seven times, the anvil in the Furnace rang like a bell. Something upstairs heard it.")
 		else:
 			Game.toast.emit("The anvil rings. The ring goes down instead of up."), {"name": "Anvil"})
+	Puzzle.declare(self, "furnace_bonemeal", "bonemeal_made", ["item:bones"], "break the bones from the crypt of the four on the anvil", {"item": "bonemeal"})
 	Props.place(self, "iron_maiden", _m(50.0, 7.0), 180.0, 1.0)
 	Interactable.make(self, _m(50.0, 7.6, 1.2), Vector3(1.2, 2.4, 1.0), "Open the iron maiden", _on_maiden, {"name": "IronMaiden"})
 	Props.place(self, "spike_cluster", _m(57.0, 19.0), 30.0, 0.9)
@@ -395,6 +399,19 @@ func _iron_door() -> void:
 
 
 # --- callbacks and hooks ------------------------------------------------------------------------------
+
+func _break_bones() -> void:
+	Game.take_item("bones")
+	Game.set_flag("bonemeal_made", true)
+	if World.hud:
+		await World.hud.say("", [
+			"You lay the three of them on the anvil. They do not object.",
+			"The first blow rings. The second goes down instead of up. By the third there is nothing on the anvil but a grey warm meal, and the forge is quieter than it was.",
+			"You take it all. It is the whole of three people and it is enough to feed a garden.",
+		])
+	Game.gain_item("bonemeal")
+	Game.note("bonemeal", "Bonemeal", "The bones from the crypt of the four, broken on the anvil in the forge, are a grey warm meal. Old bone makes a garden grow. Something somewhere is waiting to be fed.")
+
 
 func _on_maiden(_p: Node, _it: Node) -> void:
 	Audio.sfx("door_heavy", _m(50.0, 7.0, 1.0), -6.0)

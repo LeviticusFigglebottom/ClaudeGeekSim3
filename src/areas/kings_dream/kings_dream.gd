@@ -88,7 +88,7 @@ func build() -> void:
 	var g: Dictionary = sq[0]
 	add_spawn("from_king", g.origin + Vector3(0, 0.1, 30.0), 0.0)
 	add_spawn("default", g.origin + Vector3(0, 0.1, 30.0), 0.0)
-	Puzzle.declare(self, "kings_dream_march", "crowned_in_dream", ["keepsake:wings", "keepsake:hourglass"], "walk the board from the second square to the eighth; every brook is a square")
+	Puzzle.declare(self, "kings_dream_march", "dream_reached_eighth", ["keepsake:wings", "keepsake:hourglass"], "walk the board from the second square to the eighth; every brook is a square")
 	var start := 0
 	for i in DEFS.size():
 		# tools/shot.sh --flag=kd_start_<id> renders a square other than the first
@@ -300,7 +300,6 @@ func _exit() -> void:
 	var a: Dictionary = e.anchors.get("exit", {"pos": Vector3(0, 0, -20.0), "yaw": 0.0})
 	exit_door = Door.create(self, e.origin + a.pos, float(a.yaw), "nexus", "from_kings_dream", {
 		"kind": "none", "label": "Take hold of the cloth and pull", "name": "Door_out",
-		"requires_flag": "crowned_in_dream", "locked_text": "Nothing here is yours to pull yet. Something has to be put on your head first.",
 		"fade_color": Color.WHITE, "fade_duration": 1.6, "sound": "static_burst"})
 
 

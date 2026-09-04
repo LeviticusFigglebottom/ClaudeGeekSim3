@@ -810,14 +810,15 @@ func _king_talk(_player: Node, npc: Node) -> bool:
 	var n := npc as NPC
 	if n == null or World.hud == null:
 		return false
+	if Game.has_flag("king_disturbed") and Game.has_flag("tapestry_cut"):
+		# the way into his dream, every time, whatever you are holding
+		return await _king_dream(n)
 	if Game.active_is("crown"):
 		await n.say(["The King, without opening his eyes, reaches up and straightens the crown on your head.", "\"There,\" he says. \"Now we are both wrong.\""])
 		return true
 	if Game.active_is("bell"):
 		await n.say(["\"Not in here,\" the King says, asleep. \"Ring it in here and I will hear it in there.\""])
 		return true
-	if Game.has_flag("king_disturbed") and Game.has_flag("tapestry_cut"):
-		return await _king_dream(n)
 	if Game.has_flag("king_disturbed"):
 		await n.say([
 			"He is asleep. Asleep-er, if anything, the way people sleep after a fright.",

@@ -123,35 +123,26 @@ static func _rotunda(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 	for k in 6:
 		var orb := Clockwork.create(root, c + Vector3(0, 5.0 + k * 0.5, 0), {"mode": "rotate", "axis": Vector3.UP, "speed_deg": 6.0 + k * 2.0, "name": "Orb%d" % k})
 		Props.place(orb.body, "orb", Kit.polar(6.0 + k * 0.8, k * 60.0), 0.0, 0.6, {"collision": "none"})
-	# the crown, put on at the centre, with no ceremony
+	# the centre, where the well should be: nothing is put on your head, and
+	# the banquet starts anyway
 	Kit.trigger(root, c + Vector3(0, 1.0, 0), Vector3(3.0, 3.0, 3.0), func(_p: Node) -> void:
-		_crown(area, state), {"name": "CrownSpot", "once": true})
-	Puzzle.declare(area, "dream_crown", "crowned_in_dream", [], "stand where the well should be, at the centre of the last square")
+		_centre(area, state), {"name": "CentreSpot", "once": true})
+	Puzzle.declare(area, "dream_centre", "dream_banquet_begun", [], "stand where the well should be, at the centre of the last square")
 
 
-static func _crown(area: AreaBase, state: Dictionary) -> void:
+static func _centre(area: AreaBase, state: Dictionary) -> void:
 	if state.crowned:
 		return
 	state.crowned = true
 	Audio.sfx("clock_chime", null, -4.0)
-	var has := Game.has_keepsake("crown")
 	if World.hud:
-		if has:
-			await World.hud.say("", [
-				"Something is put on your head. There is no ceremony. Nobody is there to do it and it is done.",
-				"It is the Paper Crown. It was in your hands and now it is on your head, and you did not lift it, and it will not come off, and it does not need to.",
-				"\"There,\" says a voice you know from a throne. \"Now we are both wrong.\"",
-			])
-		else:
-			await World.hud.say("", [
-				"Something is put on your head. There is no ceremony. Nobody is there to do it and it is done.",
-				"It is a crown of the grey behind the doors. It hisses, very quietly, the way a television does in another flat.",
-			])
-	if has:
-		Game.equip("crown")
-	Game.set_flag("crowned_in_dream", true)
-	Game.note("dream_crowned", "The eighth square", "At the centre of the last square, where the Anteroom's well should be, something was put on your head with no ceremony. " + ("It was the Paper Crown you were carrying. It is on your head now." if has else "You were not carrying the crown, so it was made of static.") + " Then the banquet.")
-	Game.toast.emit("Queen, then. Or king. The dream is not particular.")
+		await World.hud.say("", [
+			"This is where the well should be, and where something should be put on your head. Nothing is. Nobody is here to do it.",
+			"The doors round the room hiss, very quietly, the way a television does in another flat. Behind you, the table has laid itself.",
+		])
+	Game.set_flag("dream_banquet_begun", true)
+	Game.note("dream_eighth", "The eighth square", "At the centre of the last square, where the Anteroom's well should be, nothing was put on your head. The banquet started anyway, and went faster and faster until there was nothing to do but take hold of the cloth and pull.")
+	Game.toast.emit("Nothing is put on your head. The banquet does not mind.")
 	_start_banquet(area, state)
 
 

@@ -92,8 +92,10 @@ func _ground_floor() -> void:
 	Kit.box(self, Vector3(5.5, 0.4, -10.2), Vector3(0.3, 0.8, 4.0), "wood/planks_dark")
 	Kit.box(self, Vector3(6.5, 0.4, -10.2), Vector3(0.3, 0.8, 4.0), "wood/planks_dark")
 	Kit.box(self, Vector3(6.0, 0.4, -12.35), Vector3(0.7, 0.8, 0.3), "wood/planks_dark")
-	Kit.light(self, Vector3(6.0, 0.65, -10.0), WARM, 0.5, 3.0)
-	Kit.light(self, Vector3(6.0, 0.65, -11.6), WARM, 0.4, 2.5)
+	# lit well enough from the taproom side that the hole reads as a way, not a mark
+	Kit.light(self, Vector3(6.0, 0.6, -8.7), WARM, 0.9, 2.5)
+	Kit.light(self, Vector3(6.0, 0.65, -10.2), WARM, 0.8, 3.0)
+	Kit.light(self, Vector3(6.0, 0.65, -11.6), WARM, 0.6, 2.5)
 	SeamlessTeleport.link(self, Vector3(6.0, 0, -12.0), 0.0, UT + Vector3(0, 0, 11.4), 0.0, Vector3(2.0, 2.0, 0.4), {"name": "MouseSeam", "on_teleport": _on_mouse_seam})
 
 	# --- the bar ---
@@ -525,7 +527,9 @@ func _undertavern() -> void:
 	Kit.box(self, c + Vector3(0, 3.15, D * 0.5 + 0.3), Vector3(1.8, 2.7, 0.6), wood, {"tile": 6.0})
 	# the tunnel (three times the one behind the bar)
 	var tz := c.z + D * 0.5 + 0.6 + 6.0
-	Kit.floor(self, Vector3(c.x, 0, tz), Vector2(1.8, 12.0), wood, {"tile": 6.0})
+	# the floor runs on through the wall's thickness to the room's edge, or a
+	# mouse falls through the slot under the mouth
+	Kit.floor(self, Vector3(c.x, 0, tz - 0.3), Vector2(1.8, 12.6), wood, {"tile": 6.0})
 	Kit.ceiling(self, Vector3(c.x, 1.8, tz), Vector2(1.8, 12.0), wood, {"tile": 6.0})
 	Kit.box(self, Vector3(c.x - 1.35, 0.9, tz), Vector3(0.9, 1.8, 12.0), wood, {"tile": 6.0})
 	Kit.box(self, Vector3(c.x + 1.35, 0.9, tz), Vector3(0.9, 1.8, 12.0), wood, {"tile": 6.0})
@@ -729,11 +733,13 @@ func _rumour() -> void:
 			lines.append_array(where)
 		lines.append("\"Paper keeps, so long as it's dry. %d in the glass so far, they say.\"" % roses)
 	elif Game.has_flag("beanstalk_grown"):
-		lines = ["\"Something on a hill in a garden has grown taller than the hill, and the hill's in a dream.\"", "\"Things that grow that fast are asking to be climbed. Take anything paper you've got. There's a glass up there with nothing in it.\""]
+		lines = ["\"Something on top of a tower in a garden has grown taller than the tower, and the tower's in a dream.\"", "\"Things that grow that fast are asking to be climbed. Take anything paper you've got. There's a glass up there with nothing in it.\""]
 	elif Game.has_item("bonemeal"):
-		lines = ["\"Old bone makes a garden grow. Everyone knows that. What they don't say is which garden.\"", "\"There's a hill in the King's sleep with a sprout on it that's never been fed. That's the rumour. Don't quote me.\""]
+		lines = ["\"Old bone makes a garden grow. Everyone knows that. What they don't say is which garden.\"", "\"There's a tower in the King's sleep with a sprout on top of it that's never been fed. That's the rumour. Don't quote me.\""]
+	elif Game.has_item("bones"):
+		lines = ["\"Bone that light wants breaking, and there's only one anvil I know of that would take it.\"", "\"Down in the forge. Mind the giant.\""]
 	elif Game.has_item("candle_stub"):
-		lines = ["\"A candle that burns at both ends wants an altar, not a pocket.\"", "\"The drowned city has one. Clock over it with no hands. Two candles on it, and room between them for a third.\""]
+		lines = ["\"A candle that burns at both ends was taken from somewhere, and the somewhere wants it back.\"", "\"Under the drowned city, past the four names, there's a plinth with a ring of wax on it. Light the four first or the gate won't have you.\""]
 	elif Game.has_flag("visited_kings_dream"):
 		lines = ["\"Under the hill, in the forge, there's an iron maiden with nobody in it.\"", "\"Open it anyway. The last one who did came out with a candle and a look on his face.\""]
 	elif Game.has_keepsake("wings") and Game.has_keepsake("hourglass"):

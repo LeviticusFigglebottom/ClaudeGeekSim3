@@ -30,9 +30,10 @@ speculatively.
   things. The bottom of the well is a door now. It is not open yet. Something
   is still missing, and it is not a thing."* There is no fourth state and no
   descent.
-* The Candle Stub from the forge goes on the Ossuary altar in the Drowned
-  City and becomes Bonemeal. Bonemeal fed to the sprout on the hill in the
-  King's Dream grows the beanstalk into the King's Mind
+* The Candle Stub from the forge goes back on the plinth in the crypt of the
+  four in the Ossuary and the niches give up their Bones; the anvil in the
+  Furnace breaks them into Bonemeal. Bonemeal fed to the sprout on the tower
+  in the King's Dream grows the beanstalk into the King's Mind
   (`docs/areas/KINGS_MIND.md`). The three Paper Roses go in the vase by the
   King's bed there. After the third, he has stopped dreaming about you and is
   waiting. What he is waiting for, and what happens next, is open: the flag is

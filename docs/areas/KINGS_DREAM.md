@@ -67,7 +67,7 @@ Non-negotiables, in the order they were given:
 *Through the Looking-Glass* is a chess problem. The countryside is divided
 into squares by brooks and hedges, Alice enters as a white pawn on the second
 square, and every brook she crosses advances her one square and changes the
-world completely. On the eighth square she is crowned.
+world completely. On the eighth square she is crowned; the player is not.
 
 That is the whole layout of this area.
 
@@ -229,11 +229,11 @@ Quotes: the Furnace, the Waiting Halls, the Ossuary.
 goes wrong until she pulls the tablecloth off the table.*
 
 A rotunda that is the Anteroom, but the twelve doors are all open and all show
-static. Something is put on the player's head with no ceremony.
-
-**If the player is carrying the Paper Crown, it is the Paper Crown that is put
-on their head, and it comes off the inventory and onto them.** That is the
-best beat available and it uses a keepsake the game already has.
+static. At the centre, where the well should be, nothing is put on the
+player's head: there is no coronation, nobody is there to do it, and the
+banquet starts anyway. (An earlier build crowned the player here and left the
+Paper Crown on their head, which stopped the King offering the dream again.
+That is gone; the dream can be re-entered any number of times.)
 
 The banquet. The candles grow to the ceiling. The food introduces itself.
 Everything accelerates. The way out is to take hold of something and pull.

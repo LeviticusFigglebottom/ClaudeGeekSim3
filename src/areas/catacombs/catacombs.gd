@@ -285,6 +285,27 @@ func _ladder(pos: Vector3, yaw: float, top: float) -> void:
 		y += 0.42
 
 
+func _on_plinth(_p: Node, _it: Node) -> void:
+	if World.hud == null:
+		return
+	if Game.has_flag("crypt_candle_placed"):
+		await World.hud.say("", ["The black candle stands on the plinth, burning at both ends and the middle, and not getting any shorter.", "The three niches are empty now. The fourth still has its chair."])
+		return
+	if not Game.has_item("candle_stub"):
+		await World.hud.say("", ["A plinth with a ring of old wax on it, where a candle stood for a long time and was taken.", "The three niches with bones in them face it, the way an audience faces a stage that has not been used lately."])
+		return
+	Game.take_item("candle_stub")
+	Game.set_flag("crypt_candle_placed", true)
+	await World.hud.say("", [
+		"You stand the black stub in the ring of wax it left. It lights itself, at both ends and the middle, which is not how candles work.",
+		"The three names on the stones outside go quiet in a way you can feel through the floor.",
+		"In the niches the bones stir, and settle, and slide forward off their shelves into your hands, all three, light as kindling. The fourth niche does not move. The chair in it is still facing out.",
+	])
+	Game.gain_item("bones")
+	Audio.sfx("whisper", null, -6.0)
+	Game.note("crypt_bones", "The candle and the bones", "The black candle from the forge went back on the plinth in the crypt of the four, and the three niches gave up their bones. Bone that light wants breaking. There is an anvil in the forge.")
+
+
 # --- the chapel of the four names --------------------------------------------------------
 
 func _chapel() -> void:
@@ -353,7 +374,13 @@ func _chapel() -> void:
 	# the crypt beyond
 	var crypt := _c(9, 19)
 	Kit.box(self, crypt + Vector3(0, 0.3, 0), Vector3(1.0, 0.6, 1.0), "stone/blocks_dark", {"tile": 1.0})
-	Pickup.create(self, crypt + Vector3(0, 0.6, 0), {"item": "candle_stub", "requires_flag": "ossuary_names", "name": "Pickup_candle_stub"})
+	# the plinth: the black candle from the forge was taken from here and is
+	# owed back; put on it, the three niches give up their bones
+	if Game.has_flag("crypt_candle_placed"):
+		Props.place(self, "candle_cluster", crypt + Vector3(0, 0.6, 0), 0.0, 0.5, {"collision": "none", "tint": Color(0.15, 0.12, 0.14)})
+		Kit.light(self, crypt + Vector3(0, 1.0, 0), Color(0.6, 0.4, 0.9), 0.7, 4.0)
+	Interactable.make(self, crypt + Vector3(0, 0.75, 0), Vector3(1.2, 1.0, 1.2), "The plinth", _on_plinth, {"name": "CryptPlinth"})
+	Puzzle.declare(self, "crypt_bones", "crypt_candle_placed", ["flag:ossuary_names", "item:candle_stub"], "put the black candle from the forge back on the plinth in the crypt of the four", {"item": "bones"})
 	Readable.create(self, crypt + Vector3(0, 0, -0.85), 180.0, "Read the crypt wall", [
 		"Four niches. Four names. Three of them have bones in.",
 		"The fourth niche is swept clean and there is a chair in it, facing out.",

@@ -431,12 +431,12 @@ static func _hill(area: AreaBase, root: Node3D) -> void:
 	Kit.light(root, HILL + Vector3(0, HILL_TOP + 3.0, 0), Color(1.0, 0.9, 0.95), 1.2, 14.0)
 	for k in 5:
 		Props.place(root, "cloud", HILL + Kit.polar(7.0 + k * 1.5, k * 72.0 + 20.0, HILL_TOP + 3.0 + k * 1.2), k * 50.0, 1.4, {"collision": "none"})
-	Readable.create(root, HILL + Vector3(0, HILL_TOP, 1.2), 0.0, "Look out from the hill", [
-		"From the hill you can see the whole garden, which is what hills are for. In the book she could never reach it.",
+	Readable.create(root, HILL + Vector3(0, HILL_TOP, 1.2), 0.0, "Look out from the tower", [
+		"From the tower you can see the whole garden, which is what towers are for. In the book she could never reach the hill; so the dream built her a tower instead.",
 		"The maze is under you. From here it is not a maze.",
 		"The wind is warm and comes from below, as if something under the garden were breathing out.",
-	], {"name": "HillView", "size": Vector3(2.0, 1.4, 1.0), "note_key": "dream_hill", "note_title": "The hill in the garden", "note_text": "A pink hill with a stair round it, at the east side of the garden. From the top the maze is not a maze. The wind comes up from below, warm, as if something were breathing."})
-	Puzzle.declare(area, "dream_hill", "", [], "climb the pink hill on the east side of the garden and look down")
+	], {"name": "HillView", "size": Vector3(2.0, 1.4, 1.0), "note_key": "dream_hill", "note_title": "The tower in the garden", "note_text": "A pink tower with a stair round it, at the east side of the garden, and a sprout on top. From the top the maze is not a maze. The wind comes up from below, warm, as if something were breathing."})
+	Puzzle.declare(area, "dream_hill", "", [], "climb the pink tower on the east side of the garden and look down")
 
 
 # --- the beanstalk -----------------------------------------------------------------------
@@ -491,7 +491,7 @@ static func _feed(area: AreaBase) -> void:
 	if World.hud == null:
 		return
 	if not Game.has_item("bonemeal"):
-		await World.hud.say("", ["A sprout, on top of a hill, on top of a dream. It is a little taller than you and it has not grown since you got here.", "The soil round it is pink and thin. Something this small, this high up, would need feeding."])
+		await World.hud.say("", ["A sprout, on top of a tower, on top of a dream. It is a little taller than you and it has not grown since you got here.", "The soil round it is pink and thin. Something this small, this high up, would need feeding."])
 		return
 	Game.take_item("bonemeal")
 	Game.set_flag("beanstalk_grown", true)
@@ -500,7 +500,7 @@ static func _feed(area: AreaBase) -> void:
 		"The sprout thinks about it. Then it goes up.",
 		"It goes up past you, past the clouds you put there, past the hedges' idea of how tall a thing can be, and the leaves come out of it in a stair, and it is still going.",
 	])
-	Game.note("beanstalk", "The beanstalk", "The sprout on the garden's hill, fed the bonemeal, is a stalk now, higher than the dream. There is a stair of leaves round it. Whatever is at the top is above the King's sleep, which means it is in his head.")
+	Game.note("beanstalk", "The beanstalk", "The sprout on the garden's tower, fed the bonemeal, is a stalk now, higher than the dream. There is a stair of leaves round it. Whatever is at the top is above the King's sleep, which means it is in his head.")
 	Audio.sfx("wind_gust", null, -4.0)
 	World.reload_here("hilltop", {"color": Color(0.85, 0.95, 0.8), "duration": 0.9})
 

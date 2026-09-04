@@ -5,15 +5,18 @@ he has been told"*. Built in `src/areas/kings_mind/kings_mind.gd`.
 
 ## Getting there
 
-1. The Candle Stub from the iron maiden in the Furnace goes on the altar in
-   the Ossuary chapel of the Drowned City, between the two tall candles. It
-   lights itself; the bones under the slab come out as **Bonemeal**
-   (flag `bonemeal_made`, item `bonemeal`).
-2. On the hill in the Garden of Live Flowers (the King's Dream, square 2)
-   there is a sprout where the arch used to be. Fed the bonemeal it grows into
-   a beanstalk with a stair of leaves round it (flag `beanstalk_grown`; the
-   dream rebuilds at spawn `hilltop`). The leaf at the top is a door.
-3. The door comes out on the top of the same stalk, above the dream:
+1. In the Ossuary, light the candles for the four names (`ossuary_names`)
+   so the crypt's gate opens. The Candle Stub from the iron maiden in the
+   Furnace goes back on the plinth in the crypt; the three niches give up
+   their **Bones** (flag `crypt_candle_placed`, item `bones`).
+2. Strike the anvil in the Furnace carrying the bones: they break into
+   **Bonemeal** (flag `bonemeal_made`, item `bonemeal`).
+3. On top of the pink tower in the Garden of Live Flowers (the King's Dream,
+   square 2) there is a sprout where the arch used to be. Fed the bonemeal it
+   grows into a beanstalk with a stair of leaves round it (flag
+   `beanstalk_grown`; the dream rebuilds at spawn `hilltop`). The leaf at the
+   top is a door.
+4. The door comes out on the top of the same stalk, above the dream:
    spawn `from_beanstalk`. The way back is the same stalk (`kings_dream:hilltop`).
 
 The route is declared on the sprout (`dream_beanstalk`, route
