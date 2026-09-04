@@ -149,7 +149,10 @@ docs/                    HANDOFF (start here), DESIGN, WORLD (the map of
 * [`docs/WORLD.md`](docs/WORLD.md) — every area, every connection, every keepsake and its route.
 * [`docs/AREA_AUTHORING.md`](docs/AREA_AUTHORING.md) — how to add a realm in an afternoon.
 * [`docs/areas/KINGS_DREAM.md`](docs/areas/KINGS_DREAM.md) — the specification
-  for the next area, a fragmented Wonderland of eight squares.
+  for the King's Dream, a Wonderland of eight squares; `KINGS_MIND.md`,
+  `PROMOTION.md` and `STATIC_END.md` beside it cover the areas past it.
+* [`docs/ENDINGS.md`](docs/ENDINGS.md) — the three ends that exist as choices,
+  the one outlined, and what is open.
 
 ## Licence notes
 

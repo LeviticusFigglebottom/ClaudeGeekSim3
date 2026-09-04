@@ -103,6 +103,16 @@ const AREAS := {
 		"name": "The King's Dream", "subtitle": "he is dreaming about you",
 		"realm": "kings_dream", "ambience": "sea",
 	},
+	"promotion": {
+		"scene": "res://src/areas/promotion/promotion.tscn",
+		"name": "The Last Rank", "subtitle": "a pawn that gets there is whatever it is told",
+		"realm": "promotion", "ambience": "hallway",
+	},
+	"static_end": {
+		"scene": "res://src/areas/static_end/static_end.tscn",
+		"name": "Off Air", "subtitle": "the set turned off",
+		"realm": "static", "ambience": "static",
+	},
 	"kings_mind": {
 		"scene": "res://src/areas/kings_mind/kings_mind.tscn",
 		"name": "The King's Mind", "subtitle": "everything he has been told",

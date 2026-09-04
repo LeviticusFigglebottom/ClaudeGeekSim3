@@ -65,7 +65,6 @@ var current := -1
 var env: Environment = null
 var sun: DirectionalLight3D = null
 var sky: MeshInstance3D = null
-var exit_door: Door = null
 var brooks_built := 0
 var _palette_tween: Tween = null
 var _pending_notes: Array = []
@@ -298,9 +297,41 @@ func _set_current(i: int, animate: bool) -> void:
 func _exit() -> void:
 	var e: Dictionary = sq[7]
 	var a: Dictionary = e.anchors.get("exit", {"pos": Vector3(0, 0, -20.0), "yaw": 0.0})
-	exit_door = Door.create(self, e.origin + a.pos, float(a.yaw), "nexus", "from_kings_dream", {
-		"kind": "none", "label": "Take hold of the cloth and pull", "name": "Door_out",
-		"fade_color": Color.WHITE, "fade_duration": 1.6, "sound": "static_burst"})
+	# the cloth is the way out, and it is also where the Usher has put his lamp
+	# down at your place: taking hold of it asks which of three things you mean
+	Interactable.make(self, e.origin + a.pos + Vector3(0, 1.0, 0), Vector3(2.4, 2.0, 1.8), "Take hold of the cloth", _on_cloth, {"name": "Door_out", "yaw": float(a.yaw)})
+	Puzzle.declare(self, "kings_dream_out", "", [], "take hold of the cloth on the banquet table and pull", {"route": "nexus:from_kings_dream"})
+	Puzzle.declare(self, "kings_dream_promotion", "ending_limbo", ["flag:dream_banquet_begun"], "once the banquet has begun, take hold of the cloth and accept the promotion: the last rank", {"route": "promotion:from_banquet"})
+	Puzzle.declare(self, "kings_dream_plug", "ending_unplugged", ["flag:dream_banquet_begun"], "once the banquet has begun, take hold of the cloth and pull the plug instead", {"route": "static_end:from_banquet"})
+
+
+## The three things the cloth can mean, once the banquet has begun. "No"
+## comes first, so nothing is chosen by accident: both of the others are ends
+## of the game. Before the banquet the cloth is only the way back.
+func _on_cloth(_p: Node, _it: Node) -> void:
+	if World.hud == null or not Game.has_flag("dream_banquet_begun"):
+		World.travel("nexus", "from_kings_dream", {"color": Color.WHITE, "duration": 1.6})
+		return
+	var i: int = await World.hud.ask("", "The cloth is in your hands. Under it, at your place, the cable. Across the table the Usher, nearer than he has ever stood, pointing at both. Two of these are ends, and say so.", [
+		"No. Pull the cloth, and go back.",
+		"Accept the promotion. Stay on the board, as a piece. (an ending)",
+		"Pull the plug. (an ending)",
+	])
+	if i == 1 or i == 2:
+		var y: int = await World.hud.ask("", "There is no coming back from this one. Are you sure?", ["No.", "Yes."])
+		if y != 1:
+			return
+	match i:
+		1:
+			Game.set_flag("promotion_taken", true)
+			Game.note("promotion", "The promotion", "At the banquet you took the Usher's lamp. A pawn that reaches the last rank is promoted: it becomes whatever it is told to be, and it never leaves the board.")
+			World.travel("promotion", "from_banquet", {"color": Color(0.1, 0.06, 0.14), "duration": 1.8})
+		2:
+			Game.set_flag("plug_pulled", true)
+			Game.note("plug", "The plug", "At the banquet you pulled the plug instead of the cloth. The doors went to snow and stayed there.")
+			World.travel("static_end", "from_banquet", {"color": Color.WHITE, "duration": 1.8})
+		_:
+			World.travel("nexus", "from_kings_dream", {"color": Color.WHITE, "duration": 1.6})
 
 
 # --- hooks ----------------------------------------------------------------------

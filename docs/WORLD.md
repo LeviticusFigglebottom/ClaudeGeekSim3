@@ -87,3 +87,26 @@ the Hallway stair (three descents) → `catacombs:from_stairs`.
   brooks run back. The Wings are used four times and the Hourglass five.
   Spec: `docs/areas/KINGS_DREAM.md`; the entrance differs from the spec by
   request (the King, not the stone telephone; no Anteroom arch).
+
+## The King's Mind, and the ends
+
+* `kings_mind` — The King's Mind. Reached from the top of the beanstalk on
+  the tower in the Garden of Live Flowers once the sprout has been fed
+  Bonemeal (four Candle Stubs on the crypt plinth in the Ossuary → Bones;
+  the anvil in the Furnace → Bonemeal). Beanstalks in cloud, a keep with
+  walls of grey matter and a labyrinth of bookshelves, the King in a coma
+  and a vase for the three Paper Roses. After the third rose, the King
+  offers the memorial ending. Spec: `docs/areas/KINGS_MIND.md`.
+* `promotion` — The Last Rank. From the cloth at the banquet, once the
+  banquet has begun, by accepting the promotion. One rank of eight squares,
+  BORN to a square with nothing on it; standing on the last is the ending.
+  Spec: `docs/areas/PROMOTION.md`.
+* `static_end` — Off Air. From the same cloth, by pulling the plug. The
+  same eight things, grey and sinking, each watched by a set showing snow;
+  the Usher on a bed at the end, and the plug. Pulling it is the ending.
+  Spec: `docs/areas/STATIC_END.md`.
+
+All three endings are confirmations that default to "No"; their scenes are
+not made yet (`docs/ENDINGS.md`). Neither `promotion` nor `static_end` has
+a door back: holding R wakes you, as everywhere, and the solver reaches
+them through the routes declared on the cloth.

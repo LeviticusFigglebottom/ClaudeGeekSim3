@@ -3,10 +3,11 @@ extends RefCounted
 ## The eighth square. A rotunda that is the Anteroom, but the twelve doors are
 ## all open and all show static, and the room is, subtly, the mirrored one:
 ## the doors run the other way round and the plaque reads backwards. At the
-## centre something is put on your head with no ceremony; if you are carrying
-## the Paper Crown, it is the Paper Crown. Then the banquet, at which the
+## centre nothing is put on your head, and the banquet starts anyway: the
 ## candles grow to the ceiling, the food introduces itself and everything
-## accelerates. The way out is to take hold of the cloth and pull.
+## accelerates. Once it has begun the Usher stands across the table and a
+## cable runs from under the cloth to the wall. The way out is to take hold
+## of the cloth and pull; the two other things the cloth can mean are ends.
 ##
 ## Quotes the Anteroom, the Static, the Other Anteroom and the Workshop. The
 ## brook beyond the rotunda runs back to the wood.
@@ -20,7 +21,7 @@ const COLD := Color(0.6, 0.7, 1.0)
 
 static func build(area: AreaBase, root: Node3D, ctx: Dictionary) -> Dictionary:
 	var d: Dictionary = ctx.def
-	var state := {"crowned": false, "candles": [], "turn": null, "lights": [], "t": 0.0, "speed": 0.0, "guests": []}
+	var state := {"crowned": false, "candles": [], "turn": null, "lights": [], "t": 0.0, "speed": 0.0, "guests": [], "root": root, "dressed": false}
 	Kit.floor(root, Vector3.ZERO, Vector2(KD.SQ, KD.SQ), String(d.ground), {"tint": d.tint, "tile": 2.0, "thick": 0.2})
 	_approach(area, root)
 	_rotunda(area, root, state)
@@ -192,10 +193,54 @@ static func _banquet(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 		"A table laid for a coronation, for pieces. Nobody has told you where to sit and every place is yours.",
 		"The cloth hangs over the edge nearest you. It is the only thing in the room that looks like it would come away if pulled.",
 	], {"name": "TableLook", "size": Vector3(2.0, 1.2, 1.0)})
+	if Game.has_flag("dream_banquet_begun"):
+		_dress_banquet(state)
+
+
+## Once the banquet has begun: the Usher across the table, the closest he has
+## ever stood, and a cable from under the cloth at your place to a socket in
+## the wall between two of the doors. Two things to pull.
+static func _dress_banquet(state: Dictionary) -> void:
+	if state.dressed:
+		return
+	state.dressed = true
+	var root: Node3D = state.root
+	if root == null or not is_instance_valid(root):
+		return
+	var tp := CENTRE + Vector3(0, 0, -7.0)
+	Props.place(root, "usher", tp + Vector3(0, 0, -3.4), 180.0, 1.0, {"collision": "none", "name": "UsherAtTable"})
+	Kit.light(root, tp + Vector3(0, 2.6, -3.0), COLD, 0.6, 5.0)
+	Readable.create(root, tp + Vector3(0, 1.4, -3.4), 180.0, "The Usher", [
+		"Across the table, at last, near enough to see. A coat, a hat, and under the hat a face you know from the mirror in the flat.",
+		"He is not pointing at you. He is pointing at the edge of the cloth, where a cable goes under it, and where it comes out again and runs to the wall.",
+	], {"name": "UsherLook", "size": Vector3(1.4, 2.8, 1.2), "note_key": "usher_table", "note_title": "The Usher at the table", "note_text": "At the banquet the Usher stood across the table from you, the closest he has ever been, with your face. He pointed at the cloth, and at the cable that runs from under it to the wall."})
+	# a plate on the face of the pillar between two doors, the cable going up into it
+	var socket := CENTRE + Kit.polar(R - 2.2, 45.0, 0.5)
+	Kit.box(root, socket, Vector3(0.5, 0.5, 0.12), "metal/plate", {"solid": false, "tint": Color(0.55, 0.55, 0.6), "rotation": Vector3(0, 45, 0)})
+	Kit.box(root, socket + Kit.polar(-0.08, 45.0), Vector3(0.2, 0.2, 0.1), "metal/iron", {"solid": false, "tint": Color(0.15, 0.15, 0.17), "rotation": Vector3(0, 45, 0)})
+	Kit.light(root, socket + Kit.polar(-1.2, 45.0, 0.6), COLD, 0.5, 4.0)
+	var pts := [tp + Vector3(1.6, 0.05, 1.45), tp + Vector3(5.6, 0.05, 0.4), CENTRE + Kit.polar(R - 4.0, 45.0, 0.05), socket + Kit.polar(-0.16, 45.0)]
+	for k in pts.size() - 1:
+		_cable(root, pts[k], pts[k + 1])
+	Readable.create(root, socket + Kit.polar(-0.6, 45.0), Kit.yaw_to_center(45.0), "The socket", [
+		"A socket in the wall between two of the doors, and the cable in it, and the cable warm.",
+		"Everything in the room that hisses is on the other end of it.",
+	], {"name": "SocketLook", "size": Vector3(1.0, 1.0, 1.0)})
+
+
+## A straight run of cable between two points, in the square's own space
+## (the square sits hundreds of metres from the world origin, so no global
+## look-at here).
+static func _cable(root: Node3D, a: Vector3, b: Vector3) -> void:
+	var d := b - a
+	var seg := Kit.cylinder(root, Vector3.ZERO, 0.06, d.length(), "metal/iron", {"solid": false, "segments": 6, "tint": Color(0.3, 0.3, 0.33)})
+	var up := Vector3.UP if absf(d.normalized().y) < 0.99 else Vector3.RIGHT
+	seg.transform = Transform3D(Basis.looking_at(d.normalized(), up) * Basis(Vector3.RIGHT, PI * 0.5), (a + b) * 0.5)
 
 
 static func _start_banquet(_area: AreaBase, state: Dictionary) -> void:
 	state.speed = 1.0
+	_dress_banquet(state)
 	for cn in state.candles:
 		var n: Node3D = cn
 		if is_instance_valid(n):

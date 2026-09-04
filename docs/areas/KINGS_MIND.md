@@ -47,8 +47,15 @@ Interacting with the vase holding a Paper Rose puts it in (item `rose`
 taken, `roses_placed` counted, a planted rose appears in the vase). The three
 roses are in the castle library, under the tavern floor (the Tin Mouse), and
 the hedge maze of the Garden (the Wings). After the third, flag
-`roses_all_placed`: he has stopped dreaming about you and is waiting. Nothing
-reads the flag yet; see `docs/ENDINGS.md`.
+`roses_all_placed`: he has stopped dreaming about you and is waiting.
+
+## The King
+
+"The King" (`KingLook`) is a look before the third rose. After it, it asks
+"Stay with him. (an ending)", "No" first, then asks again, and plays the
+`memorial` ending (`ending_memorial`): a memorial to yourself. Its scene is
+not made yet; see `docs/ENDINGS.md`. Declared as `kings_mind_memorial`,
+requires `flag:roses_all_placed`.
 
 ## Hints
 

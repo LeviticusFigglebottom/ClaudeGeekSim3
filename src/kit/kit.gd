@@ -676,6 +676,10 @@ static func label(parent: Node, text: String, pos: Vector3, yaw_deg: float, size
 	l.position = pos
 	# Label3D faces +Z; the Kit's yaw convention faces -Z.
 	l.rotation.y = deg_to_rad(yaw_deg + 180.0)
+	if opts.get("flat", false):
+		# lying on the ground, face up, the top of the text towards `yaw`:
+		# read it standing south of it, looking the way the yaw looks
+		l.rotation = Vector3(deg_to_rad(-90.0), deg_to_rad(yaw_deg), 0.0)
 	l.pixel_size = float(opts.get("pixel_size", 0.01))
 	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED if opts.get("billboard", false) else BaseMaterial3D.BILLBOARD_DISABLED
 	l.shaded = false

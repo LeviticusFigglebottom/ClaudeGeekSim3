@@ -1,0 +1,64 @@
+# The Last Rank
+
+Area id `promotion`. Display name **The Last Rank**, subtitle *"a pawn that
+gets there is whatever it is told"*. Built in
+`src/areas/promotion/promotion.gd`. Realm preset `promotion` (a bruised
+violet sky, the King's Mind sky texture, thin fog).
+
+This is where accepting the promotion goes. It is one of the three ends of
+the game, and its ending scene is not made yet: `Ending.play("limbo", ...)`
+sets `ending_limbo`, fades, and for now wakes the player in the flat.
+
+## Getting there
+
+At the banquet on the eighth square of the King's Dream, once the banquet
+has begun (`dream_banquet_begun`, set by standing at the centre), taking
+hold of the cloth asks three things. "No" is first and selected by default.
+"Accept the promotion" and "Pull the plug" both say *(an ending)* and both
+ask again, "No" first, before they go anywhere. Accepting sets
+`promotion_taken` and travels to `promotion:from_banquet`.
+
+The route is declared on the cloth (`kings_dream_promotion`, done flag
+`ending_limbo`, requires `flag:dream_banquet_begun`).
+
+## The place
+
+The board from the dream with the corruption showing through. One rank of
+eight squares fourteen metres across, walked north in order, with three
+files of board either side that are being forgotten from the edges in: some
+squares are missing, some are static. Pawns the size of houses stand along
+both sides and invisible walls above them keep the player to the file.
+Knocked-off pieces lie on the edge squares; every fifth fence pawn and some
+of the fallen are covered in static (`_corrupt`). Behind the first square
+the rank you came from is painted out with a wall of snow. Falling off the
+edge squares lands in the Static as everywhere; no route needs a fall.
+
+The rank is the progression of a life, and each square has its word on the
+ground in front of it:
+
+| Square | Word | What stands there |
+|---|---|---|
+| 1 | BORN | a cot the size of a room, a mobile of pieces turning over it |
+| 2 | SMALL | chalked hopscotch, a pawn your height beside one of theirs, a chair, the picture of the house |
+| 3 | TAUGHT | six desks facing the board of rules from the croquet ground, chairs turned round, the clock |
+| 4 | KEPT | filing cabinets, a desk, a phone that never rings, the ticket dispenser, the floor going to static |
+| 5 | LOVED | a table for two, two warm mugs, two queens of opposite colours together, paper roses |
+| 6 | HOME | the white door from the field, ajar, the mailbox with 5½ on it, a window that shows night |
+| 7 | KEPT AGAIN | an iron bed with hospital corners, a drip, a chair somebody sat in a long time, a set showing snow, the clock at half past five |
+| 8 | (no word) | a toppled red queen, the stone from the Ossuary with your name, and a raised white square with nothing on it |
+
+The Usher stands near the last square and vanishes when looked at, as
+everywhere.
+
+## The ending
+
+"Stand on the last square" (`LastSquare`) asks, "No" first, then asks
+again. Yes plays the `limbo` ending: nothing is put on your head, the pieces
+turn, the board keeps you.
+
+## Debug
+
+`tools/shot.sh promotion out.png from_banquet "0,-6"` for the cot;
+`--pos=0,0.1,-34` for KEPT, `--pos=0,0.1,-62` for HOME, `--pos=0,0.1,-90`
+for the last square. The coplanar audit (`tools/coplanar.tscn --
+--area=promotion`) is clean.

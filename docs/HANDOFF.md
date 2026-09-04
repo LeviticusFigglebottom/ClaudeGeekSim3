@@ -129,7 +129,7 @@ assets/models           generated GLBs, one per prop
 tools/gen_assets/       the Python generators for all of the above
 tools/verify.gd         the headless verifier
 docs/                   DESIGN, WORLD, AREA_AUTHORING, DEPLOY, ENDINGS,
-                        areas/KINGS_DREAM.md
+                        areas/KINGS_DREAM, KINGS_MIND, PROMOTION, STATIC_END
 ```
 
 An area is registered in `src/data/areas.gd` with a scene path, name,
@@ -277,11 +277,11 @@ Render screenshots at every step and look at them.
 
 ## 9. Things that are not your job
 
-* **Endings are undesigned and are not yours to design.** `docs/ENDINGS.md`
-  records one decided rule and marks the rest open. Do not invent endings and
-  do not build the well descent. The Candle Stub and the Paper Roses now have
-  their uses (the altar, the beanstalk, the vase in the King's Mind); the
-  thread stops at `roses_all_placed` and nothing reads that flag yet.
+* **Endings are not yours to design.** `docs/ENDINGS.md` records the three
+  that exist as choices (the promotion, the plug, the memorial), the M ending
+  that is outlined and not to be built yet, and what is open. Do not invent
+  endings and do not build the well descent. The ending scenes themselves are
+  the next job and are stubbed in `src/core/ending.gd`.
 * There is no roadmap and no backlog. Known imperfections that are not worth
   your time: some faces on the Slow Sea are flat sprites, round moving
   platforms use box collision, the Drowned City's main street does not flood

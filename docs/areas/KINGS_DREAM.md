@@ -67,7 +67,8 @@ Non-negotiables, in the order they were given:
 *Through the Looking-Glass* is a chess problem. The countryside is divided
 into squares by brooks and hedges, Alice enters as a white pawn on the second
 square, and every brook she crosses advances her one square and changes the
-world completely. On the eighth square she is crowned; the player is not.
+world completely. On the eighth square she is crowned; the player is not,
+and is asked instead what the cloth means.
 
 That is the whole layout of this area.
 
@@ -89,7 +90,7 @@ That is the whole layout of this area.
   optional and both hold secrets.
 
 Squares are numbered by rank, as in the book: the player arrives on the second
-and is crowned on the eighth.
+and reaches the banquet on the eighth.
 
 ## 4. The eight squares
 
@@ -236,7 +237,20 @@ Paper Crown on their head, which stopped the King offering the dream again.
 That is gone; the dream can be re-entered any number of times.)
 
 The banquet. The candles grow to the ceiling. The food introduces itself.
-Everything accelerates. The way out is to take hold of something and pull.
+Everything accelerates. Once it has begun the Usher stands across the table,
+the closest he has ever been, and a cable runs from under the cloth at the
+player's place to a socket in the wall between two doors. The way out is to
+take hold of the cloth and pull, and taking hold of it asks what you mean:
+
+1. **No. Pull the cloth, and go back.** Default. The Anteroom,
+   `nexus:from_kings_dream`.
+2. **Accept the promotion. Stay on the board, as a piece. (an ending)**
+   Asks again, "No" first. The Last Rank, `docs/areas/PROMOTION.md`.
+3. **Pull the plug. (an ending)** Asks again. Off Air,
+   `docs/areas/STATIC_END.md`.
+
+Before the banquet has begun the cloth is only the way back. See
+`docs/ENDINGS.md`.
 
 Quotes: the Anteroom, the Static, the Other Anteroom, the Workshop.
 

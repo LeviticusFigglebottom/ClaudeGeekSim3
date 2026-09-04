@@ -317,11 +317,8 @@ func _bedroom(c: Vector3) -> void:
 		Props.place(self, "candle_tall", c + Vector3(sx * 0.6, 0, 2.4), 0.0, 1.0, {"collision": "none"})
 		Kit.light(self, c + Vector3(sx * 0.6, 1.6, 2.4), CANDLE, 1.1, 9.0)
 	Kit.light(self, bed + Vector3(0, 3.2, 0), PINK, 1.0, 10.0)
-	Readable.create(self, bed + Vector3(0, 1.0, 0.2), 0.0, "Look at the King", [
-		"No crown. No red. A man of no particular size, under a sheet, breathing about once for every four of yours.",
-		"His eyes move under the lids. Somewhere below all this a garden is happening, and a train, and a trial, and he is doing all of it.",
-		"He is not asleep, exactly. Asleep is something you can be woken from.",
-	], {"name": "KingLook", "size": Vector3(2.6, 1.4, 2.6), "note_key": "kings_mind_king", "note_title": "The King as he is", "note_text": "At the end of the labyrinth in his head, in a bedroom the size of a hall, the Red King lies under a sheet with no crown and no colour, breathing once for every four of your breaths. Not asleep: asleep can be woken. There is a vase by the bed with nothing in it."})
+	Interactable.make(self, bed + Vector3(0, 1.0, 0.2), Vector3(2.6, 1.4, 2.6), "The King", _on_king, {"name": "KingLook"})
+	Puzzle.declare(self, "kings_mind_memorial", "ending_memorial", ["flag:roses_all_placed"], "with the three roses in the vase, stay with the King")
 	# the table by the bed, and the vase
 	var table := bed + Vector3(2.2, 0, 0.3)
 	Props.place(self, "stool", table, 0.0, 1.1)
@@ -333,6 +330,31 @@ func _bedroom(c: Vector3) -> void:
 	Kit.light(self, vase_pos + Vector3(0, 1.2, 0), Color(1.0, 0.95, 0.85), 0.8, 5.0)
 	Puzzle.declare(self, "kings_mind_roses", "roses_all_placed", ["item:rose"], "put the three paper roses in the vase by his bed")
 	Usher.spawn(self, c + Vector3(-7.0, 0, 1.5), {"appear_delay": 1.5})
+
+
+## Looking at him, until the roses are in; then staying with him, which is an end.
+func _on_king(_p: Node, _it: Node) -> void:
+	if World.hud == null:
+		return
+	if not Game.has_flag("roses_all_placed"):
+		await World.hud.say("", [
+			"No crown. No red. A man of no particular size, under a sheet, breathing about once for every four of yours.",
+			"His eyes move under the lids. Somewhere below all this a garden is happening, and a train, and a trial, and he is doing all of it.",
+			"He is not asleep, exactly. Asleep is something you can be woken from.",
+		])
+		Game.note("kings_mind_king", "The King as he is", "At the end of the labyrinth in his head, in a bedroom the size of a hall, the Red King lies under a sheet with no crown and no colour, breathing once for every four of your breaths. Not asleep: asleep can be woken. There is a vase by the bed with nothing in it.")
+		return
+	var i: int = await World.hud.ask("", "Three roses in the vase, and he has stopped dreaming about you, and he is waiting. If you stay with him now, this is the end of it: a memorial, with you in it. Stay?", ["No. Not yet.", "Stay with him. (an ending)"])
+	if i != 1:
+		return
+	var y: int = await World.hud.ask("", "There is no coming back from this one. Are you sure?", ["No.", "Yes."])
+	if y != 1:
+		return
+	await Ending.play("memorial", "The memorial", [
+		"You sit in the chair by the bed, the one somebody has sat in a long time, and it fits.",
+		"His breathing does not change. Yours does: it slows, once for every four, until there is no telling which of you is which.",
+		"The roses do not need water. Somebody will come and look at them, and at you, and go away again, and that is what a memorial is for.",
+	], Color(0.98, 0.95, 0.92))
 
 
 func _rose_in_vase(i: int) -> void:
