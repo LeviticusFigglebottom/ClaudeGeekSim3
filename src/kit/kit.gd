@@ -895,6 +895,15 @@ static func mouse_gap(parent: Node, pos: Vector3, yaw_deg: float, size: Vector2 
 	var b := blocker(root, Vector3(0, size.y * 0.5, 0), Vector3(size.x, size.y, 0.3), L_BIG_ONLY)
 	b.name = "BigOnlyBlocker"
 	mouse_gaps.append({"pos": pos, "yaw": yaw_deg, "size": size, "depth": float(opts.get("crawl", 3.0))})
+	# a hole this small is easy to walk past, so say so once, the first time the
+	# full-size player stands in front of it
+	var said := [false]
+	trigger(parent, pos + Vector3(0, 0.9, 0), Vector3(2.2, 1.8, 2.2), func(_p: Node) -> void:
+		if said[0] or Game.small:
+			return
+		said[0] = true
+		Game.toast.emit(String(opts.get("hint", "There is a hole in the skirting board. Something small could get through there."))),
+		{"name": "MouseGapHint", "continuous": true})
 	return root
 
 
