@@ -872,8 +872,17 @@ static func mouse_gap(parent: Node, pos: Vector3, yaw_deg: float, size: Vector2 
 static func ring(parent: Node, pos: Vector3, r_in: float, r_out: float, segments: int, tex_name: String, opts: Dictionary = {}) -> MeshInstance3D:
 	var tile := float(opts.get("tile", default_tile))
 	var down := bool(opts.get("down", false))
+	# opts.gaps: Array of [angle_deg, width_deg] sectors left open (0 = +X, 90 = +Z)
+	var gaps: Array = opts.get("gaps", [])
 	var quads: Array = []
 	for i in segments:
+		var mid_deg := 360.0 * (i + 0.5) / segments
+		var skip := false
+		for g in gaps:
+			if absf(wrapf(mid_deg - float(g[0]), -180.0, 180.0)) < float(g[1]) * 0.5:
+				skip = true
+		if skip:
+			continue
 		var a0 := TAU * i / segments
 		var a1 := TAU * (i + 1) / segments
 		var p0 := Vector3(cos(a0) * r_in, 0, sin(a0) * r_in)

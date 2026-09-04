@@ -866,7 +866,7 @@ func _swing(i: int) -> void:
 
 
 func _solve_bells() -> void:
-	bells_puzzle.solve("The four bells agree. In the middle, a fifth answers.")
+	bells_puzzle.solve("The four bells agree. In the middle, a fifth answers. Somewhere a heavy door is listening for it.")
 	Audio.sfx("bell_small", CRYPT_C + Vector3(0, 1.2, 0), -2.0)
 	if bell_cage != null and is_instance_valid(bell_cage):
 		var tw := create_tween()

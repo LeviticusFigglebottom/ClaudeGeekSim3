@@ -13,6 +13,8 @@ const R := 9.0
 const WALL_H := 36.0
 
 var top_y := 26.0
+## where the spiral arrives at the top (degrees, 0 = +X); the landing keeps clear of it
+var top_angle := 112.0
 var hour_cw: Clockwork = null
 var minute_cw: Clockwork = null
 var pendulum_cw: Clockwork = null
@@ -93,7 +95,9 @@ func _climb() -> void:
 		a += 24.0
 		count += 1
 		i += 1
-	top_y = y - 0.25
+	# the landing is level with the last step, and open above the last three
+	top_y = y - 0.95
+	top_angle = wrapf(a - 24.0, 0.0, 360.0)
 
 
 func _landing_thing(idx: int, pos: Vector3, ang: float) -> void:
@@ -122,42 +126,51 @@ func _landing_thing(idx: int, pos: Vector3, ang: float) -> void:
 
 func _top() -> void:
 	var ty := top_y
-	Kit.ring(self, Vector3(0, ty, 0), 3.0, R - 0.15, 24, "wood/planks_dark", {"tile": 2.0, "name": "TopRing"})
-	Kit.ring(self, Vector3(0, ty - 0.3, 0), 3.0, R - 0.15, 24, "wood/planks_dark", {"down": true, "tile": 2.0, "solid": false})
-	Kit.round_wall(self, Vector3(0, ty - 0.3, 0), 3.0, 0.3, 24, "metal/brass", {"outward": true})
-	Kit.round_wall(self, Vector3(0, ty, 0), 3.0, 0.9, 24, "metal/brass")
+	var open_sector := [[top_angle - 24.0, 150.0]]
+	Kit.ring(self, Vector3(0, ty, 0), 3.0, R - 0.15, 24, "wood/planks_dark", {"tile": 2.0, "name": "TopRing", "gaps": open_sector})
+	Kit.ring(self, Vector3(0, ty - 0.3, 0), 3.0, R - 0.15, 24, "wood/planks_dark", {"down": true, "tile": 2.0, "solid": false, "gaps": open_sector})
+	Kit.round_wall(self, Vector3(0, ty - 0.3, 0), 3.0, 0.3, 24, "metal/brass", {"outward": true, "gaps": open_sector})
+	Kit.round_wall(self, Vector3(0, ty, 0), 3.0, 0.9, 24, "metal/brass", {"gaps": open_sector})
+	# what stands on the landing sits away from where the stair comes up
+	var face_a := wrapf(top_angle + 100.0, 0.0, 360.0)
+	var door_a := wrapf(top_angle + 155.0, 0.0, 360.0)
+	var glass_a := wrapf(top_angle + 205.0, 0.0, 360.0)
+	var bell_a := wrapf(top_angle + 255.0, 0.0, 360.0)
 	# the clock face, and the hands that move when you are not looking
-	var face_c := Kit.polar(R - 0.14, 0.0, ty + 4.0)
-	Kit.sign(self, "metal/clock_face", face_c, Kit.yaw_to_center(0.0), Vector2(7.0, 7.0), {"unshaded": true})
-	Kit.light(self, Kit.polar(R - 2.5, 0.0, ty + 4.0), Color(1.0, 0.9, 0.7), 1.3, 9.0)
-	var hc := Kit.polar(R - 0.4, 0.0, ty + 4.0)
-	hour_cw = Clockwork.create(self, hc, {"mode": "rotate", "axis": Vector3(1, 0, 0), "speed_deg": 0.0 if visit_count >= 2 else 0.4, "name": "HourHand"})
+	var face_c := Kit.polar(R - 0.14, face_a, ty + 4.0)
+	Kit.sign(self, "metal/clock_face", face_c, Kit.yaw_to_center(face_a), Vector2(7.0, 7.0), {"unshaded": true})
+	Kit.light(self, Kit.polar(R - 2.5, face_a, ty + 4.0), Color(1.0, 0.9, 0.7), 1.3, 9.0)
+	var hc := Kit.polar(R - 0.4, face_a, ty + 4.0)
+	var axis := Vector3(cos(deg_to_rad(face_a)), 0, sin(deg_to_rad(face_a)))
+	hour_cw = Clockwork.create(self, hc, {"mode": "rotate", "axis": axis, "speed_deg": 0.0 if visit_count >= 2 else 0.4, "name": "HourHand"})
 	var hh := Props.place(hour_cw.body, "clock_hand", Vector3.ZERO, 0.0, 1.6, {"collision": "none"})
-	hh.rotation_degrees = Vector3(0, 90, 0)
-	hour_cw.body.rotate(Vector3(1, 0, 0), deg_to_rad(165.0 if visit_count < 2 else 60.0))
-	minute_cw = Clockwork.create(self, hc + Kit.polar(-0.05, 0.0), {"mode": "rotate", "axis": Vector3(1, 0, 0), "speed_deg": 0.0 if visit_count >= 2 else 4.0, "name": "MinuteHand"})
+	hh.rotation.y = deg_to_rad(Kit.yaw_to_center(face_a) + 90.0)
+	hour_cw.body.rotate(axis, deg_to_rad(165.0 if visit_count < 2 else 60.0))
+	minute_cw = Clockwork.create(self, hc + Kit.polar(-0.05, face_a), {"mode": "rotate", "axis": axis, "speed_deg": 0.0 if visit_count >= 2 else 4.0, "name": "MinuteHand"})
 	var mh := Props.place(minute_cw.body, "clock_hand", Vector3.ZERO, 0.0, 2.3, {"collision": "none"})
-	mh.rotation_degrees = Vector3(0, 90, 0)
-	minute_cw.body.rotate(Vector3(1, 0, 0), deg_to_rad(90.0))
+	mh.rotation.y = deg_to_rad(Kit.yaw_to_center(face_a) + 90.0)
+	minute_cw.body.rotate(axis, deg_to_rad(90.0))
 	LookAway.create(self, hc, _on_face_unseen, {"delay": 2.5, "radius": 16.0, "once": false, "require_seen_first": true, "name": "FaceWatch"})
-	Readable.create(self, Kit.polar(R - 1.0, 0.0, ty + 1.6), Kit.yaw_to_center(0.0), "The clock", ["Half past five.", "You look away, and look back. Half past five, but the hands have moved to say it differently."], {"name": "ClockRead", "size": Vector3(3.0, 3.0, 1.2), "note_key": "clocktower_face", "note_title": "The clock face", "note_text": "The clock in the Clocktower says half past five, like every clock. Its hands move when you are not looking, and arrive back at half past five."})
+	Readable.create(self, Kit.polar(R - 1.0, face_a, ty + 1.6), Kit.yaw_to_center(face_a), "The clock", ["Half past five.", "You look away, and look back. Half past five, but the hands have moved to say it differently."], {"name": "ClockRead", "size": Vector3(3.0, 3.0, 1.2), "note_key": "clocktower_face", "note_title": "The clock face", "note_text": "The clock in the Clocktower says half past five, like every clock. Its hands move when you are not looking, and arrive back at half past five."})
 	# the hourglass on its lectern
-	var lp := Kit.polar(5.6, 180.0, ty)
-	Props.place(self, "lectern", lp, Kit.yaw_to_center(180.0) + 180.0, 1.0)
+	var lp := Kit.polar(5.6, glass_a, ty)
+	Props.place(self, "lectern", lp, Kit.yaw_to_center(glass_a) + 180.0, 1.0)
 	Pickup.create(self, lp + Vector3(0, 1.15, 0), {"keepsake": "hourglass", "name": "Hourglass"})
 	Kit.light(self, lp + Vector3(0, 2.0, 0), Color(1.0, 0.85, 0.5), 1.4, 7.0)
-	Readable.create(self, lp + Vector3(0, 0.6, 0), Kit.yaw_to_center(180.0), "The lectern", ["A brass plate: TURN ONCE. TURN BACK. DO NOT TURN TWICE.", "Somebody has scratched out DO NOT."], {"name": "LecternRead", "size": Vector3(1.0, 0.8, 1.0)})
+	Readable.create(self, lp + Vector3(0, 0.6, 0), Kit.yaw_to_center(glass_a), "The lectern", ["A brass plate: TURN ONCE. TURN BACK. DO NOT TURN TWICE.", "Somebody has scratched out DO NOT."], {"name": "LecternRead", "size": Vector3(1.0, 0.8, 1.0)})
 	# the bell
-	var bp := Kit.polar(5.6, 270.0, ty)
-	Props.place(self, "bell_tower_frame", bp, Kit.yaw_to_center(270.0), 1.1)
+	var bp := Kit.polar(5.6, bell_a, ty)
+	Props.place(self, "bell_tower_frame", bp, Kit.yaw_to_center(bell_a), 1.1)
 	Props.place(self, "bell_huge", bp + Vector3(0, 0.9, 0), 0.0, 0.8, {"collision": "none"})
 	Interactable.make(self, bp + Vector3(0, 1.6, 0), Vector3(1.6, 1.8, 1.6), "Ring the great bell", _on_great_bell, {"name": "GreatBell"})
 	Kit.light(self, bp + Vector3(0, 2.6, 0), Color(1.0, 0.8, 0.5), 0.8, 7.0)
 	# the door back to the Anteroom
-	Door.create(self, Kit.polar(R - 0.34, 90.0, ty), Kit.yaw_to_center(90.0), "nexus", "from_clocktower", {"kind": "big", "label": "A door at the top of the tower", "name": "TopDoor", "fade_duration": 1.0})
-	Kit.light(self, Kit.polar(R - 1.4, 90.0, ty + 2.4), Color(1.0, 0.85, 0.55), 1.0, 7.0)
-	Kit.sign(self, "signs/plaque_anteroom", Kit.polar(R - 0.15, 105.0, ty + 1.8), Kit.yaw_to_center(105.0), Vector2(1.0, 0.6))
-	Readable.create(self, Kit.polar(R - 0.4, 105.0, ty + 1.8), Kit.yaw_to_center(105.0), "A plaque", ["THE TOP OF THE TOWER IS THE BOTTOM OF THE SKY.", "Under it, a hand-drawn arrow pointing down. Under the arrow: same door."], {"name": "TopPlaque", "size": Vector3(1.0, 0.6, 0.4)})
+	Door.create(self, Kit.polar(R - 0.34, door_a, ty), Kit.yaw_to_center(door_a), "nexus", "from_clocktower", {"kind": "big", "label": "A door at the top of the tower", "name": "TopDoor", "fade_duration": 1.0})
+	Kit.light(self, Kit.polar(R - 1.4, door_a, ty + 2.4), Color(1.0, 0.85, 0.55), 1.0, 7.0)
+	Kit.sign(self, "signs/plaque_anteroom", Kit.polar(R - 0.15, door_a + 15.0, ty + 1.8), Kit.yaw_to_center(door_a + 15.0), Vector2(1.0, 0.6))
+	Readable.create(self, Kit.polar(R - 0.4, door_a + 15.0, ty + 1.8), Kit.yaw_to_center(door_a + 15.0), "A plaque", ["THE TOP OF THE TOWER IS THE BOTTOM OF THE SKY.", "Under it, a hand-drawn arrow pointing down. Under the arrow: same door."], {"name": "TopPlaque", "size": Vector3(1.0, 0.6, 0.4)})
+	# a landing light where the stair arrives, so the last steps read as steps
+	Kit.light(self, Kit.polar(6.0, top_angle, ty + 2.2), Color(1.0, 0.85, 0.55), 1.1, 8.0)
 	# the pendulum, hanging from the top ring's rim into the shaft
 	pendulum_cw = Clockwork.create(self, Vector3(0, ty - 0.4, 0), {"mode": "oscillate", "axis": Vector3(0, 0, 1), "amplitude_deg": 9.0, "period": 3.4 if visit_count < 2 else 100000.0, "name": "Pendulum"})
 	Props.place(pendulum_cw.body, "pendulum_big", Vector3(0, -0.2, 0), 0.0, 4.0, {"collision": "none"})
@@ -215,14 +228,14 @@ func _on_face_unseen(_l: Node) -> void:
 		hour_cw.body.rotate(Vector3(1, 0, 0), deg_to_rad(30.0))
 	if minute_cw:
 		minute_cw.body.rotate(Vector3(1, 0, 0), deg_to_rad(-140.0))
-	Audio.sfx("clock_chime", Kit.polar(R - 1.0, 0.0, top_y + 3.0), -10.0)
+	Audio.sfx("clock_chime", Kit.polar(R - 1.0, top_angle + 100.0, top_y + 3.0), -10.0)
 	Game.bump("clock_hands_moved")
 	if Game.count("clock_hands_moved") == 3 and not Game.has_note("clocktower_hands"):
 		Game.note("clocktower_hands", "The hands", "The hands of the clock only move while you are not looking at them. They are catching up on something.")
 
 
 func _on_great_bell(_p: Node, _it: Node) -> void:
-	Audio.sfx("bell_big", Kit.polar(5.6, 270.0, top_y + 2.0), 0.0)
+	Audio.sfx("bell_big", Kit.polar(5.6, top_angle + 255.0, top_y + 2.0), 0.0)
 	Game.bump("great_bell_rung")
 	var was_frozen := Game.time_frozen
 	Game.time_frozen = true

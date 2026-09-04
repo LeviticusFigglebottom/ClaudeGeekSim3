@@ -11,7 +11,7 @@ const DOORS := [
 	["city", 300, "iron", {}, "", Color(0.8, 0.85, 1.0)],
 	["tavern", 330, "red", {}, "", Color(1.0, 0.7, 0.35)],
 	["house", 0, "white", {"requires_flag": "visited_house"}, "A door painted on the wall. Someone painted a house behind it. You have not been there yet.", Color(0.9, 0.9, 1.0)],
-	["castle", 30, "big", {"requires_flag": "nexus_bell_rung"}, "A door this heavy needs to be reminded that it is a door.", Color(0.8, 0.6, 1.0)],
+	["castle", 30, "big", {"requires_flag": "nexus_bell_rung"}, "A door this heavy needs to be reminded that it is a door. Something that rings would do it; the Drowned City keeps a small one under its cathedral.", Color(0.8, 0.6, 1.0)],
 	["sea", 60, "none", {"requires_flag": "visited_sea"}, "The archway is full of painted water. It is not wet yet.", Color(1.0, 0.75, 0.9)],
 	["catacombs", 90, "dark", {"requires_flag": "visited_catacombs"}, "Bones are mortared across the opening. From the other side, maybe.", Color(1.0, 0.6, 0.3)],
 	["furnace", 120, "iron", {"requires_flag": "visited_furnace"}, "The iron is warm. It is bolted from below.", Color(1.0, 0.3, 0.15)],
@@ -243,3 +243,9 @@ func on_bell(origin: Vector3) -> void:
 		Audio.sfx("ui_confirm", null, -6.0)
 		Game.toast.emit("A very small door has always been here. You are sure of it now.")
 		Game.note("workshop", "The very small door", "Thirteen rings. A door the height of your knee, beside the static. It leads to where the props are kept.")
+
+
+func on_enter(spawn_id: String, n: int) -> void:
+	super.on_enter(spawn_id, n)
+	if Game.has_keepsake("bell") and not Game.has_flag("nexus_bell_rung"):
+		Game.toast.emit("The bell in your hand shifts. Across the room, the heavy door of the Keep is listening. (F to ring it.)")
