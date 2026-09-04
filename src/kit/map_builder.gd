@@ -147,7 +147,10 @@ static func build(parent: Node, rows: Array, opts: Dictionary = {}) -> Dictionar
 			if ct != "" and not open_above:
 				add_quad.call("ceil:" + ct, ct, "ceil", _face(Vector3(x0, y0 + height, z1), Vector3(x1, y0 + height, z1), Vector3(x1, y0 + height, z0), Vector3(x0, y0 + height, z0), Vector2(x0 / tile, z1 / tile), Vector2(x1 / tile, z1 / tile), Vector2(x1 / tile, z0 / tile), Vector2(x0 / tile, z0 / tile), Vector3.DOWN))
 			if ch == "D" or ch == "O":
-				doorways.append({"pos": origin + Vector3(cx, y0, cz), "cell": cell, "height": door_h, "map": String(opts.get("name", "Map"))})
+				# recorded in world space, so a map built under a moved node (a square of
+				# the King's Dream) is probed where it actually stands
+				var dpos := root.to_global(Vector3(cx, y0, cz)) if root.is_inside_tree() else origin + Vector3(cx, y0, cz)
+				doorways.append({"pos": dpos, "cell": cell, "height": door_h, "map": String(opts.get("name", "Map"))})
 			if ch == "D":
 				# lintel: block above the door opening
 				var ly0 := y0 + door_h
