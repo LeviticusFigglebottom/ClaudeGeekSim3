@@ -14,6 +14,15 @@ roughly in order of value:
 * **NPC schedules.** The barkeep, the fishwife and the hermit could move
   between realms at different real-world hours (`Game.is_night()` exists).
 * **The dog's own dream.** Feed it in three realms; it leads you somewhere.
+* **The King's Dream**, a tenth realm reached by answering the stone telephone
+  in the Keep's dream bedroom, gated on the Moth Wings and the Hourglass.
+  Fully specified in `docs/areas/KINGS_DREAM.md`; not built.
+* **Six endings and the descent down the well**, chosen by which threads of
+  optional content the player finished rather than by a menu. Fully specified
+  in `docs/ENDINGS.md`; not built. That document also supersedes the note
+  below about the two pocket items: the Candle Stub becomes the fifth candle
+  on the Ossuary altar and the Paper Rose becomes a set of three for the
+  sleeping King.
 * **A lock for the two pocket items.** The Paper Rose and the Candle Stub can
   both be picked up (the rose in the castle library and, at mouse size, under
   the tavern floor; the stub in the castle chest, the ossuary crypt, the
