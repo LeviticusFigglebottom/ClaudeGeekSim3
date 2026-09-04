@@ -203,6 +203,18 @@
   "surface": "water",
   "w": 64
  },
+ "ground/pebbles": {
+  "alpha": false,
+  "h": 64,
+  "surface": "gravel",
+  "w": 64
+ },
+ "ground/red_dream": {
+  "alpha": false,
+  "h": 64,
+  "surface": "sand",
+  "w": 64
+ },
  "ground/sand": {
   "alpha": false,
   "h": 64,
@@ -299,6 +311,12 @@
   "surface": "grass",
   "w": 64
  },
+ "nature/grass_dream": {
+  "alpha": false,
+  "h": 64,
+  "surface": "grass",
+  "w": 64
+ },
  "nature/grass_moss": {
   "alpha": false,
   "h": 64,
@@ -306,6 +324,18 @@
   "w": 64
  },
  "nature/grass_pale": {
+  "alpha": false,
+  "h": 64,
+  "surface": "grass",
+  "w": 64
+ },
+ "nature/hedge": {
+  "alpha": false,
+  "h": 64,
+  "surface": "grass",
+  "w": 64
+ },
+ "nature/hedge_red": {
   "alpha": false,
   "h": 64,
   "surface": "grass",
@@ -627,7 +657,7 @@
   "alpha": false,
   "h": 48,
   "surface": "stone",
-  "w": 128
+  "w": 160
  },
  "signs/menu": {
   "alpha": false,
@@ -744,6 +774,12 @@
   "w": 256
  },
  "sky/house": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 256
+ },
+ "sky/kings_dream": {
   "alpha": false,
   "h": 128,
   "surface": "stone",

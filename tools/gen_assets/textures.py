@@ -215,6 +215,25 @@ def grass(rng, c1, c2, blade, size=64, blades=140, levels=10):
     return T.quantize(T.grain(base, rng, 0.04), levels)
 
 
+def hedge(rng, colors, size=64, n=160, rmin=3, rmax=7, levels=12):
+    """A clipped hedge: dense opaque leaf blobs over a dark base (no alpha)."""
+    base = T.solid(size, colors[0])
+    im = T.to_pil(base)
+    from PIL import ImageDraw
+    d = ImageDraw.Draw(im)
+    for i in range(n):
+        x = rng.random() * size
+        y = rng.random() * size
+        r = rng.uniform(rmin, rmax)
+        c = colors[int(rng.integers(1, len(colors)))]
+        col = tuple(int(v * 255) for v in T.hexc(c))
+        for ox in (-size, 0, size):
+            for oy in (-size, 0, size):
+                d.ellipse([x + ox - r, y + oy - r * 0.7, x + ox + r, y + oy + r * 0.7], fill=col)
+    out = T.from_pil(im)
+    return T.quantize(T.grain(out[..., :3], rng, 0.03), levels)
+
+
 def leaves_card(rng, colors, size=64, n=90, rmin=4, rmax=9, levels=12):
     """Alpha-cut leaf cluster for tree canopy cards."""
     base = T.solid(size, colors[0])
@@ -882,6 +901,12 @@ def build_catalog():
     reg("nature/leaves_purple", lambda r: leaves_card(r, ["#3a1e4a", "#5a2e6e", "#7a3f8a", "#2a1436"]), alpha=True)
     reg("nature/leaves_pale", lambda r: leaves_card(r, ["#c9c2b0", "#a89f8c", "#e0dccc"], n=70), alpha=True)
     reg("nature/leaves_autumn", lambda r: leaves_card(r, ["#8a3a1a", "#b5561f", "#d9832a", "#5a2a12"]), alpha=True)
+    # the King's Dream: a fever-bright garden
+    reg("nature/hedge", lambda r: hedge(r, ["#1f4a22", "#3f8a3a", "#5aa848", "#2e6a2e", "#7cc258"]), surface="grass")
+    reg("nature/hedge_red", lambda r: hedge(r, ["#4a1a22", "#8a2a3a", "#a83848", "#6a1e2e", "#c25058"]), surface="grass")
+    reg("nature/grass_dream", lambda r: grass(r, "#8fc04a", "#6a9a36", "#d8f070", blades=160), surface="grass")
+    reg("ground/pebbles", lambda r: cobbles(r, "#b8a890", "#8a7c6a", "#5a5048", npts=70), surface="gravel")
+    reg("ground/red_dream", lambda r: T.quantize(T.grain(T.mix(T.solid(64, "#a02a2a"), T.solid(64, "#6a1418"), T.noise(64, 6, r, octaves=4)), r, 0.05), 10), surface="sand")
     reg("nature/fern", _fern, alpha=True)
     reg("nature/mushroom_glow", lambda r: _mushroom_cap(r, "#4a2a6e", f["glow"]))
     reg("nature/mushroom_red", lambda r: _mushroom_cap(r, "#8a1a1a", "#f0e6d0"))
@@ -905,6 +930,7 @@ def build_catalog():
     reg("sky/static", lambda r: sky("#3a3a3a", "#6a6a6a", "#9a9a9a"))
     reg("sky/cistern", lambda r: sky("#0a2a2c", "#12484d", "#2f8f95"))
     reg("sky/dawn", lambda r: sky("#2a1a3a", "#a04a5a", "#f0a060", stars=20, rng=r))
+    reg("sky/kings_dream", lambda r: sky("#4a2a58", "#f0a0b8", "#fff0c0", stars=0, bands=0.04))
 
     # brick / wood
     reg("brick/red", lambda r: stone_blocks(r, "#7a3a2a", "#5e2c22", "#3a3028", rows=8, cols=4, cracks=1), surface="stone")

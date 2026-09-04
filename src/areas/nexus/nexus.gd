@@ -67,6 +67,8 @@ func build() -> void:
 	add_spawn("from_hallway", Kit.polar(R - 3.5, 255.0, 0.1), Kit.yaw_to_center(255.0))
 	add_spawn("from_workshop", Kit.polar(R - 3.5, 255.0, 0.1), Kit.yaw_to_center(255.0))
 	add_spawn("from_mirror", Vector3(0, 0.1, -6.0), 180.0)
+	# the King's dream lets go of you here, beside the well, with no door to show for it
+	add_spawn("from_kings_dream", Vector3(-4.6, 0.1, 0.0), -90.0)
 	Kit.particles(self, Vector3(0, 3, 0), "motes", Vector3(10, 3, 10), 70)
 	Puzzle.declare(self, "nexus_bell", "nexus_bell_rung", ["keepsake:bell"], "ring the Small Bell in the Anteroom")
 	Puzzle.declare(self, "workshop_secret", "workshop_open", ["keepsake:bell"], "ring the bell thirteen times where the doors can hear it")

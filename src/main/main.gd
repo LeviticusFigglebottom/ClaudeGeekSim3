@@ -70,6 +70,11 @@ func _ready() -> void:
 			pt.name = "Playtest"
 			pt.set_script(load("res://tools/playtest.gd"))
 			add_child(pt)
+		elif a == "--brooks":
+			var bt := Node.new()
+			bt.name = "BrooksTest"
+			bt.set_script(load("res://tools/brooks_test.gd"))
+			add_child(bt)
 		elif a.begins_with("--look="):
 			var parts := a.trim_prefix("--look=").split(",")
 			if parts.size() >= 2:

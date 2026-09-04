@@ -9,7 +9,7 @@ OUT=screenshots/tour
 mkdir -p "$OUT"
 AREAS=("$@")
 if [ ${#AREAS[@]} -eq 0 ]; then
-  AREAS=(apartment corridor hallway nexus forest city tavern house castle sea catacombs furnace cistern offices clocktower static mirror_nexus workshop)
+  AREAS=(apartment corridor hallway nexus forest city tavern house castle sea catacombs furnace cistern offices clocktower static mirror_nexus workshop kings_dream)
 fi
 for a in "${AREAS[@]}"; do
   tools/shot.sh "$a" "$OUT/${a}_default.png" default "0,-6" | grep -E "shot\]|SCRIPT ERROR" || true

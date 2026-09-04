@@ -132,7 +132,8 @@ func _field() -> void:
 	Kit.terrain(self, Vector3(0, -0.02, 0), Vector2(220, 220), 44, noise_fn, "nature/grass_dark", {"tile": 3.0})
 	Kit.floor(self, Vector3(0, 0.0, 0), Vector2(26, 24), "ground/dirt", {"tile": 3.0})
 	Kit.scatter(40, rng, Vector3.ZERO, Vector2(100, 100), func(_i: int, p: Vector3) -> void:
-		if p.length() < 20.0:
+		if p.length() < 20.0 or p.distance_to(Vector3(-3, 0, 24)) < 3.0:
+			# nothing solid lands on the spawn beside the lone door
 			return
 		var m := "bush_1" if rng.randf() < 0.6 else "rock_1"
 		Props.place(self, m, p, rng.randf_range(0, 360), rng.randf_range(0.7, 1.4), {"collision": "none" if m == "bush_1" else "box"}), 20.0)

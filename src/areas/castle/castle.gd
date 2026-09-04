@@ -73,6 +73,8 @@ func build() -> void:
 	Puzzle.declare(self, "castle_rooms", "", [], "wait for the turning rooms to line up; the hourglass steadies them")
 	Puzzle.declare(self, "castle_tapestry", "tapestry_cut", ["keepsake:knife"], "cut the tapestry behind the throne")
 	Puzzle.declare(self, "castle_king", "king_disturbed", [], "whisper to the sleeping King three times; something tall comes to see")
+	Puzzle.declare(self, "kings_dream_door", "kings_dream_entered", ["keepsake:wings", "keepsake:hourglass", "flag:king_disturbed", "flag:tapestry_cut"],
+		"wake the King and open the wall behind him, then speak to him holding the Moth Wings and the Hourglass", {"route": "kings_dream:from_king"})
 	add_spawn("default", Vector3(0, 0.1, 9.0), 0.0)
 	add_spawn("from_nexus", Vector3(0, 0.1, 9.0), 0.0)
 	add_spawn("hall", Vector3(0, 0.1, -2.0), 0.0)
@@ -814,10 +816,13 @@ func _king_talk(_player: Node, npc: Node) -> bool:
 	if Game.active_is("bell"):
 		await n.say(["\"Not in here,\" the King says, asleep. \"Ring it in here and I will hear it in there.\""])
 		return true
+	if Game.has_flag("king_disturbed") and Game.has_flag("tapestry_cut"):
+		return await _king_dream(n)
 	if Game.has_flag("king_disturbed"):
 		await n.say([
 			"He is asleep. Asleep-er, if anything, the way people sleep after a fright.",
 			"You do not whisper. There is somebody tall in the keep now and you would rather not draw attention.",
+			"His sleep has a back to it, like the wall behind the throne. You would need to open the wall to be sure.",
 		])
 		return true
 	var where := "on his throne, sideways, the way a child sleeps in a car." if visit_count < 2 else "on the iron bed, on top of the covers, in his robes, the way a child sleeps in a car."
@@ -845,6 +850,39 @@ func _king_talk(_player: Node, npc: Node) -> bool:
 			])
 			Game.note("king_disturbed", "You nearly woke him", "You whispered to the King three times and the third time was not a whisper. Every clock in the keep ticked once. Something tall came to see.")
 			_summon_usher()
+	return true
+
+
+## Woken once and with the wall behind him open, the King is a door. Holding the
+## Moth Wings and the Hourglass you can go in; without them he says what is missing.
+func _king_dream(n: NPC) -> bool:
+	var wings := Game.has_keepsake("wings")
+	var hour := Game.has_keepsake("hourglass")
+	if not (wings and hour):
+		var lines: Array = [
+			"The King is asleep, and since the wall behind him was opened his sleep has a draught in it. You can feel it on your face: warm, and too pleased to see you.",
+		]
+		if not wings and not hour:
+			lines.append("\"...not like that,\" he says, asleep. \"you would fall, and the hour would not wait for you. come back when you can do both.\"")
+		elif not wings:
+			lines.append("\"...you would fall,\" he says, asleep. \"it is a long way down into a person. bring something that falls slowly.\"")
+		else:
+			lines.append("\"...the hour would not wait for you,\" he says, asleep. \"bring something that makes it.\"")
+		await n.say(lines)
+		Game.note("king_door", "The King is a door", "Since the tapestry was cut the King's sleep has a draught in it. He says you would need a way to fall slowly and a way to make the hour hold still. Then he would let you in.")
+		return true
+	var second := Game.has_flag("kings_dream_entered")
+	if not second:
+		await n.say([
+			"The King is asleep, and his sleep has a draught in it, and the draught is warm.",
+			"\"...there you are,\" he says, without waking. \"i was just dreaming about you. come and see.\"",
+			"He does not move. The floor does.",
+		])
+	else:
+		await n.say(["\"...again?\" the King says, asleep. \"very well. it is not the same dream twice. it is never the same dream twice.\""])
+	Game.set_flag("kings_dream_entered", true)
+	Audio.sfx("whisper", n.global_position, -4.0)
+	World.travel("kings_dream", "from_king", {"color": Color(0.98, 0.85, 0.8), "duration": 1.2})
 	return true
 
 

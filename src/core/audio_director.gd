@@ -88,6 +88,13 @@ func set_ambience(ambience_name: String, fade: float = 2.5) -> void:
 	_amb_active = next_i
 
 
+## Bend the ambience loop's pitch (the King's Dream drops it while the hour is held).
+func set_ambience_pitch(pitch: float, fade: float = 0.8) -> void:
+	for p in _amb:
+		var tw := create_tween()
+		tw.tween_property(p, "pitch_scale", clampf(pitch, 0.25, 2.0), fade)
+
+
 ## Play a one-shot effect. If `at` is a Vector3 the sound is positional (in the
 ## current area's space); otherwise it is a flat UI sound.
 func sfx(sfx_name: String, at: Variant = null, volume_db: float = 0.0, pitch_jitter: float = 0.06) -> void:

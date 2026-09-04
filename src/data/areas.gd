@@ -98,6 +98,11 @@ const AREAS := {
 		"name": "The Other Anteroom", "subtitle": ".ereh tiaw .etal era uoy",
 		"realm": "mirror", "ambience": "mirror",
 	},
+	"kings_dream": {
+		"scene": "res://src/areas/kings_dream/kings_dream.tscn",
+		"name": "The King's Dream", "subtitle": "he is dreaming about you",
+		"realm": "kings_dream", "ambience": "sea",
+	},
 }
 
 ## Areas the player can reach without any keepsake, straight from the first sleep.
