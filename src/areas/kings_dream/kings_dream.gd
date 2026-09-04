@@ -282,11 +282,30 @@ func _exit() -> void:
 func on_enter(spawn_id: String, n: int) -> void:
 	super.on_enter(spawn_id, n)
 	Game.set_flag("visited_kings_dream", true)
+	if spawn_id == "from_king":
+		_fall()
 	if n == 1:
 		Game.note("kings_dream_in", "The King's dream", "You went into the King's sleep and it was a garden, and the garden was a square on a board. He has never been to any of the places in it. He has only heard them described.")
 
 
+## The rabbit hole. The King lets you in from a long way up: you fall for a
+## few seconds past the shelves of his museum and land on the lawn unhurt.
+func _fall() -> void:
+	var p := player()
+	if p == null:
+		return
+	var g: Dictionary = sq[0]
+	var top: Vector3 = g.anchors.get("fall_top", Vector3(0, 40.0, 30.0))
+	p.global_position = g.origin + top
+	p.set_look(0.0, -0.9)
+	p.velocity = Vector3.ZERO
+	p.last_safe_position = g.origin + Vector3(0, 0.1, 30.0)
+	Audio.sfx("whisper", null, -6.0)
+	Game.bump("dream_falls")
+
+
 func on_time_frozen(frozen: bool) -> void:
+	Audio.set_ambience_pitch(0.6 if frozen else 1.0)
 	for p in find_children("*", "CPUParticles3D", true, false):
 		(p as CPUParticles3D).speed_scale = 0.0 if frozen else 1.0
 	for s in sq:

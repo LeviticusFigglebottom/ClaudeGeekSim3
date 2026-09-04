@@ -97,7 +97,7 @@ func _ready() -> void:
 
 
 ## Debug launch options (after `--`): --give=lantern,bell  --flag=hallway_measured
-## --item=tape_measure  --visits=house:2  --lantern  --mirror  --small
+## --item=tape_measure  --visits=house:2  --lantern  --mirror  --small  --fly
 ## Screenshot placement: --pos=x,y,z (world) and --look=yaw,pitch (degrees)
 func _apply_debug_args() -> void:
 	for a in OS.get_cmdline_user_args():
@@ -129,6 +129,10 @@ func _apply_debug_args() -> void:
 		elif a == "--mirror":
 			Game.equip("shard")
 			Game.mirror_sight = true
+		elif a == "--fly":
+			# hover for screenshots: no gravity, no collision (tools/shot.sh --pos=... --fly)
+			if Game.player:
+				Game.player.noclip = true
 		elif a == "--small":
 			Game.equip("mouse")
 			Game.small = true

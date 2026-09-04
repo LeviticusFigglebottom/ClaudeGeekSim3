@@ -129,7 +129,7 @@ def signpost_contradictory(rng):
     pts = [(-0.3, -0.1), (0.4, -0.1), (0.56, 0.0), (0.4, 0.1), (-0.3, 0.1)]
     cols = [(0.98, 0.8, 0.86), (0.8, 0.9, 1.0), (0.85, 1.0, 0.88), (1.0, 0.95, 0.75)]
     for i in range(4):
-        m.push(compose(mat_translate(0, 1.5 + i * 0.34, 0), mat_rot_y(i * PI / 2 + 0.35 + (rng.random() - 0.5) * 0.3)))
+        m.push(compose(mat_translate(0, 1.5 + i * 0.34, 0), mat_rot_y(i * PI / 2 + 0.35)))
         m.push(compose(mat_translate(0.12, 0, -0.04), mat_rot_x(-PI / 2)))
         m.prism(pts, 0.0, 0.05, "flat", cols[i], cap=True, floor=True)
         m.pop()
