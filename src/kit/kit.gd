@@ -881,7 +881,9 @@ static func mouse_gap(parent: Node, pos: Vector3, yaw_deg: float, size: Vector2 
 	# the opening's width, and a dark box fills the wall's thickness behind it
 	# (front and sides only, so from inside the crawl you can see out)
 	var wall_depth := float(opts.get("wall_depth", 0.5))
-	box(root, Vector3(0, size.y * 0.5, wall_depth * 0.5 - 0.03), Vector3(size.x, size.y, wall_depth), "", {"tint": Color(0.02, 0.02, 0.03), "unshaded": true, "solid": false, "faces": ["nz", "px", "nx", "py", "ny"]})
+	if bool(opts.get("carve", true)):
+		# a carved wall keeps its mesh over the gap, so the hole is drawn through it
+		box(root, Vector3(0, size.y * 0.5, wall_depth * 0.5 - 0.03), Vector3(size.x, size.y, wall_depth), "", {"tint": Color(0.02, 0.02, 0.03), "unshaded": true, "solid": false, "faces": ["nz", "px", "nx", "py", "ny"]})
 	if Props.exists("skirting_hole"):
 		Props.place(root, "skirting_hole", Vector3.ZERO, 0.0, size.x / 0.14, {"collision": "none"})
 	else:

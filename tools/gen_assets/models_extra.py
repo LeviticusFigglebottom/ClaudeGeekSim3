@@ -2139,9 +2139,8 @@ def skirting_hole(rng):
         m.box((sgn * (r + 0.015), cy / 2, -0.015), (0.03, cy, 0.03), "flat", wood)
     _arch(m, (0, cy, -0.015), r, ro, 0.03, 5, "flat", wood)
     m.box((0, 0.145, -0.015), (0.34, 0.03, 0.03), "flat", vary(rng, wood, 0.03))
-    pts = [(-r, 0.0), (r, 0.0)] + [(math.cos(t) * r, cy + math.sin(t) * r) for t in [i / 6 * PI for i in range(7)]]
-    for i in range(1, len(pts) - 1):
-        _trin(m, (pts[0][0], pts[0][1], -0.012), (pts[i][0], pts[i][1], -0.012), (pts[i + 1][0], pts[i + 1][1], -0.012), (0, 0, -1), DARK, WHITE)
+    # the arch is left open: what is behind it (a dark box through a carved wall,
+    # or a lit crawl behind a real gap) is what the player sees
     return single("skirting_hole", m, {"collision": "none", "mount": "wall"})
 
 
