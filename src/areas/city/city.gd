@@ -325,15 +325,17 @@ func _street_things() -> void:
 
 func _gate_street() -> void:
 	Kit.floor(self, Vector3(0, 0, 13.85), Vector2(8.0, 18.7), "stone/cobble_city", {"tile": 2.0})
-	_building(-10.0, -4.0, 12.9, 22.0, 11.0, "stone/blocks_city", "e")
-	_building(4.0, 10.0, 12.5, 22.0, 9.0, "brick/dark", "we")
+	_building(-10.0, -4.05, 12.9, 22.0, 11.0, "stone/blocks_city", "e")
+	_building(4.05, 10.0, 12.5, 22.0, 9.0, "brick/dark", "we")
 	var g := Vector3(0, 0, 23.0)
 	for sx in [-1.0, 1.0]:
 		Kit.box(self, g + Vector3(sx * 6.0, 7.0, 0), Vector3(4.0, 14.0, 6.0), "stone/blocks_city", {"tile": 2.0})
 		for k in 3:
 			Kit.box(self, g + Vector3(sx * 6.0 - 1.4 + k * 1.4, 14.6, -2.5), Vector3(0.8, 1.2, 0.8), "stone/blocks_city", {"tile": 1.0})
 		_torch(g + Vector3(sx * 3.9, 2.6, -2.0), -90.0 if sx < 0 else 90.0)
-	Kit.arch(self, g, 0.0, 8.0, 6.5, "stone/blocks_city", {"depth": 2.0, "post": 0.6, "top": 0.8, "tile": 1.0})
+	# a little narrower than the gap between the houses, so its posts stand
+	# proud of their faces instead of in them
+	Kit.arch(self, g + Vector3(0, 0, -0.05), 0.0, 7.7, 6.5, "stone/blocks_city", {"depth": 2.0, "post": 0.6, "top": 0.8, "tile": 1.0})
 	Kit.box(self, g + Vector3(0, 10.9, 0), Vector3(8.0, 7.2, 2.0), "stone/blocks_city", {"tile": 2.0})
 	for k in 5:
 		Kit.box(self, g + Vector3(-3.2 + k * 1.6, 15.1, -0.6), Vector3(0.8, 1.2, 0.8), "stone/blocks_city", {"tile": 1.0})
@@ -368,11 +370,11 @@ func _gate_street() -> void:
 
 func _west_gate() -> void:
 	Kit.floor(self, Vector3(-24.0, 0, -13.6), Vector2(6.0, 18.2), "stone/cobble_city", {"tile": 2.0})
-	_building(-33.0, -27.0, -22.5, -12.5, 10.0, "wood/planks_dark", "e")
-	_building(-21.0, -15.0, -22.5, -12.5, 12.0, "stone/blocks_city", "w")
+	_building(-33.0, -27.1, -22.5, -12.5, 10.0, "wood/planks_dark", "e")
+	_building(-20.9, -15.0, -22.5, -12.5, 12.0, "stone/blocks_city", "w")
 	var g := Vector3(-24.0, 0, -22.5)
 	Kit.arch(self, g, 0.0, 6.0, 5.5, "stone/blocks_city", {"depth": 1.6, "post": 0.8, "top": 0.9, "tile": 1.0})
-	Kit.box(self, g + Vector3(0, 8.4, 0), Vector3(7.6, 4.0, 1.6), "stone/blocks_city", {"tile": 2.0})
+	Kit.box(self, g + Vector3(0, 8.35, 0), Vector3(7.6, 3.9, 1.6), "stone/blocks_city", {"tile": 2.0})
 	var gate := Door.create(self, g, 0.0, "forest", "road", {"kind": "none", "walk_through": true, "label": "The road out, into the wood", "name": "WestGate", "fade_color": Color(0.05, 0.1, 0.09), "fade_duration": 1.0, "sound": "wind_gust"})
 	gate.add_box(Vector3(5.6, 5.0, 1.4), Vector3(0, 2.5, 0))
 	# the wood closes in on both sides of the road past the gate
@@ -743,7 +745,7 @@ func _lower_town() -> void:
 	Kit.box(self, Vector3(22.0, (LOW_Y + CHANNEL_Y) * 0.5, 20.85), Vector3(24.0, LOW_Y - CHANNEL_Y, 0.3), DARK, {"tile": 1.0})
 	Kit.box(self, Vector3(22.0, (LOW_Y + CHANNEL_Y) * 0.5, 24.65), Vector3(24.0, LOW_Y - CHANNEL_Y, 0.3), DARK, {"tile": 1.0})
 	var lb := {"base": LOW_Y - 0.2}
-	_building(4.0, 10.0, 22.0, 30.0, 10.0, "brick/dark", "e", lb)
+	_building(4.05, 10.0, 22.0, 30.0, 10.0, "brick/dark", "e", lb)
 	_building(32.0, 40.0, 12.5, 30.0, 11.0, "stone/blocks_city", "w", lb)
 	_building(10.0, 34.0, 30.0, 38.0, 9.0, "wood/planks_dark", "n", lb)
 	# the channel is deeper than the city; nobody wades it
@@ -755,13 +757,13 @@ func _lower_town() -> void:
 		Kit.blocker(self, Vector3(bx, 1.2, 20.55), Vector3(bw, 3.6, 0.3))
 		Kit.blocker(self, Vector3(bx, 1.2, 24.95), Vector3(bw, 3.6, 0.3))
 	if not second:
-		Kit.box(self, Vector3(20.0, LOW_Y - 0.1, 22.75), Vector3(3.0, 0.2, 4.3), "wood/planks_grey", {"tile": 1.0})
+		Kit.box(self, Vector3(20.0, LOW_Y - 0.05, 22.75), Vector3(3.0, 0.2, 4.3), "wood/planks_grey", {"tile": 1.0})
 		for sx in [-1.0, 1.0]:
 			Kit.box(self, Vector3(20.0 + sx * 1.42, LOW_Y + 0.45, 22.75), Vector3(0.1, 0.9, 4.3), "wood/planks_dark", {"tile": 1.0})
 			Kit.blocker(self, Vector3(20.0 + sx * 1.42, 1.2, 22.75), Vector3(0.2, 3.6, 4.3))
 	else:
-		Kit.box(self, Vector3(20.0, LOW_Y - 0.1, 21.1), Vector3(3.0, 0.2, 0.8), "wood/planks_grey", {"tile": 1.0})
-		Kit.box(self, Vector3(20.0, LOW_Y - 0.1, 24.4), Vector3(3.0, 0.2, 0.8), "wood/planks_grey", {"tile": 1.0})
+		Kit.box(self, Vector3(20.0, LOW_Y - 0.05, 21.1), Vector3(3.0, 0.2, 0.8), "wood/planks_grey", {"tile": 1.0})
+		Kit.box(self, Vector3(20.0, LOW_Y - 0.05, 24.4), Vector3(3.0, 0.2, 0.8), "wood/planks_grey", {"tile": 1.0})
 		Readable.create(self, Vector3(20.0, LOW_Y + 0.2, 20.2), 180.0, "Where the bridge was", [
 			"Two stumps of planking, one on each bank. The bridge was here. The water has taken the middle of it and left the ends, the way it leaves the ends of things.",
 			"Across the channel the market is still standing, up to its counters. Nobody is going to sell you anything from there now.",

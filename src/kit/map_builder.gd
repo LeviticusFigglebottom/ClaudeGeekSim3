@@ -27,9 +27,35 @@ class_name MapBuilder
 ## Doorway cells of every map built since `reset_registry()`; the verifier
 ## checks that nothing solid stands in them. Each entry: {pos, cell, height}.
 static var doorways: Array = []
+## Floor cells drawn since `reset_registry()`, keyed by half-metre world cell
+## and height. Two maps that meet at a doorway both hold that cell; the second
+## map does not draw it again (floor, ceiling, lintel and edge walls over the
+## same square metre flicker against each other).
+static var _covered: Dictionary = {}
 
 static func reset_registry() -> void:
 	doorways = []
+	_covered = {}
+
+
+static func _cover_key(p: Vector3) -> Vector3i:
+	return Vector3i(floori(p.x / 0.5), roundi(p.y * 50.0), floori(p.z / 0.5))
+
+
+static func _is_covered(centre: Vector3) -> bool:
+	var k := _cover_key(centre)
+	for dy in [0, -1, 1]:
+		if _covered.has(Vector3i(k.x, k.y + dy, k.z)):
+			return true
+	return false
+
+
+static func _cover(centre: Vector3, cell: float) -> void:
+	var n := maxi(1, ceili(cell / 0.5))
+	for i in n:
+		for j in n:
+			var p := centre + Vector3((i + 0.5) / n * cell - cell * 0.5, 0, (j + 0.5) / n * cell - cell * 0.5)
+			_covered[_cover_key(p)] = true
 
 
 static func build(parent: Node, rows: Array, opts: Dictionary = {}) -> Dictionary:
@@ -142,6 +168,19 @@ static func build(parent: Node, rows: Array, opts: Dictionary = {}) -> Dictionar
 			elif floors.has(ch):
 				ft = String(floors[ch])
 			var fy := y0 - (0.6 if ch == "~" else 0.0)
+			var world_c := root.to_global(Vector3(cx, y0, cz)) if root.is_inside_tree() else origin + Vector3(cx, y0, cz)
+			var drawn_already := _is_covered(world_c)
+			if not drawn_already:
+				_cover(world_c, cell)
+			if drawn_already:
+				# another map holds this cell (a shared doorway): record it, draw nothing
+				if ch == "D" or ch == "O":
+					doorways.append({"pos": world_c, "cell": cell, "height": door_h, "map": String(opts.get("name", "Map"))})
+				if ch != "." and ch != "~" and ch != ":" and ch != "D" and ch != "O":
+					if not markers.has(ch):
+						markers[ch] = []
+					markers[ch].append(origin + Vector3(cx, y0, cz))
+				continue
 			if not pit.contains(ch):
 				add_quad.call("floor:" + ft, ft, "floor", _face(Vector3(x0, fy, z0), Vector3(x1, fy, z0), Vector3(x1, fy, z1), Vector3(x0, fy, z1), Vector2(x0 / tile, z0 / tile), Vector2(x1 / tile, z0 / tile), Vector2(x1 / tile, z1 / tile), Vector2(x0 / tile, z1 / tile), Vector3.UP))
 			if ct != "" and not open_above:
@@ -199,7 +238,10 @@ static func build(parent: Node, rows: Array, opts: Dictionary = {}) -> Dictionar
 		var mesh := Kit.mesh_from_quads(b.quads)
 		var mi := MeshInstance3D.new()
 		mi.mesh = mesh
-		mi.material_override = Kit.mat(b.tex, mat_opts)
+		var mo := mat_opts.duplicate()
+		if b.kind == "floor" or b.kind == "ceil":
+			mo["depth_bias"] = Kit.FLOOR_BIAS
+		mi.material_override = Kit.mat(b.tex, mo)
 		mi.name = key.replace(":", "_").replace("/", "_")
 		if opts.has("layer"):
 			mi.layers = int(opts.layer)

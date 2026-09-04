@@ -21,6 +21,9 @@ void vertex() {
 		vec4(INV_VIEW_MATRIX[2].xyz * s.z, 0.0),
 		m[3]);
 	MODELVIEW_NORMAL_MATRIX = mat3(MODELVIEW_MATRIX);
+	// a little nearer the eye than the thing it marks, so it never flickers
+	// against a wall or a door face it lies on
+	VERTEX.z += 0.05 / max(s.z, 0.001);
 }
 
 void fragment() {

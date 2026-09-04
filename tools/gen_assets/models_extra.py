@@ -887,7 +887,7 @@ def desk_office(rng):
     m.box((0.62, 0.75, -0.1), (0.06, 0.02, 0.1), "flat", (0.75, 0.72, 0.65))
     g.add("Desk", m, extras={"collision": "box"})
     s = MeshBuilder()
-    s.card((0.3, 0.94, -0.105), (0.3, 0.24), "glow:#1a3a2a", WHITE, yaw=PI, double=False)
+    s.card((0.3, 0.94, -0.115), (0.3, 0.24), "glow:#1a3a2a", WHITE, yaw=PI, double=False)
     g.add("Screen", s)
     return g
 

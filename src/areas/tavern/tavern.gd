@@ -82,12 +82,12 @@ func _ground_floor() -> void:
 	Kit.box(self, Vector3(6.0, 2.1, -8.15), Vector3(8.0, 2.6, 0.3), "wall/plaster_tavern")
 	Kit.box(self, Vector3(3.825, 0.4, -8.15), Vector3(3.65, 0.8, 0.3), "wall/plaster_tavern")
 	Kit.box(self, Vector3(8.175, 0.4, -8.15), Vector3(3.65, 0.8, 0.3), "wall/plaster_tavern")
-	Kit.box(self, Vector3(3.825, 0.9, -8.02), Vector3(3.65, 0.16, 0.06), "wood/planks_dark", {"solid": false})
-	Kit.box(self, Vector3(8.175, 0.9, -8.02), Vector3(3.65, 0.16, 0.06), "wood/planks_dark", {"solid": false})
+	Kit.box(self, Vector3(3.825, 0.9, -8.0), Vector3(3.55, 0.16, 0.06), "wood/planks_dark", {"solid": false})
+	Kit.box(self, Vector3(8.175, 0.9, -8.0), Vector3(3.55, 0.16, 0.06), "wood/planks_dark", {"solid": false})
 	Kit.mouse_gap(self, Vector3(6.0, 0, -8.0), 180.0, Vector2(0.7, 0.78), {"carve": false})
 	# the mouse tunnel behind the wall
 	# the floor runs in under the wall to meet the taproom's, or a mouse falls through the slot
-	Kit.floor(self, Vector3(6.0, -0.005, -10.05), Vector2(0.7, 4.3), "wood/planks_dark")
+	Kit.floor(self, Vector3(6.0, -0.02, -10.05), Vector2(0.7, 4.3), "wood/planks_dark")
 	Kit.ceiling(self, Vector3(6.0, 0.8, -10.2), Vector2(0.7, 4.0), "wood/planks_dark")
 	Kit.box(self, Vector3(5.5, 0.4, -10.2), Vector3(0.3, 0.8, 4.0), "wood/planks_dark")
 	Kit.box(self, Vector3(6.5, 0.4, -10.2), Vector3(0.3, 0.8, 4.0), "wood/planks_dark")

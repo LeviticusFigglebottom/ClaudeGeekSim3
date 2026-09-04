@@ -88,7 +88,7 @@ func _plan() -> void:
 		[25, 22, "D"], [25, 23, "D"], [25, 24, "D"],  # hall -> back corridor
 		[28, 21, "D"], [29, 21, "D"],   # corridor -> bathroom
 		[37, 21, "D"], [38, 21, "D"],   # corridor -> bedroom B
-		[43, 23, "D"],                  # corridor -> basement stair (east)
+		[43, 23, "D"], [43, 24, "D"],   # corridor -> basement stair (east)
 	]
 	if visit_count >= 2:
 		rects.append([26, 26, 43, 29, "s"])          # the room that was not there
@@ -131,8 +131,21 @@ func _field() -> void:
 		# hollows only: the corridor of bedrooms and the enormous bathroom stand
 		# on this field further out, and nothing may rise through their floors
 		return lerpf(-0.14, minf(h - 0.05, -0.14), edge)
-	Kit.terrain(self, Vector3(0, -0.02, 0), Vector2(220, 220), 44, noise_fn, "nature/grass_dark", {"tile": 3.0})
-	Kit.floor(self, Vector3(0, -0.06, 0), Vector2(26, 24), "ground/dirt", {"tile": 3.0})
+	# the ground is cut away where the basement stair goes down through it; a
+	# concrete apron round the bulkhead covers the edges of the cut
+	var sx := -1.0 if mirrored else 1.0
+	# (the terrain's cells are 2 m; the cut comes out as x 10..18, z 2..6, and
+	# the stairwell stands in it at x 11..15.8, z 3.7..5.3)
+	var hole := Rect2(10.5 if sx > 0 else -18.5, 2.0, 8.0, 4.0)
+	Kit.terrain(self, Vector3(0, -0.02, 0), Vector2(220, 220), 110, noise_fn, "nature/grass_dark", {"tile": 3.0, "holes": [hole]})
+	Kit.floor(self, Vector3(sx * 15.5, -0.1, 2.8), Vector2(5.0, 1.6), "wall/concrete", {"tile": 1.5})
+	Kit.floor(self, Vector3(sx * 15.5, -0.1, 5.7), Vector2(5.0, 0.6), "wall/concrete", {"tile": 1.5})
+	Kit.floor(self, Vector3(sx * 16.95, -0.1, 4.5), Vector2(2.1, 1.8), "wall/concrete", {"tile": 1.5})
+	Kit.box(self, Vector3(sx * 14.0, -3.5, 4.0), Vector3(8.4, 0.4, 4.4), "wall/concrete_dark", {"tile": 2.0, "solid": false})
+	# the yard's dirt, in three pieces round the stairwell's cut
+	Kit.floor(self, Vector3(0, -0.06, -4.2), Vector2(26, 15.6), "ground/dirt", {"tile": 3.0})
+	Kit.floor(self, Vector3(0, -0.06, 8.7), Vector2(26, 6.6), "ground/dirt", {"tile": 3.0})
+	Kit.floor(self, Vector3(-sx * 1.0, -0.06, 4.5), Vector2(24, 1.8), "ground/dirt", {"tile": 3.0})
 	Kit.scatter(40, rng, Vector3.ZERO, Vector2(100, 100), func(_i: int, p: Vector3) -> void:
 		if p.length() < 20.0 or p.distance_to(Vector3(-3, 0, 24)) < 3.0:
 			# nothing solid lands on the spawn beside the lone door
@@ -201,7 +214,7 @@ func _hall() -> void:
 	Kit.sign(self, "wood/door_dark", _m(9.53, 6.25, 1.1), _yaw(-90.0), Vector2(0.9, 2.1), {"tint": Color(0.6, 0.55, 0.5)})
 	Kit.label(self, "?", _m(9.54, 6.25, 1.95), _yaw(-90.0), 32, Color(0.5, 0.45, 0.4), "display", {"pixel_size": 0.01})
 	var back_trig := Kit.trigger(self, _m(10.2, 6.25, 1.0), Vector3(1.4, 2.2, 1.8), _on_backwards, {"name": "BackwardsTrigger", "continuous": true})
-	back_trig.set_meta("dest", _m(8.0, 6.25))
+	back_trig.set_meta("dest", _m(6.3, 6.25))
 	Readable.create(self, _m(9.6, 6.25, 1.1), _yaw(-90.0), "A door with no handle", ["A door with no handle on this side.", "There is no handle on the other side either. You get the feeling it opens for people who are not looking at it."], {"name": "BackDoorRead", "size": Vector3(0.3, 2.0, 1.0)})
 	# the hidden room
 	Props.place(self, "chair", _m(5.0, 6.25), _yaw(90.0), 1.0)
@@ -231,7 +244,7 @@ func _living() -> void:
 		empty_frame.prompt = "The photograph, returned"
 	else:
 		Kit.box(empty_frame, Vector3(0, 0, -0.05), Vector3(0.5, 0.5, 0.04), "wood/planks_dark", {"solid": false})
-		Kit.box(empty_frame, Vector3(0, 0, -0.075), Vector3(0.42, 0.42, 0.01), "wall/paper", {"solid": false, "tint": Color(0.8, 0.78, 0.7)})
+		Kit.box(empty_frame, Vector3(0, 0, -0.085), Vector3(0.42, 0.42, 0.01), "wall/paper", {"solid": false, "tint": Color(0.8, 0.78, 0.7)})
 	Props.place(self, "bookshelf", _m(0.72, 3.4), _yaw(-90.0), 1.0)
 	_journal(_m(1.1, 3.4, 1.2))
 	Props.place(self, "sofa", _m(3.6, 4.2), _yaw(0.0), 1.0)
@@ -324,48 +337,53 @@ func _corridor_and_basement() -> void:
 	Kit.light(self, _m(15.0, 11.75, H - 0.15), Color(1.0, 0.88, 0.7), 1.3, 6.0)
 	Kit.light(self, _m(20.0, 11.75, H - 0.15), Color(1.0, 0.88, 0.7), 1.3, 6.0)
 	Props.place(self, "radiator", _m(17.0, 12.35), _yaw(0.0), 1.0)
-	# the basement: a walled stairwell east of the house, a concrete room, and a
-	# second stair that keeps going down
-	var top := _m(22.0, 11.75)
+	# the basement: a walled stairwell east of the house going down three metres
+	# to a concrete room, and out of the room's far end a second stair that keeps
+	# going down. Laid out end to end so nothing stands across either flight:
+	#   landing 0..0.8 | stair A 0.8..4.8 | room 4.8..16.8 | stair B 16.8..20.8 | bottom
+	var top := _m(22.0, 12.0)
 	var dx := -1.0 if mirrored else 1.0
-	Kit.floor(self, top + Vector3(dx * 0.4, 0, 0), Vector2(0.8, 1.5), "wall/concrete")
-	Kit.ceiling(self, top + Vector3(dx * 2.6, 2.4, 0), Vector2(5.2, 1.6), "wall/concrete_dark")
-	# the stairwell is a closed shaft: side walls the whole way down outside the
-	# basement room, and above the room's ceiling where it passes over it, with
-	# an end wall over the room, so no sky or field shows through it
-	var room_w := top.x + dx * 2.8
-	Kit.wall(self, Vector3(top.x, -3.2, top.z - 0.8), Vector3(room_w, -3.2, top.z - 0.8), 5.6, "wall/concrete", {"thick": 0.2})
-	Kit.wall(self, Vector3(room_w, -3.2, top.z + 0.8), Vector3(top.x, -3.2, top.z + 0.8), 5.6, "wall/concrete", {"thick": 0.2})
-	Kit.wall(self, Vector3(room_w, -0.7, top.z - 0.8), Vector3(top.x + dx * 5.2, -0.7, top.z - 0.8), 3.1, "wall/concrete", {"thick": 0.2})
-	Kit.wall(self, Vector3(top.x + dx * 5.2, -0.7, top.z + 0.8), Vector3(room_w, -0.7, top.z + 0.8), 3.1, "wall/concrete", {"thick": 0.2})
-	Kit.wall(self, Vector3(top.x + dx * 5.2, -0.7, top.z - 0.9), Vector3(top.x + dx * 5.2, -0.7, top.z + 0.9), 3.1, "wall/concrete_dark", {"thick": 0.2})
-	Kit.light(self, top + Vector3(dx * 3.0, 1.6, 0), Color(0.9, 0.85, 0.7), 0.7, 5.0)
+	Kit.floor(self, top + Vector3(dx * 0.4, 0, 0), Vector2(0.8, 1.6), "wall/concrete")
+	Kit.ceiling(self, top + Vector3(dx * 2.4, 2.4, 0), Vector2(4.8, 1.6), "wall/concrete_dark")
+	# the stairwell is a closed shaft: side walls the whole way down, and an end
+	# wall above the room's ceiling, so no sky or field shows through it
+	var shaft_end := top.x + dx * 4.8
+	Kit.wall(self, Vector3(top.x, -3.2, top.z - 0.8), Vector3(shaft_end, -3.2, top.z - 0.8), 5.6, "wall/concrete", {"thick": 0.2})
+	Kit.wall(self, Vector3(shaft_end, -3.2, top.z + 0.8), Vector3(top.x, -3.2, top.z + 0.8), 5.6, "wall/concrete", {"thick": 0.2})
+	Kit.wall(self, Vector3(shaft_end, -0.7, top.z - 0.7), Vector3(shaft_end, -0.7, top.z + 0.7), 3.1, "wall/concrete_dark", {"thick": 0.2})
+	Kit.light(self, top + Vector3(dx * 3.0, 1.0, 0), Color(0.9, 0.85, 0.7), 0.7, 5.0)
 	# the stairwell's outside shell: every face but the one in the doorway, which
 	# used to be drawn across the opening and made the way down look like a wall
-	Kit.box(self, top + Vector3(dx * 2.6, 1.2, 0), Vector3(5.2, 2.4, 1.6), "wall/concrete", {"faces": ["px" if dx > 0 else "nx", "pz", "nz", "py"], "solid": false, "tint": Color(0.6, 0.6, 0.62)})
+	Kit.box(self, top + Vector3(dx * 2.4, 1.25, 0), Vector3(4.8, 2.5, 1.4), "wall/concrete", {"faces": ["px" if dx > 0 else "nx", "pz", "nz", "py"], "solid": false, "tint": Color(0.6, 0.6, 0.62)})
 	Kit.light(self, top + Vector3(dx * 0.6, 2.0, 0), Color(0.9, 0.85, 0.7), 0.9, 4.0)
 	Kit.label(self, "down", top + Vector3(dx * 0.05, 2.25, 0), _yaw(90.0), 22, Color(0.55, 0.55, 0.6), "body", {"pixel_size": 0.01})
 	Kit.stairs(self, top + Vector3(dx * 0.8, 0, 0), _yaw(-90.0), 1.4, 10, -0.3, 0.4, "wall/concrete", {"name": "BasementStairs"})
-	var room_c := top + Vector3(dx * 7.3, -3.0, 0)
-	var m := MapBuilder.build(self, [
-		"......",
-		"..b...",
-		"......",
-	], {"cell": CELL * 3.0, "height": 2.4, "origin": room_c + Vector3(-4.5, 0, -2.25), "floor": "wall/concrete", "wall": "wall/concrete_dark", "ceiling": "wall/concrete_dark", "name": "Basement", "double_thin": true})
+	# the room: a doorway cell at each end, the first met by the bottom of stair
+	# A, the second opening straight onto the top of stair B
+	var rows := ["D..b...D", " ...... "] if not mirrored else ["D...b..D", " ...... "]
+	rows = [" ...... ", rows[0], " ...... "]
+	var origin := Vector3(top.x + dx * 4.8 if not mirrored else top.x - 4.8 - 12.0, -3.0, top.z - 2.25)
+	var m := MapBuilder.build(self, rows, {"cell": CELL * 3.0, "height": 2.4, "origin": origin, "floor": "wall/concrete", "wall": "wall/concrete_dark", "ceiling": "wall/concrete_dark", "name": "Basement", "double_thin": true})
 	var b: Vector3 = m.first.call("b")
 	Props.place(self, "boxes_moving" if Props.exists("boxes_moving") else "crate", b + Vector3(1.2, 0, -1.2), 20.0, 1.0)
 	Props.place(self, "crate_small", b + Vector3(-1.4, 0, 1.2), 70.0, 1.0)
 	Kit.light(self, b + Vector3(0, 2.1, 0), Color(1.0, 0.9, 0.7), 0.8, 6.0)
+	Kit.light(self, b + Vector3(dx * 4.0, 2.1, 0), Color(1.0, 0.9, 0.7), 0.6, 5.0)
 	Readable.create(self, b + Vector3(-1.6, 1.2, -2.1), 0.0, "Writing on the pipe", ["Someone has written on the pipe: DOWN IS THE SAME AS DOWN."], {"name": "PipeWriting", "size": Vector3(0.8, 0.5, 0.3)})
-	add_spawn("basement", top + Vector3(-dx * 1.0, 0.1, 0), _yaw(90.0))
-	var second_top := b + Vector3(dx * 3.0, 0, 0)
+	add_spawn("basement", top + Vector3(-dx * 1.4, 0.1, 0), _yaw(90.0))
+	# stair B: down out of the room's far doorway, in a shaft of its own whose
+	# ceiling is the room's ceiling carried on
+	var second_top := Vector3(top.x + dx * 16.8, -3.0, top.z)
 	Kit.stairs(self, second_top, _yaw(-90.0), 1.4, 10, -0.3, 0.4, "wall/concrete", {"name": "BasementStairs2"})
-	Kit.wall(self, second_top + Vector3(0, -3.0, -0.8), second_top + Vector3(dx * 5.6, -3.0, -0.8), 5.4, "wall/concrete", {"thick": 0.2})
-	Kit.wall(self, second_top + Vector3(dx * 5.6, -3.0, 0.8), second_top + Vector3(0, -3.0, 0.8), 5.4, "wall/concrete", {"thick": 0.2})
-	Kit.ceiling(self, second_top + Vector3(dx * 2.8, 2.4, 0), Vector2(5.6, 1.6), "wall/concrete_dark")
+	var shaft2_end := second_top.x + dx * 5.6
+	Kit.wall(self, Vector3(second_top.x, -6.2, top.z - 0.8), Vector3(shaft2_end, -6.2, top.z - 0.8), 5.6, "wall/concrete", {"thick": 0.2})
+	Kit.wall(self, Vector3(shaft2_end, -6.2, top.z + 0.8), Vector3(second_top.x, -6.2, top.z + 0.8), 5.6, "wall/concrete", {"thick": 0.2})
+	Kit.ceiling(self, Vector3(second_top.x + dx * 2.8, -0.6, top.z), Vector2(5.6, 1.6), "wall/concrete_dark")
+	Kit.box(self, Vector3(second_top.x + dx * 2.8, -6.45, top.z), Vector3(5.6, 0.3, 1.8), "wall/concrete_dark", {"solid": false})
+	Kit.light(self, Vector3(second_top.x + dx * 2.0, -1.2, top.z), Color(0.9, 0.85, 0.7), 0.6, 5.0)
 	var bottom := second_top + Vector3(dx * 4.8, -3.0, 0)
 	Kit.floor(self, bottom, Vector2(1.6, 1.6), "wall/concrete")
-	Kit.wall(self, bottom + Vector3(dx * 0.8, 0, -0.8), bottom + Vector3(dx * 0.8, 0, 0.8), 2.4, "wall/concrete_dark", {"thick": 0.2})
+	Kit.wall(self, bottom + Vector3(dx * 0.8, -0.2, -0.7), bottom + Vector3(dx * 0.8, -0.2, 0.7), 5.5, "wall/concrete_dark", {"thick": 0.2})
 	var loops := Game.count("house_basement_loops")
 	Puzzle.declare(self, "house_basement", "", [], "walk the basement stair down until it gives up (three times)", {"route": "cistern:from_basement"})
 	basement_seam = SeamlessTeleport.create(self, bottom + Vector3(-dx * 0.3, 0, 0), _yaw(-90.0), top + Vector3(dx * 0.4, 0, 0), _yaw(-90.0), Vector3(1.6, 2.5, 0.5), {"name": "BasementSeam", "count_flag": "house_basement_loops", "one_way": false, "on_teleport": _on_basement_loop})
@@ -387,29 +405,34 @@ func _bedroom_corridor() -> void:
 	var length := 30.0
 	Kit.floor(self, c0 + Vector3(dirx * length * 0.5, 0, 0), Vector2(length, 1.6), "wood/planks_house", {"tile": 1.5})
 	Kit.ceiling(self, c0 + Vector3(dirx * length * 0.5, H, 0), Vector2(length, 1.6), "wall/ceiling_plaster")
-	Kit.wall(self, c0 + Vector3(0, 0, 0.8), c0 + Vector3(dirx * length, 0, 0.8), H, "wall/wallpaper_damask", {"tile": 1.5})
-	Kit.wall(self, c0 + Vector3(dirx * length, 0, -0.8), c0 + Vector3(dirx * length, 0, 0.8), H, "wall/wallpaper_damask")
-	Kit.wall(self, c0 + Vector3(0, 0, -0.8), c0 + Vector3(dirx * 1.2, 0, -0.8), H, "wall/wallpaper_damask")
-	Kit.wall(self, c0 + Vector3(dirx * (3.0 + 5 * 4.5 + 2.7), 0, -0.8), c0 + Vector3(dirx * length, 0, -0.8), H, "wall/wallpaper_damask")
+	Kit.wall(self, c0 + Vector3(dirx * length, 0, -0.8), c0 + Vector3(0, 0, -0.8), H, "wall/wallpaper_damask", {"tile": 1.5})
+	Kit.wall(self, c0 + Vector3(dirx * length, 0, 0.8), c0 + Vector3(dirx * length, 0, -0.8), H, "wall/wallpaper_damask")
+	Kit.wall(self, c0 + Vector3(dirx * 1.2, 0, 0.8), c0 + Vector3(0, 0, 0.8), H, "wall/wallpaper_damask")
+	Kit.wall(self, c0 + Vector3(dirx * length, 0, 0.8), c0 + Vector3(dirx * (3.0 + 5 * 4.5 + 2.7), 0, 0.8), H, "wall/wallpaper_damask")
+	# the rooms hang off the south side of the corridor (north of it is the crawl
+	# behind bedroom B's skirting, which they used to be built straight through)
+	var rz := c0.z + 2.6          # room centre
+	var rn := c0.z + 0.8          # the room's wall on the corridor
+	var rf := c0.z + 4.4          # the far wall
 	for k in 6:
 		var rx := c0.x + dirx * (3.0 + k * 4.5)
-		Kit.floor(self, Vector3(rx, 0, c0.z - 2.6), Vector2(3.6, 3.6), "wall/carpet_house")
-		Kit.ceiling(self, Vector3(rx, H, c0.z - 2.6), Vector2(3.6, 3.6), "wall/ceiling_plaster")
-		Kit.wall(self, Vector3(rx - 1.8, 0, c0.z - 4.4), Vector3(rx + 1.8, 0, c0.z - 4.4), H, "wall/wallpaper_floral")
-		Kit.wall(self, Vector3(rx - 1.8, 0, c0.z - 0.8), Vector3(rx - 1.8, 0, c0.z - 4.4), H, "wall/wallpaper_floral")
-		Kit.wall(self, Vector3(rx + 1.8, 0, c0.z - 4.4), Vector3(rx + 1.8, 0, c0.z - 0.8), H, "wall/wallpaper_floral")
-		Kit.wall(self, Vector3(rx - 1.8, 0, c0.z - 0.8), Vector3(rx - 0.6, 0, c0.z - 0.8), H, "wall/wallpaper_damask")
-		Kit.wall(self, Vector3(rx + 0.6, 0, c0.z - 0.8), Vector3(rx + 1.8, 0, c0.z - 0.8), H, "wall/wallpaper_damask")
-		Kit.box(self, Vector3(rx, H - 0.3, c0.z - 0.8), Vector3(1.2, 0.6, 0.2), "wall/wallpaper_damask")
-		Props.place(self, "bed_single", Vector3(rx - 0.8, 0, c0.z - 3.4), 0.0, 1.0)
-		Props.place(self, "window_night", Vector3(rx + 0.9, 1.5, c0.z - 4.32), 180.0, 1.0, {"collision": "none"})
-		Kit.sign(self, "props/painting_house", Vector3(rx + 1.2, 1.3, c0.z - 4.3), 0.0, Vector2(0.5, 0.5))
-		Kit.light(self, Vector3(rx, H - 0.2, c0.z - 2.6), Color(1.0, 0.8, 0.9), 0.8, 5.0)
-		Kit.wall(self, Vector3(rx + 1.8, 0, c0.z - 0.8), Vector3(rx + 2.7, 0, c0.z - 0.8), H, "wall/wallpaper_damask")
-		Kit.wall(self, Vector3(rx - 2.7, 0, c0.z - 0.8), Vector3(rx - 1.8, 0, c0.z - 0.8), H, "wall/wallpaper_damask")
-	Kit.box(self, c0 + Vector3(dirx * length * 0.5, H + 0.15, -2.6), Vector3(length + 0.4, 0.3, 6.0), "stone/blocks_dark", {"solid": false})
-	Kit.box(self, c0 + Vector3(dirx * length * 0.5, H * 0.5, -4.7), Vector3(length + 0.4, H, 0.3), "wood/planks_wall", {"solid": false})
-	Readable.create(self, Vector3(c0.x + dirx * 3.0, 1.0, c0.z - 3.4), 0.0, "The child's bed", ["The same bed. The same window. The same drawing.", "Every room along this corridor is the same room. You are not sure the corridor is not also the same room."], {"name": "SameRoom", "size": Vector3(1.2, 0.8, 2.0), "note_key": "same_room", "note_title": "The same room", "note_text": "Behind the door that was not there: a corridor of the same child's bedroom, over and over."})
+		Kit.floor(self, Vector3(rx, 0, rz), Vector2(3.6, 3.6), "wall/carpet_house")
+		Kit.ceiling(self, Vector3(rx, H, rz), Vector2(3.6, 3.6), "wall/ceiling_plaster")
+		Kit.wall(self, Vector3(rx + 1.8, 0, rf), Vector3(rx - 1.8, 0, rf), H, "wall/wallpaper_floral")
+		Kit.wall(self, Vector3(rx - 1.8, 0, rf), Vector3(rx - 1.8, 0, rn), H, "wall/wallpaper_floral")
+		Kit.wall(self, Vector3(rx + 1.8, 0, rn), Vector3(rx + 1.8, 0, rf), H, "wall/wallpaper_floral")
+		Kit.wall(self, Vector3(rx - 0.6, 0, rn), Vector3(rx - 1.8, 0, rn), H, "wall/wallpaper_damask")
+		Kit.wall(self, Vector3(rx + 1.8, 0, rn), Vector3(rx + 0.6, 0, rn), H, "wall/wallpaper_damask")
+		Kit.box(self, Vector3(rx, H - 0.3, rn), Vector3(1.2, 0.6, 0.2), "wall/wallpaper_damask")
+		Props.place(self, "bed_single", Vector3(rx - 0.8, 0, rf - 1.0), 180.0, 1.0)
+		Props.place(self, "window_night", Vector3(rx + 0.9, 1.5, rf - 0.08), 0.0, 1.0, {"collision": "none"})
+		Kit.sign(self, "props/painting_house", Vector3(rx + 1.2, 1.3, rf - 0.1), 180.0, Vector2(0.5, 0.5))
+		Kit.light(self, Vector3(rx, H - 0.2, rz), Color(1.0, 0.8, 0.9), 0.8, 5.0)
+		Kit.wall(self, Vector3(rx + 2.7, 0, rn), Vector3(rx + 1.8, 0, rn), H, "wall/wallpaper_damask")
+		Kit.wall(self, Vector3(rx - 1.8, 0, rn), Vector3(rx - 2.7, 0, rn), H, "wall/wallpaper_damask")
+	Kit.box(self, c0 + Vector3(dirx * length * 0.5, H + 0.15, 2.6), Vector3(length + 0.4, 0.3, 6.0), "stone/blocks_dark", {"solid": false})
+	Kit.box(self, c0 + Vector3(dirx * length * 0.5, H * 0.5, 4.7), Vector3(length + 0.4, H, 0.3), "wood/planks_wall", {"solid": false})
+	Readable.create(self, Vector3(c0.x + dirx * 3.0, 1.0, rf - 1.0), 180.0, "The child's bed", ["The same bed. The same window. The same drawing.", "Every room along this corridor is the same room. You are not sure the corridor is not also the same room."], {"name": "SameRoom", "size": Vector3(1.2, 0.8, 2.0), "note_key": "same_room", "note_title": "The same room", "note_text": "Behind the door that was not there: a corridor of the same child's bedroom, over and over."})
 	var seam_x := c0.x + dirx * (3.0 + 4 * 4.5 + 2.2)
 	var back_x := c0.x + dirx * (3.0 + 1 * 4.5 + 2.2)
 	var fyaw := _yaw(-90.0)
@@ -647,4 +670,4 @@ func _on_hatch(p: Node, it: Node) -> void:
 		Audio.sfx("door_creak_long", pos, -6.0)
 		Game.set_flag("attic_seen", true)
 	elif World.hud:
-		await World.hud.say("", ["The attic hatch. Too high to reach, and no ladder.", "If you could fly. Or if the house liked you more."])
+		await World.hud.say("", ["The attic hatch. Too high to reach, and no ladder.", "If you could fly. Or if the house liked you more: there is a frame in the living room with nothing in it, and somewhere with filing cabinets there is what was in it."])

@@ -29,7 +29,8 @@ static func build(area: AreaBase, root: Node3D, ctx: Dictionary) -> Dictionary:
 	# down, which is where you land if you step off, with stairs back up
 	Kit.floor(root, Vector3(0, 0, 41.0), Vector2(KD.SQ + 2.0, 9.0), String(d.ground), {"tint": d.tint, "tile": 2.0, "thick": 0.2})
 	Kit.floor(root, Vector3(0, 0, -41.0), Vector2(KD.SQ + 2.0, 9.0), String(d.ground), {"tint": d.tint, "tile": 2.0, "thick": 0.2})
-	Kit.floor(root, Vector3(0, 0, 36.0), Vector2(6.0, 4.0), "wall/concrete", {"tile": 1.5, "thick": 0.2})
+	# the gangway: a concrete slab from the rear door to the strip, over the trackbed
+	Kit.floor(root, Vector3(0, 0, 35.25), Vector2(6.0, 2.5), "wall/concrete", {"tile": 1.5, "thick": 1.0, "all_faces": true})
 	_trackbed(area, root, d)
 	_carriage(area, root, state)
 	_doors(area, root, state)
@@ -173,7 +174,11 @@ static func _doors(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 ## hedged so you do not take it by accident. Stairs at both ends come back up.
 static func _trackbed(area: AreaBase, root: Node3D, d: Dictionary) -> void:
 	var y := -3.0
-	Kit.floor(root, Vector3(0, y, 0), Vector2(KD.SQ + 2.0, 73.0), "ground/gravel", {"tint": Color(0.7, 0.68, 0.7), "tile": 2.0, "thick": 0.3})
+	Kit.floor(root, Vector3(0, y, 0), Vector2(24.0, 73.0), "ground/gravel", {"tint": Color(0.7, 0.68, 0.7), "tile": 2.0, "thick": 0.3})
+	for sx in [-1.0, 1.0]:
+		# the meadow the painted country slides along, and a wall at the end of it
+		Kit.floor(root, Vector3(sx * 29.0, y, 0), Vector2(34.0, 73.0), "nature/grass_dream", {"tint": Color(0.8, 0.85, 0.7), "tile": 3.0, "thick": 0.3})
+		Kit.box(root, Vector3(sx * 46.0, y * 0.5, 0), Vector3(0.3, -y, 73.0), "wall/concrete_dark", {"tile": 2.0})
 	# the faces of the strips, so the drop is a wall and not a hole in the world
 	Kit.box(root, Vector3(0, y * 0.5, 36.5), Vector3(KD.SQ + 2.0, -y, 0.3), "wall/concrete_dark", {"tile": 2.0})
 	Kit.box(root, Vector3(0, y * 0.5, -36.5), Vector3(KD.SQ + 2.0, -y, 0.3), "wall/concrete_dark", {"tile": 2.0})
@@ -196,9 +201,11 @@ static func _trackbed(area: AreaBase, root: Node3D, d: Dictionary) -> void:
 		var foot := Vector3(8.2, y, 36.0 * side - 5.6 * side)
 		Kit.stairs(root, foot, 180.0 if side > 0 else 0.0, 1.8, 12, -y / 12.0, 0.45, "wall/concrete", {"tile": 1.0, "name": "TrackStair%d" % int(side)})
 		Kit.light(root, Vector3(8.2, y + 3.0, 33.0 * side), LAMP, 0.9, 8.0)
-	# rails either side of the gangway, so the way into the carriage is a way and not an edge
-	for sx in [-3.1, 3.1]:
-		Kit.box(root, Vector3(float(sx), 0.5, 36.0), Vector3(0.1, 1.0, 4.4), "metal/iron")
+	# rails either side of the gangway and across its ends beside the coachwork,
+	# so the way into the carriage is a way and not an edge
+	for sx in [-1.0, 1.0]:
+		Kit.box(root, Vector3(sx * 3.1, 0.5, 35.2), Vector3(0.1, 1.0, 2.6), "metal/iron")
+		Kit.box(root, Vector3(sx * 2.6, 0.5, 34.05), Vector3(0.9, 1.0, 0.1), "metal/iron")
 	Readable.create(root, Vector3(0, y + 0.5, 30.0), 0.0, "The track", [
 		"Sleepers and two rails, going both ways into the fog. The rails are warm. Nothing is on them; the train is beside them, which is not where trains go.",
 		"Steps at either end lead back up to the strips. Somebody expected people to fall.",
@@ -265,67 +272,96 @@ static func _guard(n: NPC) -> void:
 
 # --- the world going past the windows -------------------------------------------------
 
-## Two rings of painted country, far out either side, turning slowly the
-## other way, so the board goes past every window in one direction and never
-## comes round.
+const LANE_L := 63.0          # the loop the country runs round
+const LANE_PITCH := 10.5
+const LANE_SPEED := 5.0
+const SHED_Z := 24.0          # the sheds the country slides into at either end
+
+## Painted country going past both sides of the train, in squares, and a
+## town with a clock tower among them: a conveyor on each side that runs
+## the way the train is not going, into a shed at the far end and out of
+## the one at the near end, so it comes round.
 static func _scenery(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 	var rng := area.rng
 	var cols: Array = []
 	for d in (area as Node).DEFS:
 		cols.append(d.paint)
 	for side in [-1.0, 1.0]:
-		var pivot := Vector3(side * 160.0, 0, 0)
-		var cw := Clockwork.create(root, pivot, {"mode": "rotate", "axis": Vector3.UP, "speed_deg": side * 1.6, "name": "Scenery%s" % ("W" if side < 0 else "E")})
-		var quads: Array = []
-		var qcols: Array = []
-		var n := 28
-		var r := 118.0
-		for i in n:
-			var a0 := TAU * i / n
-			var a1 := TAU * (i + 1) / n
-			var p0 := Vector3(cos(a0) * r, -2.0, sin(a0) * r)
-			var p1 := Vector3(cos(a1) * r, -2.0, sin(a1) * r)
-			var h := rng.randf_range(6.0, 16.0)
-			var c: Color = cols[rng.randi() % cols.size()]
-			# a wall of country facing the pivot's centre (the train side)
-			var q := [p0, p0 + Vector3(0, h, 0), p1 + Vector3(0, h, 0), p1, Vector2(0, 1), Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector3.ZERO]
-			if side > 0:
-				q = [p1, p1 + Vector3(0, h, 0), p0 + Vector3(0, h, 0), p0, Vector2(0, 1), Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector3.ZERO]
-			quads.append(q)
-			qcols.append(c)
-			# a hedge line along the foot of it
-			var g := [p0, p0 + Vector3(0, 1.6, 0), p1 + Vector3(0, 1.6, 0), p1, Vector2(0, 1), Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector3.ZERO]
-			if side > 0:
-				g = [p1, p1 + Vector3(0, 1.6, 0), p0 + Vector3(0, 1.6, 0), p0, Vector2(0, 1), Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector3.ZERO]
-			quads.append(g)
-			qcols.append(Color(0.16, 0.36, 0.18))
-		var mi := Kit.add_mesh(cw.body, Kit.mesh_from_quads(quads, qcols), Kit.vertex_mat({"unshaded": true, "double": true}), Vector3.ZERO, {"solid": false, "cast_shadow": false, "name": "Country"})
-		state.scenery.append(cw)
-		mi.extra_cull_margin = 400.0
-		# a town in front of the country: houses, a church, trees, and a clock tower
-		# that says half past five every time it comes round
-		var town_r := r - 6.0
-		var a_town := PI if side > 0 else 0.0
-		for k in 9:
-			var a := a_town + (k - 4) * 0.032
-			var hp := Vector3(cos(a) * town_r, -2.0, sin(a) * town_r)
-			var hh := rng.randf_range(4.0, 8.0)
-			var house := Kit.box(cw.body, hp + Vector3(0, hh * 0.5, 0), Vector3(3.0 + rng.randf() * 2.0, hh, 3.0), "stone/blocks_city", {"tile": 2.5, "solid": false, "tint": Color(1.0, 0.95, 0.9)})
-			house.rotation.y = -a
-			Kit.box(cw.body, hp + Vector3(0, hh + 0.5, 0), Vector3(4.0, 1.0, 3.6), "wood/planks_dark", {"tint": Color(0.5, 0.35, 0.35), "solid": false}).rotation.y = -a
-		var ta := a_town + 0.02
-		var tp := Vector3(cos(ta) * (town_r - 3.0), -2.0, sin(ta) * (town_r - 3.0))
-		Kit.box(cw.body, tp + Vector3(0, 9.0, 0), Vector3(3.2, 18.0, 3.2), "stone/blocks_clocktower", {"tile": 2.5, "solid": false})
-		Kit.box(cw.body, tp + Vector3(0, 19.0, 0), Vector3(4.0, 2.0, 4.0), "metal/brass", {"tile": 2.0, "solid": false})
-		var face_dir: float = -side
-		var face := Kit.sign(cw.body, "metal/clock_face", tp + Vector3(face_dir * 1.62, 15.0, 0), -90.0 if face_dir > 0 else 90.0, Vector2(2.4, 2.4))
+		var lane := Node3D.new()
+		lane.name = "Lane%s" % ("W" if side < 0 else "E")
+		root.add_child(lane)
+		for i in 6:
+			var el := Node3D.new()
+			# the east lane is a half pitch on from the west one, so a tower is
+			# never at both windows at once and seldom at neither
+			el.position = Vector3(0, -3.0, -LANE_L * 0.5 + i * LANE_PITCH + (LANE_PITCH * 0.5 if side > 0 else 0.0))
+			el.visible = absf(el.position.z) < SHED_Z + LANE_PITCH * 0.5 - 0.2
+			lane.add_child(el)
+			if i == 0:
+				_town(el, side, rng, true)
+			elif i == 3:
+				_town(el, side, rng, false)
+			else:
+				_country(el, side, rng, cols)
+			state.scenery.append(el)
+		for end in [-1.0, 1.0]:
+			var zc: float = end * (SHED_Z + 6.15)
+			Kit.box(root, Vector3(side * 27.0, 5.5, zc), Vector3(30.0, 17.0, 12.3), "wall/concrete_dark", {"tile": 3.0, "tint": Color(0.55, 0.5, 0.55)})
+			# the mouth: dark, and the country slides into it
+			Kit.box(root, Vector3(side * 27.0, 4.7, end * (SHED_Z - 0.03)), Vector3(28.0, 15.0, 0.04), "wall/concrete_dark", {"tint": Color(0.03, 0.03, 0.04), "unshaded": true, "solid": false})
+			Kit.label(root, "THE SAME TOWN", Vector3(side * 27.0, 13.0, end * (SHED_Z - 0.08)), 180.0 if end < 0 else 0.0, 40, Color(0.75, 0.7, 0.72), "display", {"pixel_size": 0.03})
+
+
+## A square of country: a painted flat the height of a hill, a lower one in
+## front of it, a hedge along the foot, and a tree or two before that.
+static func _country(el: Node3D, side: float, rng: RandomNumberGenerator, cols: Array) -> void:
+	el.name = "Country"
+	var quads: Array = []
+	var qcols: Array = []
+	var flat := func(x: float, w: float, h: float, col: Color) -> void:
+		var a := Vector3(x, 0, -w * 0.5)
+		var b := Vector3(x, 0, w * 0.5)
+		# facing the train: clockwise seen from the train side
+		var q := [a, a + Vector3(0, h, 0), b + Vector3(0, h, 0), b, Vector2(0, 1), Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector3.ZERO]
+		if side > 0:
+			q = [b, b + Vector3(0, h, 0), a + Vector3(0, h, 0), a, Vector2(0, 1), Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector3.ZERO]
+		quads.append(q)
+		qcols.append(col)
+	var base: Color = cols[rng.randi() % cols.size()]
+	flat.call(side * 34.0, 10.0, rng.randf_range(9.0, 14.0), base)
+	flat.call(side * 30.0, rng.randf_range(5.0, 8.0), rng.randf_range(4.0, 7.0), base.darkened(0.25))
+	flat.call(side * 27.0, 10.0, 1.4, Color(0.16, 0.36, 0.18))
+	var mi := Kit.add_mesh(el, Kit.mesh_from_quads(quads, qcols), Kit.vertex_mat({"unshaded": true, "double": true}), Vector3.ZERO, {"solid": false, "cast_shadow": false, "name": "Flats"})
+	mi.extra_cull_margin = 60.0
+	for k in 2:
+		Props.place(el, ["tree_oak_1", "tree_pine_1", "tree_autumn"][rng.randi() % 3], Vector3(side * rng.randf_range(20.0, 25.0), 0, rng.randf_range(-4.0, 4.0)), rng.randf_range(0, 360), rng.randf_range(1.0, 1.6), {"collision": "none"})
+
+
+## The town: a row of houses with a clock tower behind them, or a church, and
+## trees. The clock says half past five every time it comes round.
+static func _town(el: Node3D, side: float, rng: RandomNumberGenerator, tower: bool) -> void:
+	el.name = "Town" if tower else "Church"
+	for k in 4:
+		var hz := -4.2 + k * 2.8
+		var hh := rng.randf_range(3.6, 5.5)
+		var hp := Vector3(side * 18.0, 0, hz)
+		Kit.box(el, hp + Vector3(0, hh * 0.5, 0), Vector3(3.0, hh, 2.4), "stone/blocks_city", {"tile": 2.5, "solid": false, "tint": Color(1.0, 0.95, 0.9)})
+		Kit.box(el, hp + Vector3(0, hh + 0.4, 0), Vector3(3.6, 0.8, 2.8), "wood/planks_dark", {"tint": Color(0.5, 0.35, 0.35), "solid": false})
+		Kit.sign(el, "props/window_night", hp + Vector3(-side * 1.52, 1.8, 0), 90.0 if side > 0 else -90.0, Vector2(0.8, 1.0))
+	if tower:
+		var tp := Vector3(side * 24.0, 0, 0)
+		Kit.box(el, tp + Vector3(0, 7.0, 0), Vector3(3.2, 14.0, 3.2), "stone/blocks_clocktower", {"tile": 2.5, "solid": false})
+		Kit.box(el, tp + Vector3(0, 15.0, 0), Vector3(4.0, 2.0, 4.0), "metal/brass", {"tile": 2.0, "solid": false})
+		var face := Kit.sign(el, "metal/clock_face", tp + Vector3(-side * 1.62, 10.0, 0), 90.0 if side > 0 else -90.0, Vector2(2.6, 2.6))
 		face.name = "TownClock"
-		Kit.light(cw.body, tp + Vector3(face_dir * 3.0, 15.0, 0), Color(1.0, 0.9, 0.7), 1.2, 12.0)
-		for k in 14:
-			var a := a_town + rng.randf_range(-0.25, 0.25)
-			var tr := town_r - rng.randf_range(2.0, 12.0)
-			Props.place(cw.body, ["tree_oak_1", "tree_pine_1", "tree_autumn"][k % 3], Vector3(cos(a) * tr, -2.0, sin(a) * tr), rng.randf_range(0, 360), rng.randf_range(1.2, 2.2), {"collision": "none"})
-	Kit.box(root, Vector3(0, -3.2, 0), Vector3(30.0, 0.2, 200.0), "ground/gravel", {"solid": false, "tint": Color(0.6, 0.6, 0.65), "tile": 3.0})
+		Kit.light(el, tp + Vector3(-side * 3.0, 10.0, 0), Color(1.0, 0.9, 0.7), 1.4, 12.0)
+	else:
+		var cp := Vector3(side * 24.0, 0, 1.5)
+		Kit.box(el, cp + Vector3(0, 3.5, 0), Vector3(4.0, 7.0, 6.0), "stone/blocks_city", {"tile": 2.5, "solid": false, "tint": Color(0.9, 0.9, 0.95)})
+		Kit.box(el, cp + Vector3(0, 7.6, 0), Vector3(4.6, 1.2, 6.6), "wood/planks_dark", {"tint": Color(0.4, 0.35, 0.4), "solid": false})
+		Kit.box(el, cp + Vector3(0, 10.5, -2.0), Vector3(1.4, 7.0, 1.4), "stone/blocks_city", {"tile": 2.5, "solid": false, "tint": Color(0.9, 0.9, 0.95)})
+	for k in 3:
+		Props.place(el, ["tree_oak_1", "tree_autumn", "tree_oak_1"][k], Vector3(side * rng.randf_range(27.0, 31.0), 0, rng.randf_range(-4.5, 4.5)), rng.randf_range(0, 360), rng.randf_range(1.2, 1.8), {"collision": "none"})
 
 
 # --- the front of the train, which exists while the hour is held --------------------------
@@ -338,24 +374,25 @@ static func _platform(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 	Kit.box(root, Vector3(0, H - 0.3, z0), Vector3(2.0, 0.6, 0.2), WALL)
 	Kit.label(root, "there is no next carriage", Vector3(0, 2.35, z0 + 0.12), 0.0, 16, Color(0.6, 0.55, 0.5), "body", {"pixel_size": 0.009})
 	Kit.light(root, Vector3(0, H - 0.4, z0 + 2.0), Color(1.0, 0.8, 0.7), 0.7, 5.0)
-	# the platform, in nothing
+	# the platform, in nothing: a slab from the van's door to the strip, over the
+	# trackbed, with a rail along every edge you could step off
 	var p := PLATFORM
-	Kit.floor(root, p + Vector3(0, 0, -1.0), Vector2(10.0, 8.0), "wall/concrete", {"tile": 1.5})
-	Kit.box(root, p + Vector3(0, -0.6, -1.0), Vector3(10.0, 1.0, 8.0), "wall/concrete_dark", {"solid": false, "tile": 1.5})
-	Props.place(root, "waiting_chairs", p + Vector3(-3.5, 0, -2.0), 90.0, 1.0)
-	Props.place(root, "lantern_post_city", p + Vector3(3.5, 0, -2.5), 0.0, 1.0, {"collision": "cylinder"})
-	Kit.light(root, p + Vector3(3.5, 3.0, -2.5), Color(1.0, 0.9, 0.75), 1.1, 9.0)
-	Kit.box(root, p + Vector3(3.5, 1.5, -4.0), Vector3(0.1, 3.0, 0.1), "metal/iron")
-	Readable.create(root, p + Vector3(3.5, 2.3, -4.0), 0.0, "Read the station sign", [
+	Kit.floor(root, p + Vector3(0, 0, 0.75), Vector2(10.0, 2.5), "wall/concrete", {"tile": 1.5, "thick": 1.0, "all_faces": true})
+	for sx in [-1.0, 1.0]:
+		Kit.box(root, p + Vector3(sx * 5.0, 0.5, 0.75), Vector3(0.1, 1.0, 2.5), "metal/iron")
+		Kit.box(root, p + Vector3(sx * 3.6, 0.5, 1.95), Vector3(2.8, 1.0, 0.1), "metal/iron")
+	Props.place(root, "waiting_chairs", p + Vector3(-3.6, 0, 0.9), 90.0, 1.0)
+	Props.place(root, "lantern_post_city", p + Vector3(3.8, 0, 0.6), 0.0, 1.0, {"collision": "cylinder"})
+	Kit.light(root, p + Vector3(3.8, 3.0, 0.6), Color(1.0, 0.9, 0.75), 1.1, 9.0)
+	Kit.box(root, p + Vector3(4.2, 1.5, -1.6), Vector3(0.1, 3.0, 0.1), "metal/iron")
+	Readable.create(root, p + Vector3(4.2, 2.3, -1.6), 180.0, "Read the station sign", [
 		"BETWEEN. That is the whole name of the station. It is between stations, and it is not on the board.",
 		"Nobody gets off here. You have. The train, held still, waits with the patience of a thing that does not know it has stopped.",
 	], {"name": "BetweenSign", "sign": "signs/kd_between", "sign_size": Vector2(1.2, 0.45), "size": Vector3(1.3, 0.6, 0.3), "note_key": "dream_between", "note_title": "Between", "note_text": "You held the hour and the train had a front, and beyond it a platform called BETWEEN, which is not on the board. From it, a brook. Off its edge, nothing."})
-	Kit.trigger(root, p + Vector3(0, 1.0, 0), Vector3(8.0, 3.0, 6.0), func(_p: Node) -> void:
+	Kit.trigger(root, p + Vector3(0, 1.0, -0.5), Vector3(8.0, 3.0, 4.0), func(_p: Node) -> void:
 		if not Game.has_flag("dream_off_train"):
 			Game.set_flag("dream_off_train", true)
 			Game.toast.emit("You have got off a train that does not stop, between stations."), {"name": "OffTrain", "once": true})
-	# the strip to the brook
-	Kit.floor(root, Vector3(0, 0, -39.5), Vector2(6.0, 3.0), "wall/concrete", {"tile": 1.5})
 	area.rng.randf()
 	state.van = z0
 
@@ -365,6 +402,14 @@ static func _tick(state: Dictionary, delta: float) -> void:
 		return
 	state.t += delta
 	state.clack += delta
+	for el in state.scenery:
+		var n: Node3D = el
+		var z: float = n.position.z + LANE_SPEED * delta
+		if z > LANE_L * 0.5:
+			z -= LANE_L
+		n.position.z = z
+		# hidden once wholly inside a shed, so its going round is never seen
+		n.visible = absf(z) < SHED_Z + LANE_PITCH * 0.5 - 0.2
 	if state.clack > 1.1:
 		state.clack = 0.0
 		var p := Game.player as Player

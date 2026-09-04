@@ -151,7 +151,8 @@ static func _freeze(state: Dictionary, frozen: bool) -> void:
 # --- the deck that drifts ---------------------------------------------------------------
 
 static func _boat(_area: AreaBase, root: Node3D, state: Dictionary) -> void:
-	var start := SHOP + Vector3(0, 0, -SHOP_D * 0.5 - 5.0)
+	# the boat rides a hand above the water, so its deck is never in the water's plane
+	var start := SHOP + Vector3(0, 0.12, -SHOP_D * 0.5 - 5.0)
 	var cw := Clockwork.create(root, start, {"mode": "path", "points": [Vector3.ZERO, Vector3(0, 0, -13.0)], "speed_deg": 6.0, "platform": true, "name": "Boat"})
 	state.boat = cw
 	var deck := cw.body
@@ -182,7 +183,7 @@ static func _boat(_area: AreaBase, root: Node3D, state: Dictionary) -> void:
 static func _island(area: AreaBase, root: Node3D) -> void:
 	var c := ISLAND
 	Kit.cylinder(root, c + Vector3(0, BED_Y, 0), 7.0, 1.3, "ground/sand", {"tint": Color(0.95, 0.9, 0.85), "segments": 14, "tile": 2.0})
-	Kit.cylinder(root, c + Vector3(0, BED_Y, 0), 6.2, 1.5, "ground/sand", {"tint": Color(0.95, 0.9, 0.85), "segments": 14, "tile": 2.0})
+	Kit.cylinder(root, c + Vector3(0, BED_Y + 0.2, 0), 6.2, 1.3, "ground/sand", {"tint": Color(0.95, 0.9, 0.85), "segments": 14, "tile": 2.0})
 	# the rock: a Slow Sea stack with a stair round it to a landing seven metres up
 	Kit.cylinder(root, c + Vector3(0, 0.3, 0), 2.4, ISLAND_TOP - 0.3, "stone/blocks_sea", {"tint": Color(0.95, 0.85, 0.95), "segments": 10, "tile": 3.0})
 	var flights := 4
@@ -269,8 +270,8 @@ static func _quay(area: AreaBase, root: Node3D) -> void:
 		Props.place(root, "pillar_tiled", Vector3(float(sx), QUAY_Y, QUAY_Z - 8.0), 0.0, 1.0, {"collision": "cylinder"})
 		Kit.light(root, Vector3(float(sx), QUAY_Y + 4.0, QUAY_Z - 8.0), MINT, 1.0, 12.0)
 	# hedges along the quay's edges, at its height
-	KD.hedge(root, Vector3(-KD.HALF - 1.2, QUAY_Y, QUAY_Z), Vector3(-KD.HALF - 1.2, QUAY_Y, -KD.RIM), {"tint": Color(0.9, 1.0, 0.9)})
-	KD.hedge(root, Vector3(KD.HALF + 1.2, QUAY_Y, -KD.RIM), Vector3(KD.HALF + 1.2, QUAY_Y, QUAY_Z), {"tint": Color(0.9, 1.0, 0.9)})
+	KD.hedge(root, Vector3(-KD.HALF - 0.6, QUAY_Y, QUAY_Z), Vector3(-KD.HALF - 0.6, QUAY_Y, -KD.RIM + 0.6), {"tint": Color(0.9, 1.0, 0.9)})
+	KD.hedge(root, Vector3(KD.HALF + 0.6, QUAY_Y, -KD.RIM + 0.6), Vector3(KD.HALF + 0.6, QUAY_Y, QUAY_Z), {"tint": Color(0.9, 1.0, 0.9)})
 	Kit.particles(root, Vector3(0, QUAY_Y + 0.5, QUAY_Z - 10.0), "fog", Vector3(40.0, 0.5, 8.0), 20)
 	area.rng.randf()
 

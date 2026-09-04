@@ -52,16 +52,12 @@ const DEFS := [
 		"fog": Color("#c8bfe6"), "fog_density": 0.011, "ambient": Color("#d8d0f0"), "bg": Color("#1a1430"), "sun": Color("#e8e0ff"), "sky": Color(0.85, 0.8, 1.0)},
 ]
 
-## The march, by square index. Odd visits walk the ranks in order; even visits
-## have the board dealt differently, with two forward brooks running back.
-const ORDER_ODD := [0, 1, 2, 3, 4, 5, 6, 7]
-const ORDER_EVEN := [0, 1, 5, 2, 6, 3, 4, 7]
-## Squares whose forward brook leaves by a side edge instead of the far one.
-const SIDE_EXITS_EVEN := {5: "E", 6: "E"}
+## The march, by square index: the ranks in order, the same on every visit,
+## so the board a player learns is the board they come back to.
+const ORDER := [0, 1, 2, 3, 4, 5, 6, 7]
 ## Brooks that run backwards: [from square, from edge, to square, to edge]. "WALL" is
 ## the brook on top of the wall in the sixth square, which the square builds itself.
-const BACKS_ODD := [[4, "WALL", 0, "E"], [7, "N", 2, "W"]]
-const BACKS_EVEN := [[5, "N", 0, "E"], [6, "N", 2, "E"], [4, "WALL", 0, "W"], [7, "N", 2, "W"]]
+const BACKS := [[4, "WALL", 0, "E"], [7, "N", 2, "W"]]
 
 var sq: Array = []            # per square index: {node, origin, def, anchors, fords}
 var order: Array = []
@@ -83,7 +79,7 @@ func build() -> void:
 	sky = r.get("sky")
 	if sun:
 		sun.directional_shadow_max_distance = 90.0
-	order = ORDER_ODD if visit_count % 2 == 1 else ORDER_EVEN
+	order = ORDER
 	_plan_fords()
 	for i in DEFS.size():
 		_build_square(i)
@@ -107,15 +103,12 @@ func _plan_fords() -> void:
 	sq = []
 	for i in DEFS.size():
 		sq.append({"def": DEFS[i], "origin": Vector3(i * GAP, float(DEFS[i].y), 0.0), "fords": {}, "anchors": {}, "node": null, "index": i})
-	var side_exits: Dictionary = SIDE_EXITS_EVEN if visit_count % 2 == 0 else {}
 	for k in order.size() - 1:
 		var a: int = order[k]
 		var b: int = order[k + 1]
-		var edge: String = String(side_exits.get(a, "N"))
-		sq[a].fords[edge] = {"kind": "leave", "other": b, "other_edge": "S", "two_way": true}
-		sq[b].fords["S"] = {"kind": "arrive", "other": a, "other_edge": edge, "two_way": true}
-	var backs: Array = BACKS_ODD if visit_count % 2 == 1 else BACKS_EVEN
-	for bk in backs:
+		sq[a].fords["N"] = {"kind": "leave", "other": b, "other_edge": "S", "two_way": true}
+		sq[b].fords["S"] = {"kind": "arrive", "other": a, "other_edge": "N", "two_way": true}
+	for bk in BACKS:
 		var a: int = bk[0]
 		var ea: String = bk[1]
 		var b: int = bk[2]
@@ -151,7 +144,7 @@ func _build_square(i: int) -> void:
 	for other in DEFS:
 		if other.id != d.id:
 			paints.append(other.paint)
-	KD.painted_board(node, 0.0, paints, hash(String(d.id)) ^ (visit_count * 7919))
+	KD.painted_board(node, 0.0, paints, hash(String(d.id)))
 	# the square's own contents
 	var ctx := {"index": i, "def": d, "visit": visit_count, "fords": s.fords, "order": order, "march": order.find(i), "area": self}
 	var anchors: Dictionary = {}
@@ -166,7 +159,7 @@ func _build_square(i: int) -> void:
 			continue
 		var f: Dictionary = s.fords[edge]
 		var other: Dictionary = DEFS[int(f.other)]
-		var fo := {"gate": bool(anchors.get("gates", {}).get(edge, true))}
+		var fo := {"gate": bool(anchors.get("gates", {}).get(edge, true)), "other_gates": s.fords.keys()}
 		var anchor := KD.ford(node, edge, float(edge_y.get(edge, 0.0)), d, other, fo)
 		anchors[edge] = anchor
 	# someone tall, further away in every square

@@ -46,7 +46,9 @@ static func create(parent: Node, pos: Vector3, yaw_deg: float, prompt_: String, 
 		var mo := {"solid": false}
 		if opts.has("layer"):
 			mo["layer"] = opts.layer
-		Kit.sign(r, String(opts.sign), Vector3(0, size.y * 0.5, 0), 0.0, s, mo)
+		# a touch in front of the readable's own plane, so a note pinned on a
+		# wall never lies in the wall's face
+		Kit.sign(r, String(opts.sign), Vector3(0, size.y * 0.5, -0.015), 0.0, s, mo)
 	if opts.has("model"):
 		Props.place(r, String(opts.model), Vector3.ZERO, 0.0, float(opts.get("scale", 1.0)), {"collision": String(opts.get("collision", "box"))})
 	return r

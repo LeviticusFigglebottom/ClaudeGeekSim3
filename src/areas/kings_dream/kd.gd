@@ -69,7 +69,10 @@ static func rim(parent: Node, y: float, tint: Color = HEDGE_TINT) -> void:
 	var r := RIM
 	var e := HALF + 1.2
 	var corners := [Vector3(-e, y, -r), Vector3(e, y, -r), Vector3(e, y, r), Vector3(-e, y, r)]
-	var sides := [[Vector3(-e, y, -r), Vector3(e, y, -r)], [Vector3(e, y, -r), Vector3(e, y, r)], [Vector3(e, y, r), Vector3(-e, y, r)], [Vector3(-e, y, r), Vector3(-e, y, -r)]]
+	# the east and west sides stop where the north and south ones begin, so
+	# the corners are not two hedges in one place
+	var ri := r - HEDGE_T * 0.5
+	var sides := [[Vector3(-e, y, -r), Vector3(e, y, -r)], [Vector3(e, y, -ri), Vector3(e, y, ri)], [Vector3(e, y, r), Vector3(-e, y, r)], [Vector3(-e, y, ri), Vector3(-e, y, -ri)]]
 	for s in sides:
 		hedge(parent, s[0], s[1], {"tint": tint})
 	for i in 4:
@@ -83,10 +86,24 @@ static func rim(parent: Node, y: float, tint: Color = HEDGE_TINT) -> void:
 
 
 ## The inner hedge line before a ford, with a gap in the middle of it.
-static func gate(parent: Node, edge: String, y: float, tint: Color = HEDGE_TINT, gap_w: float = GATE_W) -> void:
+static func gate(parent: Node, edge: String, y: float, tint: Color = HEDGE_TINT, gap_w: float = GATE_W, other_gates: Array = []) -> void:
 	var hw := gap_w * 0.5
-	hedge(parent, at(edge, GATE, -HALF - 0.6, y), at(edge, GATE, -hw, y), {"tint": tint})
-	hedge(parent, at(edge, GATE, hw, y), at(edge, GATE, HALF + 0.6, y), {"tint": tint})
+	# the hedge reaches the rim's face and no further, and where another edge
+	# has a gate too it stops at that gate's hedge instead of crossing it
+	hedge(parent, _clip(at(edge, GATE, -HALF, y), edge, other_gates), at(edge, GATE, -hw, y), {"tint": tint})
+	hedge(parent, at(edge, GATE, hw, y), _clip(at(edge, GATE, HALF, y), edge, other_gates), {"tint": tint})
+
+
+static func _clip(p: Vector3, edge: String, other_gates: Array) -> Vector3:
+	for o in other_gates:
+		if String(o) == edge:
+			continue
+		match String(o):
+			"N": p.z = maxf(p.z, -GATE + HEDGE_T * 0.5)
+			"S": p.z = minf(p.z, GATE - HEDGE_T * 0.5)
+			"E": p.x = minf(p.x, GATE - HEDGE_T * 0.5)
+			"W": p.x = maxf(p.x, -GATE + HEDGE_T * 0.5)
+	return p
 
 
 ## Everything a brook needs on one edge of a square except the seam: the bank
@@ -95,15 +112,17 @@ static func gate(parent: Node, edge: String, y: float, tint: Color = HEDGE_TINT,
 static func ford(parent: Node, edge: String, y: float, this_def: Dictionary, other_def: Dictionary, opts: Dictionary = {}) -> Dictionary:
 	var ns := edge == "N" or edge == "S"
 	var strip := func(along: float, depth: float, tex: String, tint: Color, lift: float) -> void:
-		var size := Vector2(SQ + 2.0, depth) if ns else Vector2(depth, SQ + 2.0)
+		# the east and west strips stop where the north and south ones begin,
+		# so no two fords lie over each other in a corner
+		var size := Vector2(SQ + 2.0, depth) if ns else Vector2(depth, GATE * 2.0)
 		Kit.floor(parent, at(edge, along, 0.0, y + lift), size, tex, {"tint": tint, "tile": 2.0, "thick": 0.12})
 	if bool(opts.get("gate", true)):
-		gate(parent, edge, y, this_def.get("hedge", HEDGE_TINT), float(opts.get("gap", GATE_W)))
+		gate(parent, edge, y, this_def.get("hedge", HEDGE_TINT), float(opts.get("gap", GATE_W)), opts.get("other_gates", []))
 	# the near bank
 	strip.call(GATE + 1.0, 2.0, String(this_def.ground), this_def.get("tint", Color.WHITE), 0.1)
 	# the bed and the water
 	strip.call(BROOK, BROOK_W, "ground/pebbles", Color(0.9, 0.95, 1.0), 0.09)
-	var wsize := Vector2(SQ + 2.0, BROOK_W) if ns else Vector2(BROOK_W, SQ + 2.0)
+	var wsize := Vector2(SQ + 2.0, BROOK_W) if ns else Vector2(BROOK_W, GATE * 2.0)
 	var water := Kit.water(parent, at(edge, BROOK, 0.0, y + 0.2), wsize, "nature/water_sea", {"tint": opts.get("water", this_def.get("water", Color(0.8, 0.85, 1.0, 0.75))), "uv_scale": 0.5, "speed": 0.05, "swell": 0.02})
 	water.name = "Brook_" + edge
 	# the far bank, which is the other square's

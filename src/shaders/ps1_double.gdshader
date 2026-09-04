@@ -13,6 +13,7 @@ uniform float emission_energy = 1.0;
 uniform float alpha_scissor : hint_range(0.0, 1.0) = 0.0;
 uniform float snap : hint_range(0.0, 512.0) = 200.0;
 uniform float affine : hint_range(0.0, 1.0) = 0.35;
+uniform float depth_bias : hint_range(0.0, 0.05) = 0.0;
 uniform bool use_vertex_color = false;
 uniform float specular_amt : hint_range(0.0, 1.0) = 0.05;
 uniform float scroll_x = 0.0;
@@ -22,7 +23,13 @@ varying vec2 uv_affine;
 varying float w_var;
 
 void vertex() {
-	vec4 clip = PROJECTION_MATRIX * MODELVIEW_MATRIX * vec4(VERTEX, 1.0);
+	vec4 view = MODELVIEW_MATRIX * vec4(VERTEX, 1.0);
+	if (depth_bias > 0.0) {
+		// a decal on a surface: drawn a little nearer the eye along its own
+		// sight line, so it never flickers against what it lies on
+		view.xyz *= (1.0 - depth_bias);
+	}
+	vec4 clip = PROJECTION_MATRIX * view;
 	if (snap > 0.0 && clip.w > 0.0) {
 		vec2 grid = vec2(snap, snap * 0.5625);
 		clip.xy = floor(clip.xy / clip.w * grid + 0.5) / grid * clip.w;

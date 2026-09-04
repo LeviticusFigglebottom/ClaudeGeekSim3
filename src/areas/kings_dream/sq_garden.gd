@@ -171,12 +171,12 @@ static func _paths(root: Node3D) -> void:
 	var tint := Color(1.0, 0.95, 0.85)
 	# from the lawn north to the mouth of the maze, and out to the beds either side
 	Kit.floor(root, Vector3(0, 0.1, 12.0), Vector2(4.0, 28.0), "ground/gravel", {"tint": tint, "tile": 1.5, "thick": 0.12})
-	Kit.floor(root, Vector3(0, 0.1, 18.0), Vector2(60.0, 3.0), "ground/gravel", {"tint": tint, "tile": 1.5, "thick": 0.12})
+	Kit.floor(root, Vector3(0, 0.12, 18.0), Vector2(60.0, 3.0), "ground/gravel", {"tint": tint, "tile": 1.5, "thick": 0.12})
 	# and north of the maze, to the gate
-	Kit.floor(root, Vector3(0, 0.1, -33.0), Vector2(4.0, 12.0), "ground/gravel", {"tint": tint, "tile": 1.5, "thick": 0.12})
+	Kit.floor(root, Vector3(0, 0.1, -32.4), Vector2(4.0, 11.2), "ground/gravel", {"tint": tint, "tile": 1.5, "thick": 0.12})
 	Kit.floor(root, Vector3(-32.0, 0.1, -15.0), Vector2(3.0, 40.0), "ground/gravel", {"tint": tint, "tile": 1.5, "thick": 0.12})
 	Kit.floor(root, Vector3(32.0, 0.1, -15.0), Vector2(3.0, 40.0), "ground/gravel", {"tint": tint, "tile": 1.5, "thick": 0.12})
-	Kit.floor(root, Vector3(0, 0.1, -33.0), Vector2(66.0, 3.0), "ground/gravel", {"tint": tint, "tile": 1.5, "thick": 0.12})
+	Kit.floor(root, Vector3(0, 0.12, -33.0), Vector2(66.0, 3.0), "ground/gravel", {"tint": tint, "tile": 1.5, "thick": 0.12})
 
 
 ## Two beds of paper roses. The near end of each has been painted.
@@ -418,12 +418,13 @@ static func _hill(area: AreaBase, root: Node3D) -> void:
 		var steps := 12
 		var step_d := d.length() / steps
 		Kit.stairs(root, l0, Kit.dir_to_yaw(d.normalized()), 1.7, steps, rise / steps, step_d, tex, {"tint": Color(1.0, 0.85, 0.9) if i % 2 == 0 else Color(0.85, 0.95, 0.9), "tile": 1.0, "name": "HillFlight%d" % i})
-		Kit.floor(root, l0 + Vector3(0, 0.0, 0), Vector2(1.9, 1.9), tex, {"tint": Color(0.95, 0.9, 0.95), "tile": 1.0})
+		# landings a shade above the flights' feet and the ground, never in their plane
+		Kit.floor(root, l0 + Vector3(0, 0.03, 0), Vector2(1.9, 1.9), tex, {"tint": Color(0.95, 0.9, 0.95), "tile": 1.0})
 		if i % 2 == 1:
 			Kit.light(root, l0 + Vector3(0, 2.2, 0), Color(1.0, 0.85, 0.9), 0.7, 8.0)
 	# the last flight lands on the top: a bridge from the landing to the mound
 	var top_l := HILL + Kit.polar(r, flights * 45.0, HILL_TOP)
-	Kit.floor(root, top_l, Vector2(1.9, 1.9), tex, {"tint": Color(0.95, 0.9, 0.95), "tile": 1.0})
+	Kit.floor(root, top_l + Vector3(0, 0.03, 0), Vector2(1.9, 1.9), tex, {"tint": Color(0.95, 0.9, 0.95), "tile": 1.0})
 	Kit.floor(root, (top_l + HILL + Vector3(0, HILL_TOP, 0)) * 0.5, Vector2(1.6, r), tex, {"tint": Color(0.95, 0.9, 0.95), "tile": 1.0, "yaw": Kit.dir_to_yaw((HILL - top_l).normalized()) + 90.0})
 	Props.place(root, "arch_pastel", HILL + Vector3(0, HILL_TOP, 0), 90.0, 1.2, {"collision": "none"})
 	Kit.light(root, HILL + Vector3(0, HILL_TOP + 3.0, 0), Color(1.0, 0.9, 0.95), 1.2, 14.0)

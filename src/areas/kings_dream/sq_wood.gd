@@ -56,7 +56,7 @@ static func _rows(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 	for ix in range(-14, 15):
 		for iz in range(-12, 13):
 			var x := ix * 5.0 + (2.5 if iz % 2 == 0 else 0.0)
-			var z := iz * 5.0 + 2.0
+			var z := iz * 5.0 + 2.3
 			# the paths: the way in, the avenue and the clearing, the way out, and the side ways
 			if absf(x) < 3.2 and z > -40.0:
 				continue

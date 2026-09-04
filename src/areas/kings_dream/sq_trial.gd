@@ -147,9 +147,9 @@ static func _trench(area: AreaBase, root: Node3D) -> void:
 	# end, rising west to the far side, and one along the south wall at the west end,
 	# rising east to the side you came from
 	Kit.stairs(root, Vector3(42.0, TRENCH_Y, TRENCH_Z1 + 1.0), 90.0, 1.8, 24, -TRENCH_Y / 24.0, 0.4, "stone/blocks_furnace", {"tile": 1.0, "name": "TrenchStairN"})
-	Kit.floor(root, Vector3(32.0, 0.0, TRENCH_Z1 + 0.2), Vector2(2.4, 2.4), "stone/blocks_furnace", {"tile": 1.0})
+	Kit.floor(root, Vector3(32.0, 0.03, TRENCH_Z1 + 0.2), Vector2(2.4, 2.4), "stone/blocks_furnace", {"tile": 1.0, "thick": 0.06})
 	Kit.stairs(root, Vector3(-42.0, TRENCH_Y, TRENCH_Z0 - 1.0), -90.0, 1.8, 24, -TRENCH_Y / 24.0, 0.4, "stone/blocks_furnace", {"tile": 1.0, "name": "TrenchStairS"})
-	Kit.floor(root, Vector3(-32.0, 0.0, TRENCH_Z0 - 0.2), Vector2(2.4, 2.4), "stone/blocks_furnace", {"tile": 1.0})
+	Kit.floor(root, Vector3(-32.0, 0.03, TRENCH_Z0 - 0.2), Vector2(2.4, 2.4), "stone/blocks_furnace", {"tile": 1.0, "thick": 0.06})
 	Kit.light(root, Vector3(40.0, TRENCH_Y + 3.0, cz), EMBER, 1.0, 10.0)
 	Kit.light(root, Vector3(-40.0, TRENCH_Y + 3.0, cz), EMBER, 1.0, 10.0)
 	Readable.create(root, Vector3(0, TRENCH_Y + 0.6, cz), 0.0, "The bottom of the trench", [
@@ -168,7 +168,7 @@ static func _trench(area: AreaBase, root: Node3D) -> void:
 static func _court(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 	var c := COURT
 	var rows := MapBuilder.rasterize(11, 11, [[1, 1, 10, 10, "."]], [[5, 10, "D"], [5, 0, "D"]], [[5, 2, "b"], [5, 5, "d"]])
-	var m := MapBuilder.build(root, rows, {"cell": 2.0, "height": 6.0, "origin": c + Vector3(-11.0, 0, -11.0), "door_h": 3.0, "tile": 2.0,
+	var m := MapBuilder.build(root, rows, {"cell": 2.0, "height": 6.0, "origin": c + Vector3(-11.0, 0.1, -11.0), "door_h": 3.0, "tile": 2.0,
 		"floor": "wood/planks_dark", "wall": "wall/wallpaper_damask_red", "ceiling": "wood/planks_dark", "name": "Court", "outer_faces": true})
 	var bench: Vector3 = m.first.call("b")
 	var dock: Vector3 = m.first.call("d")

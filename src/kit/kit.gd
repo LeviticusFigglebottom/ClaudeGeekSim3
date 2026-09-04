@@ -116,6 +116,12 @@ static func shader(kind: String) -> Shader:
 ## emission_energy (float), alpha (bool: force alpha scissor), uv_scale (Vector2),
 ## uv_offset (Vector2), vertex_color (bool), affine (float), snap (float),
 ## specular (float), scroll (Vector2), transparent (bool, alpha blend via Standard).
+## How much nearer the eye a floor or ceiling is drawn than the geometry it
+## shares a plane with (a fraction of its distance: 5 mm at ten metres).
+## Overlays on a floor (rings, path patches) use more, see _mat_opts.
+const FLOOR_BIAS := 0.0005
+
+
 static func mat(tex_name: String, opts: Dictionary = {}) -> Material:
 	var key := tex_name + "|" + str(opts)
 	if _mat_cache.has(key):
@@ -145,6 +151,7 @@ static func mat(tex_name: String, opts: Dictionary = {}) -> Material:
 		sm.set_shader_parameter("alpha_scissor", 0.5 if alpha else 0.0)
 		sm.set_shader_parameter("use_vertex_color", bool(opts.get("vertex_color", false)))
 		sm.set_shader_parameter("affine", float(opts.get("affine", 0.35)))
+		sm.set_shader_parameter("depth_bias", float(opts.get("depth_bias", 0.0)))
 		sm.set_shader_parameter("snap", float(opts.get("snap", 200.0)))
 		sm.set_shader_parameter("specular_amt", float(opts.get("specular", 0.05)))
 		if opts.has("scroll"):
@@ -344,9 +351,13 @@ static func box(parent: Node, pos: Vector3, size: Vector3, tex_name: String, opt
 
 static func _mat_opts(opts: Dictionary) -> Dictionary:
 	var o := {}
-	for k in ["tint", "unshaded", "double", "emission", "emission_energy", "alpha", "uv_scale", "uv_offset", "vertex_color", "affine", "snap", "specular", "scroll", "transparent"]:
+	for k in ["tint", "unshaded", "double", "emission", "emission_energy", "alpha", "uv_scale", "uv_offset", "vertex_color", "affine", "snap", "specular", "scroll", "transparent", "depth_bias"]:
 		if opts.has(k):
 			o[k] = opts[k]
+	# an overlay lies on another surface (a path on the ground, a rug, a stain):
+	# it is drawn a touch nearer the eye so the two never flicker
+	if bool(opts.get("overlay", false)) and not o.has("depth_bias"):
+		o["depth_bias"] = 0.004
 	return o
 
 
@@ -355,6 +366,10 @@ static func floor(parent: Node, pos: Vector3, size: Vector2, tex_name: String, o
 	var thick := float(opts.get("thick", 0.2))
 	var o := opts.duplicate()
 	o["faces"] = ["py"] if not opts.get("all_faces", false) else []
+	# a floor lies over whatever else was built to its height (the top of a
+	# wall, a terrain cell): drawn a hair nearer the eye, it is the one seen
+	if not o.has("depth_bias") and not o.has("overlay"):
+		o["depth_bias"] = FLOOR_BIAS
 	return box(parent, pos - Vector3(0, thick * 0.5, 0), Vector3(size.x, thick, size.y), tex_name, o)
 
 
@@ -365,6 +380,8 @@ static func ceiling(parent: Node, pos: Vector3, size: Vector2, tex_name: String,
 	o["faces"] = ["ny"] if not opts.get("all_faces", false) else []
 	if not o.has("cast_shadow"):
 		o["cast_shadow"] = false
+	if not o.has("depth_bias") and not o.has("overlay"):
+		o["depth_bias"] = FLOOR_BIAS
 	return box(parent, pos + Vector3(0, thick * 0.5, 0), Vector3(size.x, thick, size.y), tex_name, o)
 
 
@@ -530,6 +547,8 @@ static func arch(parent: Node, pos: Vector3, yaw_deg: float, width: float, heigh
 
 
 ## Heightmap terrain. `height_fn.call(x, z) -> float`, `color_fn.call(x, z, h) -> Color` (optional).
+## opts.holes: Array of Rect2 (world x, z) whose cells are left out of mesh and
+## collision both, for a stair or a cellar that has to go down through the ground.
 static func terrain(parent: Node, pos: Vector3, size: Vector2, res: int, height_fn: Callable, tex_name: String, opts: Dictionary = {}) -> MeshInstance3D:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -553,12 +572,21 @@ static func terrain(parent: Node, pos: Vector3, size: Vector2, res: int, height_
 			var z := -d * 0.5 + d * j / res
 			vrow.append(Vector3(x, heights[j][i], z))
 		verts.append(vrow)
+	var holes: Array = opts.get("holes", [])
 	for j in res:
 		for i in res:
 			var a: Vector3 = verts[j][i]
 			var b: Vector3 = verts[j][i + 1]
 			var c: Vector3 = verts[j + 1][i + 1]
 			var dd: Vector3 = verts[j + 1][i]
+			if not holes.is_empty():
+				var centre := Vector2((a.x + c.x) * 0.5 + pos.x, (a.z + c.z) * 0.5 + pos.z)
+				var skip := false
+				for h in holes:
+					if (h as Rect2).has_point(centre):
+						skip = true
+				if skip:
+					continue
 			var tris := [[a, b, c], [a, c, dd]] if (i + j) % 2 == 0 else [[a, b, dd], [b, c, dd]]
 			for tri in tris:
 				var n: Vector3 = (tri[2] - tri[0]).cross(tri[1] - tri[0]).normalized()
@@ -1021,9 +1049,16 @@ static func ring(parent: Node, pos: Vector3, r_in: float, r_out: float, segments
 	var mesh := mesh_from_quads(quads)
 	var o := opts.duplicate()
 	o["shape"] = "trimesh"
+	# a ring with no collision is a mark on the ground it lies on
+	if not o.has("depth_bias"):
+		if not bool(opts.get("solid", true)):
+			# the smaller the ring the nearer it is drawn, so rings laid on rings read in order
+			o["depth_bias"] = 0.003 + 0.002 * clampf(1.0 - r_out / 10.0, 0.0, 1.0)
+		else:
+			o["depth_bias"] = FLOOR_BIAS
 	if not o.has("surface"):
 		o["surface"] = surface_of(tex_name)
-	return add_mesh(parent, mesh, opts.get("mat", mat(tex_name, _mat_opts(opts))), pos, o)
+	return add_mesh(parent, mesh, opts.get("mat", mat(tex_name, _mat_opts(o))), pos, o)
 
 
 ## A circular wall of `segments` flat panels facing inward. opts.gaps: Array of

@@ -158,6 +158,11 @@ Sounds: `Audio.sfx("bell_big", position)`; ambience is chosen by the registry.
 
 ## Checklist before you call an area done
 1. `tools/verify.sh` is green (every door target exists, routes solve).
+   Then `.bin/godot --headless --path . res://tools/coplanar.tscn -- --area=<id>`
+   lists surfaces that share a plane and flicker against each other; fix
+   every FIGHT it prints for your area (floors get a small depth bias for
+   free, rugs and rings are drawn as overlays; two walls in one plane, or a
+   floor laid on a floor, you move).
 2. `tools/shot.sh <id> out.png [spawn] [yaw,pitch] [--pos=x,y,z] [--give=lantern] [--visits=<id>:2]`
    looks like a place, not a box (open the PNG and check from several spots):
    at least three light sources, a floor/ceiling/sky, props with silhouettes, one

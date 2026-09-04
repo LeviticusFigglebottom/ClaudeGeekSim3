@@ -83,7 +83,7 @@ That is the whole layout of this area.
   is a corridor.
 * **Gliding up reveals a different board.** With the Wings, from the high
   points, the player can see the squares laid out. The arrangement they see is
-  not the arrangement they walked. Neither is it stable between visits.
+  not the arrangement they walked.
 * **Some brooks run backwards.** Two of the eight lead to a square the player
   has already crossed, entered from a different edge, changed. Both are
   optional and both hold secrets.
@@ -316,30 +316,31 @@ stop all particles, and have every face in the area open its eyes.
 
 ## 8. Getting in and out
 
-**In.** The stone telephone in the Keep's dream bedroom, `DreamPhone` in
-`castle.gd`. It already reads *"You do not pick it up. It would be somebody
-asking to be woken."* Convert it from a `Readable` to an `Interactable`:
+**In.** The Red King himself, asleep in the Keep's dream bedroom
+(`castle.gd`). Once the player has disturbed him (`king_disturbed`) and cut
+the tapestry (`tapestry_cut`), talking to him again is the way in:
 
-* Without both keepsakes: the existing lines, unchanged.
-* Holding **Moth Wings** and **Hourglass**: you pick it up, and you fall.
+* Without both keepsakes: he mutters a hint about what is missing (the Wings,
+  the Hourglass, or both).
+* Holding **Moth Wings** and **Hourglass**: you fall.
 
 The fall is the rabbit hole and is the area's opening shot. Two or three
 seconds, drifting past shelves of objects from every realm the player has been
 to, arranged like a museum with the labels swapped. Land unhurt on Square 2.
-Set flag `answered_the_phone`.
 
-Declare the route in `castle.gd`, where it begins:
+The route is declared in `castle.gd`, where it begins:
 
 ```
-Puzzle.declare(self, "kings_dream_phone", "answered_the_phone",
-    ["keepsake:wings", "keepsake:hourglass"],
-    "answer the stone telephone in the King's dream bedroom",
-    {"route": "kings_dream:from_phone"})
+Puzzle.declare(self, "kings_dream_door", "kings_dream_entered",
+    ["keepsake:wings", "keepsake:hourglass", "flag:king_disturbed", "flag:tapestry_cut"],
+    ..., {"route": "kings_dream:from_king"})
 ```
 
-**Out.** Square 8 exits to `nexus:from_kings_dream`. Add a thirteenth arch to
-the Anteroom keyed on flag `visited_kings_dream`, in the style of the existing
-`cistern` entry in `nexus.gd`, so the return trip is one door.
+The stone telephone is untouched; there is no arch to the dream in the
+Anteroom.
+
+**Out.** Square 8 exits to `nexus:from_kings_dream`: a plain spawn beside the
+well, no door. The way back in is the King again.
 
 **Falling.** Off a hedge, off the wall, off the board: `World.fall_out()`,
 which already lands the player in the Static. Falling out of the Red King's
@@ -476,9 +477,9 @@ At least six, in the house style. Suggested:
 ## 12. Returning
 
 * **Visit 1.** As described.
-* **Visit 2.** The board is dealt differently. Same eight squares, different
-  order, and two of the brooks that ran forward now run back. The maze spells
-  a different word.
+* **Visit 2.** The same board, the same order, the same brooks: a player who
+  learned the way keeps it. What changes is inside the squares: the maze
+  spells a different word, the roses are red, the wood has its names.
 * **Visit 3.** The King is not under the tree. The grass holds his shape. The
   two who explain him are still there and are still explaining.
 

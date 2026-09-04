@@ -201,8 +201,8 @@ func _chasm() -> void:
 	Kit.box(self, mid + Vector3(0, (top_y + LOWER_Y + 2.6) * 0.5, -CELL * 0.5 - 0.15), Vector3(6.0, top_y - (LOWER_Y + 2.6), 0.3), wall_tex, {"tile": 2.0})
 	Kit.box(self, mid + Vector3(0, (top_y + LOWER_Y + 2.6) * 0.5, CELL * 0.5 + 0.15), Vector3(6.0, top_y - (LOWER_Y + 2.6), 0.3), wall_tex, {"tile": 2.0})
 	# end walls under the floor edges
-	Kit.box(self, mid + Vector3(-3.0 - 0.1, (LOWER_Y + 2.6) * 0.5, 0), Vector3(0.2, -(LOWER_Y + 2.6), CELL), "stone/blocks_dark", {"tile": 2.0})
-	Kit.box(self, mid + Vector3(3.0 + 0.1, (LOWER_Y + 2.6) * 0.5, 0), Vector3(0.2, -(LOWER_Y + 2.6), CELL), "stone/blocks_dark", {"tile": 2.0})
+	Kit.box(self, mid + Vector3(-3.0 - 0.1, (LOWER_Y + 2.6 - 0.03) * 0.5, 0), Vector3(0.2, -(LOWER_Y + 2.6) - 0.03, CELL), "stone/blocks_dark", {"tile": 2.0})
+	Kit.box(self, mid + Vector3(3.0 + 0.1, (LOWER_Y + 2.6 - 0.03) * 0.5, 0), Vector3(0.2, -(LOWER_Y + 2.6) - 0.03, CELL), "stone/blocks_dark", {"tile": 2.0})
 	Kit.ceiling(self, mid + Vector3(0, top_y, 0), Vector2(6.0, CELL), "stone/blocks_dark")
 	# the bridge
 	var bridge := Kit.box(self, mid + Vector3(0, -0.15, 0), Vector3(6.6, 0.3, 1.3), "wood/planks_grey", {"tile": 1.0, "surface": "wood", "name": "Bridge"})
@@ -491,8 +491,8 @@ func _pool_chamber() -> void:
 	var cor := Vector3(exit_c.x + 1.0 + 1.35, 0, exit_c.z)
 	Kit.floor(self, cor, Vector2(2.7, CELL), "stone/flagstone")
 	Kit.ceiling(self, cor + Vector3(0, H, 0), Vector2(2.7, CELL), "stone/blocks_dark")
-	Kit.box(self, cor + Vector3(0, H * 0.5, -CELL * 0.5 - 0.1), Vector3(2.7, H, 0.2), wall_tex)
-	Kit.box(self, cor + Vector3(0, H * 0.5, CELL * 0.5 + 0.1), Vector3(2.7, H, 0.2), wall_tex)
+	Kit.box(self, cor + Vector3(-0.2, H * 0.5, -CELL * 0.5 - 0.1), Vector3(2.3, H, 0.2), wall_tex)
+	Kit.box(self, cor + Vector3(-0.2, H * 0.5, CELL * 0.5 + 0.1), Vector3(2.3, H, 0.2), wall_tex)
 	# the chamber
 	Kit.ring(self, c, 4.9, 8.6, 24, "stone/flagstone", {"tile": 2.0})
 	Kit.ring(self, c + Vector3(0, -0.45, 0), 0.0, 5.0, 24, "ground/mud", {"surface": "water"})

@@ -222,9 +222,11 @@ def door_frame(rng, door_tex="wood/door", frame_tex="wood/planks_dark", w=1.0, h
     g = GLB("door")
     f = MeshBuilder()
     t = 0.12
-    f.box((-(w / 2 + t / 2), h / 2, 0), (t, h, 0.25), "tex:" + frame_tex, frame_col, uv_scale=0.5)
-    f.box(((w / 2 + t / 2), h / 2, 0), (t, h, 0.25), "tex:" + frame_tex, frame_col, uv_scale=0.5)
-    f.box((0, h + t / 2, 0), (w + 2 * t, t, 0.25), "tex:" + frame_tex, frame_col, uv_scale=0.5)
+    # deeper than any wall it is set in (0.2, 0.25, 0.3), so its faces never
+    # share a plane with the wall's
+    f.box((-(w / 2 + t / 2 - 0.015), h / 2, 0), (t, h, 0.36), "tex:" + frame_tex, frame_col, uv_scale=0.5)
+    f.box(((w / 2 + t / 2 - 0.015), h / 2, 0), (t, h, 0.36), "tex:" + frame_tex, frame_col, uv_scale=0.5)
+    f.box((0, h + t / 2, 0), (w + 2 * t, t, 0.36), "tex:" + frame_tex, frame_col, uv_scale=0.5)
     g.add("Frame", f, extras={"collision": "none"})
     leaf = MeshBuilder()
     # the leaf pivots at its hinge (x = -w/2); geometry offset so the node origin is the hinge
@@ -684,7 +686,7 @@ def tv_crt(rng):
     m.box((-0.15, 0.68, 0.1), (0.02, 0.35, 0.02), "flat", (0.6, 0.6, 0.6))
     g.add("Body", m, extras={"collision": "box"})
     s = MeshBuilder()
-    s.card((0, 0.31, -0.315), (0.5, 0.42), "tex:props/tv_static", (1, 1, 1), yaw=math.pi, double=False)
+    s.card((0, 0.31, -0.33), (0.5, 0.42), "tex:props/tv_static", (1, 1, 1), yaw=math.pi, double=False)
     g.add("Screen", s)
     return g
 
@@ -789,7 +791,7 @@ def mirror_wall(rng, w=0.8, h=1.0, frame="wood/planks_dark"):
     f.box((0, 0, 0), (w + 2 * t, h + 2 * t, 0.05), "tex:" + frame, (1, 1, 1))
     g.add("Frame", f, extras={"collision": "none"})
     s = MeshBuilder()
-    s.card((0, 0, -0.03), (w, h), "tex:props/mirror", (1, 1, 1), yaw=math.pi, double=False)
+    s.card((0, 0, -0.04), (w, h), "tex:props/mirror", (1, 1, 1), yaw=math.pi, double=False)
     g.add("Surface", s)
     return g
 
@@ -848,7 +850,7 @@ def picture(rng, tex, w=0.9, h=0.9, frame_col=(0.65, 0.5, 0.2)):
     f.box((0, 0, 0.0), (w + 2 * t, h + 2 * t, 0.04), "flat", frame_col)
     g.add("Frame", f, extras={"collision": "none"})
     p = MeshBuilder()
-    p.card((0, 0, -0.025), (w, h), "tex:" + tex, (1, 1, 1), yaw=math.pi, double=False)
+    p.card((0, 0, -0.035), (w, h), "tex:" + tex, (1, 1, 1), yaw=math.pi, double=False)
     g.add("Picture", p)
     return g
 
@@ -897,9 +899,9 @@ def clock_grandfather(rng):
     m.box((0, 2.3, 0), (0.7, 0.2, 0.4), "tex:wood/planks_dark", (0.9, 0.9, 0.9))
     g.add("Body", m, extras={"collision": "box"})
     f = MeshBuilder()
-    f.card((0, 1.75, -0.18), (0.45, 0.45), "tex:metal/clock_face", (1, 1, 1), yaw=math.pi, double=False)
-    f.box((0, 1.85, -0.19), (0.02, 0.16, 0.01), "flat", (0.1, 0.08, 0.06))
-    f.box((0.06, 1.75, -0.19), (0.12, 0.02, 0.01), "flat", (0.1, 0.08, 0.06))
+    f.card((0, 1.75, -0.19), (0.45, 0.45), "tex:metal/clock_face", (1, 1, 1), yaw=math.pi, double=False)
+    f.box((0, 1.85, -0.205), (0.02, 0.16, 0.01), "flat", (0.1, 0.08, 0.06))
+    f.box((0.06, 1.75, -0.205), (0.12, 0.02, 0.01), "flat", (0.1, 0.08, 0.06))
     g.add("Face", f)
     p = MeshBuilder()
     p.box((0, -0.45, 0), (0.02, 0.9, 0.02), "flat", hexc("#b58a3c"))

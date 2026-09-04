@@ -30,6 +30,7 @@ func _ready() -> void:
 	Game.time_frozen_changed.connect(on_time_frozen)
 	Game.lantern_changed.connect(on_lantern)
 	Game.mirror_sight_changed.connect(on_mirror_sight)
+	MapBuilder.reset_registry()
 	build()
 	built = true
 	if not spawns.has("default") and spawns.size() > 0:

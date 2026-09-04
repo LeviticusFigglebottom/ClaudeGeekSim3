@@ -145,6 +145,7 @@ func _terrain() -> void:
 
 
 func _paths() -> void:
+	var k := 0
 	for seg in PATHS:
 		var a: Vector2 = seg[0]
 		var b: Vector2 = seg[1]
@@ -155,7 +156,10 @@ func _paths() -> void:
 		for i in n + 1:
 			var p := a + dir * minf(i * 2.8, length)
 			var off := Vector2(-dir.y, dir.x) * rng.randf_range(-0.35, 0.35)
-			Kit.floor(self, Vector3(p.x + off.x, 0.03, p.y + off.y), Vector2(2.3 + rng.randf_range(-0.2, 0.5), 3.3), "ground/dirt", {"solid": false, "yaw": yaw + rng.randf_range(-7.0, 7.0), "thick": 0.04, "tile": 2.0, "cast_shadow": false})
+			# neighbouring patches overlap; drawn at two alternating depths so they
+			# never flicker against each other, both above the clearings' rings
+			Kit.floor(self, Vector3(p.x + off.x, 0.03, p.y + off.y), Vector2(2.3 + rng.randf_range(-0.2, 0.5), 3.3), "ground/dirt", {"solid": false, "yaw": yaw + rng.randf_range(-7.0, 7.0), "thick": 0.04, "tile": 2.0, "cast_shadow": false, "depth_bias": 0.006 + 0.0006 * (k % 5)})
+			k += 1
 	Kit.ring(self, CROSS + Vector3(0, 0.025, 0), 0.0, 4.5, 12, "ground/dirt", {"solid": false})
 	Kit.ring(self, STONES + Vector3(0, 0.025, 0), 0.0, 8.0, 16, "ground/gravel", {"solid": false, "tile": 1.5})
 	Kit.ring(self, HUT + Vector3(0, 0.025, 0), 0.0, 5.5, 12, "ground/dirt", {"solid": false})

@@ -109,8 +109,6 @@ func _cubicles() -> void:
 		else:
 			Props.place(self, "desk_office", _c(cx, 2.75), 180.0, 1.0)
 			Props.place(self, "chair_office", _c(cx, 3.75), 0.0, 1.0)
-			if k % 2 == 0:
-				Props.place(self, "tv_crt", _c(cx - 0.2, 2.7, 0.76), 180.0, 0.5, {"collision": "none"})
 			if k % 3 == 1:
 				Props.place(self, "phone_office", _c(cx + 0.45, 2.75, 0.76), 180.0, 1.0, {"collision": "none"})
 		# south row: desks against the south wall (skipping the two doorways)
@@ -122,8 +120,6 @@ func _cubicles() -> void:
 		else:
 			Props.place(self, "desk_office", _c(cx, 8.25), 0.0, 1.0)
 			Props.place(self, "chair_office", _c(cx, 7.25), 180.0, 1.0)
-			if k % 2 == 1:
-				Props.place(self, "tv_crt", _c(cx + 0.2, 8.3, 0.76), 0.0, 0.5, {"collision": "none"})
 	for x in [4.5, 9.5, 14.5, 19.5, 24.0]:
 		_fluor(x, 5.5)
 	# memos pinned to partitions
@@ -279,7 +275,6 @@ func _loop_corridor() -> void:
 	for x in [5.0, 9.8, 14.6, 24.2, 29.0, 33.8]:
 		Props.place(self, "desk_office", _c(x, 26.5), 180.0, 1.0)
 		Props.place(self, "chair_office", _c(x, 27.4), 0.0, 1.0)
-		Props.place(self, "tv_crt", _c(x - 0.2, 26.45, 0.76), 180.0, 0.5, {"collision": "none"})
 	for x in [7.0, 12.0, 17.0, 22.0, 27.0, 32.0]:
 		Props.place(self, "filing_cabinet", _c(x, 28.55), 0.0, 1.0)
 		Props.place(self, "filing_cabinet", _c(x + 0.8, 28.55), 0.0, 1.0)

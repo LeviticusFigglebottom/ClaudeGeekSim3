@@ -432,8 +432,8 @@ func _kings_dream() -> void:
 	_petrified("radiator", c + Vector3(-1.0, 0, -3.35), 180.0, 1.0, "none")
 	_petrified("boxes_moving", c + Vector3(-2.9, 0, 2.6), 20.0)
 	_petrified("window_night", c + Vector3(0.2, 1.7, -3.42), 180.0, 1.0, "none")
-	_petrified("frame_calendar", c + Vector3(3.44, 1.7, -1.2), 90.0, 1.0, "none")
-	_petrified("photo_1", c + Vector3(-3.44, 1.6, 0.6), -90.0, 1.0, "none")
+	_petrified("frame_calendar", c + Vector3(3.375, 1.7, -1.2), 90.0, 1.0, "none")
+	_petrified("photo_1", c + Vector3(-3.375, 1.6, 0.6), -90.0, 1.0, "none")
 	_petrified("rug_house", c + Vector3(0, 0.005, 0.6), 0.0, 1.0, "none")
 	Readable.create(self, c + Vector3(-2.6, 0.7, -2.0), 0.0, "Read what is in the pillow", [
 		"The pillow is stone. The words in it were not carved; they were slept into it, over years, the way a path is walked into a field.",
@@ -686,7 +686,7 @@ func _library() -> void:
 	Props.place(self, "candle", Vector3(14.6, 0, -42.1), 0.0, 1.0, {"collision": "none"})
 	Kit.light(self, Vector3(14.9, 0.6, -42.1), CANDLE, 0.5, 3.0)
 	# past the seam the aisle goes dark, and stays dark
-	Kit.box(self, Vector3(LIB_X, 2.75, z_far + 0.5), Vector3(6.0, 5.5, 0.3), "", {"solid": false, "unshaded": true, "tint": Color(0.01, 0.01, 0.015)})
+	Kit.box(self, Vector3(LIB_X, 2.75, z_far + 0.5), Vector3(6.2, 5.5, 0.3), "", {"solid": false, "unshaded": true, "tint": Color(0.01, 0.01, 0.015)})
 	Kit.particles(self, Vector3(LIB_X, 2.5, -30.0), "motes", Vector3(2.5, 2.0, 16.0), 80)
 	if visit_count >= 2 and Game.count("usher_sightings") < 9:
 		Usher.spawn(self, Vector3(LIB_X, 0, -50.0), {"appear_delay": 3.0, "radius": 30.0})

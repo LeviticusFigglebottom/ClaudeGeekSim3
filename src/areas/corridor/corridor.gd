@@ -31,7 +31,7 @@ func build() -> void:
 		var pos := Vector3(x, 0, z)
 		if str(n) == "5½":
 			Door.create(self, pos, yaw, "apartment", "front", {"kind": "wood", "label": "Flat 5½ — home", "name": "Flat5Half", "on_open": func(_d: Node) -> void: Game.set_flag("in_flat_seven", false)})
-			Kit.sign(self, "signs/five_half", pos + Vector3(0, 1.95, -0.05 if north else 0.05), yaw, Vector2(0.32, 0.32))
+			Kit.sign(self, "signs/five_half", pos + Vector3(0, 1.95, -0.08 if north else 0.08), yaw, Vector2(0.32, 0.32))
 			add_spawn("flat_door", pos + Vector3(0, 0.1, 0.9 if north else -0.9), yaw + 180.0)
 			add_spawn("default", pos + Vector3(0, 0.1, 0.9 if north else -0.9), yaw + 180.0)
 		elif n == 7:
@@ -81,10 +81,11 @@ func build() -> void:
 		Kit.add_mesh(lift_door, q, Kit.static_mat({"brightness": 0.5}), Vector3(0, 1.15, 0.1), {"solid": false, "rotation": Vector3(0, 180, 0)})
 	else:
 		lift_door.enabled = false
-		Kit.box(self, Vector3(lx, 1.2, W * 0.5 + 0.05), Vector3(1.8, 2.4, 0.1), "metal/plate", {"name": "LiftDoors"})
+		# set into the wall and standing a little proud of it
+		Kit.box(self, Vector3(lx, 1.2, W * 0.5 - 0.04), Vector3(1.8, 2.4, 0.12), "metal/plate", {"name": "LiftDoors"})
 	# graffiti, a window at the far end, and the loop
 	Kit.sign(self, "signs/graffiti_door", Vector3(29.0, 1.5, W * 0.5 - 0.02), 0.0, Vector2(1.6, 0.4))
-	Props.place(self, "window_night", Vector3(-3.9, 1.5, 0), -90.0, 1.0, {"collision": "none"})
+	Props.place(self, "window_night", Vector3(-3.88, 1.5, 0), -90.0, 1.0, {"collision": "none"})
 	Props.place(self, "plant_pot", Vector3(-3.4, 0, -1.0), 0.0, 1.0, {"collision": "none"})
 	SeamlessTeleport.link(self, Vector3(LOOP + 2.0, 0, 0), -90.0, Vector3(-2.0, 0, 0), -90.0, Vector3(W, 3.0, 0.6), {"name": "Loop", "count_flag": "corridor_loops", "on_teleport": _on_loop})
 	Kit.blocker(self, Vector3(-4.1, H * 0.5, 0), Vector3(0.2, H, W))

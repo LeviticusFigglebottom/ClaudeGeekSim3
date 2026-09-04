@@ -62,7 +62,7 @@ static func _street(area: AreaBase, root: Node3D) -> void:
 	Kit.ramp(root, Vector3(0, 0, 38.0), 0.0, STREET_W + 8.0, 3.0, STREET_Y, "stone/cobble_city", {"tile": 1.5})
 	Kit.ramp(root, Vector3(0, 0, -38.0), 180.0, STREET_W + 8.0, 3.0, STREET_Y, "stone/cobble_city", {"tile": 1.5})
 	for sx in [-1.0, 1.0]:
-		Kit.box(root, Vector3(sx * (hw + 4.0), STREET_Y * 0.5, 0), Vector3(0.3, -STREET_Y, KD.SQ - 14.0), "stone/blocks_city", {"tile": 1.5})
+		Kit.box(root, Vector3(sx * (hw + 4.0), STREET_Y * 0.5 + 0.03, 0), Vector3(0.3, -STREET_Y + 0.06, KD.SQ - 14.0), "stone/blocks_city", {"tile": 1.5})
 	# rubble, a stall, a boat that is a cart, and gulls' worth of debris in the water
 	Props.place(root, "rubble_pile", Vector3(-hw + 1.5, STREET_Y, 14.0), 20.0, 1.0)
 	Props.place(root, "rubble_pile", Vector3(hw - 2.0, STREET_Y, -26.0), 200.0, 0.8)
@@ -113,10 +113,11 @@ static func _wall(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 	var e := KD.HALF + 1.2
 	# two piers and a lintel; walkable top
 	for side in [-1.0, 1.0]:
-		var x0 := arch_w * 0.5 if side > 0 else -e
-		var x1 := e if side > 0 else -arch_w * 0.5
+		# the wall meets the arch's posts, which are 0.4 wide, face to face
+		var x0 := arch_w * 0.5 + 0.4 if side > 0 else -e
+		var x1 := e if side > 0 else -arch_w * 0.5 - 0.4
 		Kit.box(root, Vector3((x0 + x1) * 0.5, WALL_H * 0.5, WALL_Z), Vector3(x1 - x0, WALL_H, WALL_T), tex, {"tile": 2.5, "tint": Color(0.92, 0.9, 0.88)})
-	Kit.box(root, Vector3(0, (arch_h + WALL_H) * 0.5, WALL_Z), Vector3(arch_w + 0.2, WALL_H - arch_h, WALL_T), tex, {"tile": 2.5, "tint": Color(0.92, 0.9, 0.88)})
+	Kit.box(root, Vector3(0, (arch_h + 0.4 + WALL_H) * 0.5, WALL_Z), Vector3(arch_w + 0.8, WALL_H - arch_h - 0.4, WALL_T), tex, {"tile": 2.5, "tint": Color(0.92, 0.9, 0.88)})
 	Kit.arch(root, Vector3(0, STREET_Y, WALL_Z), 0.0, arch_w, arch_h, "stone/blocks_dark", {"depth": WALL_T + 0.4, "post": 0.4, "top": 0.4, "pointed": true})
 	# a low parapet along the top's north side, and none on the south, which is the drop
 	Kit.box(root, Vector3(0, WALL_H + 0.4, WALL_Z - WALL_T * 0.5 + 0.2), Vector3(e * 2.0, 0.8, 0.4), tex, {"tile": 2.5})
@@ -153,8 +154,7 @@ static func _tower(area: AreaBase, root: Node3D) -> void:
 	Kit.wall(root, c + Vector3(-s * 0.5, 0, -s * 0.5), c + Vector3(s * 0.5, 0, -s * 0.5), TOWER_H - 3.5, tex, {"thick": 0.5, "tile": 2.5, "tint": Color(0.9, 0.88, 0.85)})
 	# the door at the south, at street level
 	Kit.blocker(root, c + Vector3(0, 1.2, s * 0.5), Vector3(2.0, 2.4, 0.6), 0)
-	Kit.box(root, c + Vector3(-2.2, 1.2, s * 0.5), Vector3(2.6, 2.4, 0.5), tex, {"tile": 2.5, "solid": false, "tint": Color(0.0, 0.0, 0.0, 0.0)})
-	Kit.floor(root, c, Vector2(s, s), "stone/flagstone", {"tile": 1.5})
+	Kit.floor(root, c + Vector3(0, 0.05, 0), Vector2(s, s), "stone/flagstone", {"tile": 1.5, "thick": 0.1})
 	# a hole in the south wall to get in by
 	Kit.box(root, c + Vector3(0, 1.3, s * 0.5), Vector3(2.0, 2.6, 0.8), "", {"tint": Color(0.05, 0.05, 0.06), "solid": false, "unshaded": true})
 	# flights up the inside, one along each wall in turn, landings at the corners
@@ -166,12 +166,12 @@ static func _tower(area: AreaBase, root: Node3D) -> void:
 		dd.y = 0.0
 		var steps := 12
 		Kit.stairs(root, a, Kit.dir_to_yaw(dd.normalized()), 1.4, steps, rise / steps, dd.length() / steps, "stone/flagstone", {"tile": 1.0, "name": "TowerFlight%d" % i})
-		Kit.floor(root, a, Vector2(1.6, 1.6), "stone/flagstone", {"tile": 1.0})
+		Kit.floor(root, a + Vector3(0, 0.08, 0), Vector2(1.6, 1.6), "stone/flagstone", {"tile": 1.0})
 		if i % 2 == 0:
 			Kit.light(root, c + Vector3(0, i * rise + 2.0, 0), LAMP, 0.9, 8.0)
 	# the top: a platform with the north-west corner open toward the wall
 	var top: Vector3 = c + corners[flights % 4] + Vector3(0, TOWER_H, 0)
-	Kit.floor(root, top, Vector2(1.6, 1.6), "stone/flagstone", {"tile": 1.0})
+	Kit.floor(root, top + Vector3(0, 0.03, 0), Vector2(1.6, 1.6), "stone/flagstone", {"tile": 1.0})
 	Kit.floor(root, c + Vector3(0, TOWER_H, 0), Vector2(s, s), "stone/flagstone", {"tile": 1.5})
 	Props.place(root, "bell_tower_frame", c + Vector3(0, TOWER_H, 0), 0.0, 0.8, {"collision": "none"})
 	Kit.light(root, c + Vector3(0, TOWER_H + 3.0, 0), COLD, 1.2, 12.0)
@@ -306,8 +306,8 @@ static func _terrace(area: AreaBase, root: Node3D, this_def: Dictionary, other_d
 	var depth := z1 - z0
 	# the wall's top widens into a terrace at its west end, hedged
 	Kit.floor(root, Vector3((TERRACE_X - KD.HALF - 1.2) * 0.5, y, cz), Vector2(KD.HALF + 1.2 + TERRACE_X, depth), "nature/grass_dream", {"tint": this_def.tint, "tile": 2.0, "thick": 0.4})
-	KD.hedge(root, Vector3(TERRACE_X, y, z0), Vector3(-KD.HALF - 1.2, y, z0), {"height": 2.4})
-	KD.hedge(root, Vector3(-KD.HALF - 1.2, y, z1), Vector3(TERRACE_X, y, z1), {"height": 2.4})
+	KD.hedge(root, Vector3(TERRACE_X - 1.2, y, z0), Vector3(-KD.HALF - 1.2, y, z0), {"height": 2.4})
+	KD.hedge(root, Vector3(-KD.HALF - 1.2, y, z1), Vector3(TERRACE_X - 1.2, y, z1), {"height": 2.4})
 	KD.hedge(root, Vector3(TERRACE_X - 0.6, y, z0), Vector3(TERRACE_X - 0.6, y, WALL_Z - 1.0), {"height": 2.4})
 	KD.hedge(root, Vector3(TERRACE_X - 0.6, y, WALL_Z + 1.0), Vector3(TERRACE_X - 0.6, y, z1), {"height": 2.4})
 	# the brook across the terrace, walking west

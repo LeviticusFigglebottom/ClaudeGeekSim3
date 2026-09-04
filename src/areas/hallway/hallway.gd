@@ -55,7 +55,7 @@ func build() -> void:
 		if w > prev_w + 0.01:
 			Kit.wall(self, Vector3(-prev_w * 0.5, 0, z0), Vector3(-w * 0.5, 0, z0), h, wall_tex, {"tile": 3.0})
 			Kit.wall(self, Vector3(w * 0.5, 0, z0), Vector3(prev_w * 0.5, 0, z0), h, wall_tex, {"tile": 3.0})
-			Kit.box(self, Vector3(0, (prev_h + h) * 0.5, z0), Vector3(w, h - prev_h, 0.2), wall_tex, {"tile": 3.0})
+			Kit.box(self, Vector3(0, (prev_h + h) * 0.5, z0), Vector3(prev_w, h - prev_h, 0.2), wall_tex, {"tile": 3.0})
 		# a cold dim light in every segment, so it is never quite black: you can
 		# always see the floor and the walls, just not what is written on them
 		Kit.light(self, Vector3(0, minf(h - 0.5, 3.2), (z0 + z1) * 0.5), Color(0.6, 0.65, 0.85), 1.3 if i % 2 == 0 else 0.9, w + 9.0)
