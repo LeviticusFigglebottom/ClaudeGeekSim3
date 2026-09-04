@@ -123,7 +123,7 @@ static func _avenue(_area: AreaBase, root: Node3D, state: Dictionary) -> void:
 
 static func _clearing(area: AreaBase, root: Node3D, state: Dictionary, visit: int) -> void:
 	var c := CLEARING
-	Kit.ring(root, c + Vector3(0, 0.03, 0), 0.0, 9.0, 20, "nature/grass_dark", {"tint": Color(0.75, 0.8, 0.75), "solid": false, "tile": 3.0})
+	Kit.ring(root, c + Vector3(0, 0.1, 0), 0.0, 9.0, 20, "nature/grass_dark", {"tint": Color(0.75, 0.8, 0.75), "solid": false, "tile": 3.0})
 	# the tree he sleeps under: a hallway wall that has decided to be a tree
 	var tp := c + Vector3(0, 0, -4.5)
 	Kit.box(root, tp + Vector3(0, 7.0, 0), Vector3(2.4, 14.0, 2.4), TRUNK, {"tile": 3.0})
@@ -255,6 +255,15 @@ static func _things(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 		"There is nothing behind it. You open it anyway. It opens onto the wood, which is behind it.",
 	], {"name": "LeaningDoor", "size": Vector3(1.4, 2.4, 0.8), "sound": "door_open"})
 	state.interactables.append([r4, "Open the door"])
+	# stumps and logs where the hallway has been felled, and a lantern somebody left
+	var rng := area.rng
+	for i in 10:
+		var p := Vector3(rng.randf_range(-40.0, 40.0), 0, rng.randf_range(-34.0, 34.0))
+		if absf(p.x) < 4.0 or absf(p.z - 10.0) < 4.0 or p.distance_to(CLEARING) < 11.0:
+			continue
+		Props.place(root, "stump" if i % 3 != 0 else "log", p, rng.randf_range(0, 360), 1.0, {"collision": "box", "tint": Color(0.75, 0.75, 0.8)})
+	Props.place(root, "lantern_hanging", Vector3(-7.4, 3.2, 27.0), 0.0, 1.0, {"collision": "none"})
+	Kit.light(root, Vector3(-7.4, 2.6, 27.0), Color(1.0, 0.85, 0.6), 0.9, 7.0)
 	# a fawn, which is the dog with no name, if the dog has one
 	Dog.maybe_spawn(root, Vector3(-6.0, 0.1, 14.0))
 	area.rng.randf()

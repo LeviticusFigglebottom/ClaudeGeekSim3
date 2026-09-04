@@ -73,6 +73,7 @@ static func build(area: AreaBase, root: Node3D, ctx: Dictionary) -> Dictionary:
 	_hill(area, root)
 	_field(area, root)
 	_wood(area, root)
+	_charm(area, root)
 	_lights(root)
 	var out := {}
 	out["fall_top"] = LAWN + Vector3(0, SHAFT_TOP, 0)
@@ -89,7 +90,7 @@ static func build(area: AreaBase, root: Node3D, ctx: Dictionary) -> Dictionary:
 # --- the arrival lawn and the shaft above it ---------------------------------------
 
 static func _lawn(area: AreaBase, root: Node3D, _state: Dictionary) -> void:
-	Kit.ring(root, LAWN + Vector3(0, 0.03, 0), 0.0, 6.5, 20, "nature/grass_moss", {"tint": Color(1.1, 1.05, 0.8), "solid": false, "tile": 1.5})
+	Kit.ring(root, LAWN + Vector3(0, 0.1, 0), 0.0, 6.5, 20, "nature/grass_moss", {"tint": Color(1.1, 1.05, 0.8), "solid": false, "tile": 1.5})
 	# a fairy ring of pale mushrooms where you land, from the Hollow Wood
 	for i in 14:
 		var a := i * (360.0 / 14.0)
@@ -169,13 +170,13 @@ static func _shaft(area: AreaBase, root: Node3D) -> void:
 static func _paths(root: Node3D) -> void:
 	var tint := Color(1.0, 0.95, 0.85)
 	# from the lawn north to the mouth of the maze, and out to the beds either side
-	Kit.floor(root, Vector3(0, 0.02, 12.0), Vector2(4.0, 28.0), "ground/gravel", {"tint": tint, "tile": 1.5, "thick": 0.06})
-	Kit.floor(root, Vector3(0, 0.02, 18.0), Vector2(60.0, 3.0), "ground/gravel", {"tint": tint, "tile": 1.5, "thick": 0.06})
+	Kit.floor(root, Vector3(0, 0.1, 12.0), Vector2(4.0, 28.0), "ground/gravel", {"tint": tint, "tile": 1.5, "thick": 0.12})
+	Kit.floor(root, Vector3(0, 0.1, 18.0), Vector2(60.0, 3.0), "ground/gravel", {"tint": tint, "tile": 1.5, "thick": 0.12})
 	# and north of the maze, to the gate
-	Kit.floor(root, Vector3(0, 0.02, -33.0), Vector2(4.0, 12.0), "ground/gravel", {"tint": tint, "tile": 1.5, "thick": 0.06})
-	Kit.floor(root, Vector3(-32.0, 0.02, -15.0), Vector2(3.0, 40.0), "ground/gravel", {"tint": tint, "tile": 1.5, "thick": 0.06})
-	Kit.floor(root, Vector3(32.0, 0.02, -15.0), Vector2(3.0, 40.0), "ground/gravel", {"tint": tint, "tile": 1.5, "thick": 0.06})
-	Kit.floor(root, Vector3(0, 0.02, -33.0), Vector2(66.0, 3.0), "ground/gravel", {"tint": tint, "tile": 1.5, "thick": 0.06})
+	Kit.floor(root, Vector3(0, 0.1, -33.0), Vector2(4.0, 12.0), "ground/gravel", {"tint": tint, "tile": 1.5, "thick": 0.12})
+	Kit.floor(root, Vector3(-32.0, 0.1, -15.0), Vector2(3.0, 40.0), "ground/gravel", {"tint": tint, "tile": 1.5, "thick": 0.12})
+	Kit.floor(root, Vector3(32.0, 0.1, -15.0), Vector2(3.0, 40.0), "ground/gravel", {"tint": tint, "tile": 1.5, "thick": 0.12})
+	Kit.floor(root, Vector3(0, 0.1, -33.0), Vector2(66.0, 3.0), "ground/gravel", {"tint": tint, "tile": 1.5, "thick": 0.12})
 
 
 ## Two beds of paper roses. The near end of each has been painted.
@@ -184,7 +185,7 @@ static func _beds(area: AreaBase, root: Node3D, state: Dictionary, visit: int) -
 	for side in [-1.0, 1.0]:
 		var bed_c := Vector3(side * 21.0, 0, 10.0)
 		var size := Vector2(16.0, 12.0)
-		Kit.floor(root, bed_c + Vector3(0, 0.05, 0), size, "ground/dirt", {"tint": Color(1.1, 0.95, 0.85), "tile": 1.5, "thick": 0.1})
+		Kit.floor(root, bed_c + Vector3(0, 0.12, 0), size, "ground/dirt", {"tint": Color(1.1, 0.95, 0.85), "tile": 1.5, "thick": 0.14})
 		var hx := size.x * 0.5
 		var hz := size.y * 0.5
 		var border := "wood/planks_white"
@@ -199,7 +200,7 @@ static func _beds(area: AreaBase, root: Node3D, state: Dictionary, visit: int) -
 			for c in cols:
 				var x := -hx + 1.0 + c * ((size.x - 2.0) / (cols - 1))
 				var z := -hz + 1.0 + r * ((size.y - 2.0) / (rows - 1))
-				var p := bed_c + Vector3(x, 0.1, z)
+				var p := bed_c + Vector3(x, 0.12, z)
 				# painting starts from the end nearest the path and works outward
 				var from_path := (cols - 1 - c) if side < 0 else c
 				var painted := from_path < painted_cols
@@ -440,7 +441,7 @@ static func _hill(area: AreaBase, root: Node3D) -> void:
 
 static func _field(_area: AreaBase, root: Node3D) -> void:
 	var c := Vector3(-30.0, 0, -10.0)
-	Kit.ring(root, c + Vector3(0, 0.03, 0), 0.0, 9.0, 18, "nature/grass_dark", {"tint": Color(1.0, 1.05, 0.95), "solid": false, "tile": 3.0})
+	Kit.ring(root, c + Vector3(0, 0.1, 0), 0.0, 9.0, 18, "nature/grass_dark", {"tint": Color(1.0, 1.05, 0.95), "solid": false, "tile": 3.0})
 	Props.place(root, "tree_dead_1", c + Vector3(-4.0, 0, -3.0), 40.0, 1.1)
 	Props.place(root, "tree_dead_2", c + Vector3(5.0, 0, 4.0), 200.0, 0.9)
 	# the mailbox: a post and a box with a flap
@@ -474,7 +475,7 @@ static func _wood(area: AreaBase, root: Node3D) -> void:
 			continue
 		if p.distance_to(HILL) < 11.0:
 			continue
-		Props.place(root, trees[rng.randi() % trees.size()], p, rng.randf_range(0, 360), rng.randf_range(0.9, 1.5), {"collision": "cylinder", "tint": tint})
+		Props.place(root, trees[rng.randi() % trees.size()], p, rng.randf_range(0, 360), rng.randf_range(0.9, 1.5), {"collision": "cylinder", "collision_scale": 0.2, "tint": tint})
 		n += 1
 	for i in 30:
 		var p := Vector3(rng.randf_range(-42.0, 42.0), 0, rng.randf_range(-42.0, 42.0))
@@ -483,6 +484,35 @@ static func _wood(area: AreaBase, root: Node3D) -> void:
 		Props.place(root, ["bush_1", "mushroom_glow_big", "mushroom_glow_small", "fern_cluster"][i % 4], p, rng.randf_range(0, 360), rng.randf_range(0.7, 1.3), {"collision": "none", "tint": Color(1.1, 1.0, 0.85)})
 	# a moth, enormous, asleep on a tree, from the Slow Sea's summit
 	Props.place(root, "moth_giant", Vector3(38.0, 5.0, -22.0), 250.0, 1.2, {"collision": "none", "rotation": Vector3(0, 250, 80)})
+
+
+## Small things that make it a garden: a fountain, benches, petals on the air,
+## lanterns at the way on so the gate reads as a gate.
+static func _charm(area: AreaBase, root: Node3D) -> void:
+	var rng := area.rng
+	Props.place(root, "fountain", Vector3(-14.0, 0, 30.0), 0.0, 1.1, {"collision": "cylinder", "collision_scale": 0.8, "tint": Color(1.0, 0.95, 1.0)})
+	Kit.light(root, Vector3(-14.0, 2.5, 30.0), Color(0.8, 0.9, 1.0), 0.9, 8.0)
+	Readable.create(root, Vector3(-14.0, 0.8, 31.6), 0.0, "Look in the fountain", [
+		"A fountain, running uphill, quietly. The water goes up the spout and does not come down.",
+		"There are coins in it, all the same coin, with a wave on both faces.",
+	], {"name": "Fountain", "size": Vector3(2.4, 1.2, 1.0)})
+	for b in [[Vector3(14.0, 0, 32.0), -20.0], [Vector3(-6.0, 0, 14.0), 90.0]]:
+		Props.place(root, "bench", b[0], float(b[1]), 1.0, {"collision": "box", "tint": Color(1.0, 0.95, 0.95)})
+	# petals
+	for k in 3:
+		var p := Kit.particles(root, Vector3(-21.0 + k * 21.0, 3.0, 10.0), "snow", Vector3(9.0, 1.5, 7.0), 40)
+		var m := p.material_override as StandardMaterial3D
+		if m:
+			m.albedo_color = [Color(1.0, 0.75, 0.8, 0.9), Color(0.95, 0.85, 1.0, 0.9), Color(1.0, 0.95, 0.75, 0.9)][k]
+	# the way on: two lanterns flank the gap in the north hedge, and the path is lined
+	for sx in [-5.5, 5.5]:
+		Props.place(root, "lantern_post", Vector3(float(sx), 0, 36.5 - 72.0), 0.0, 1.0, {"collision": "cylinder"})
+		Kit.light(root, Vector3(float(sx), 2.8, -35.5), Color(1.0, 0.9, 0.75), 1.1, 9.0)
+	for k in 6:
+		for sx in [-2.6, 2.6]:
+			Props.place(root, "rose_paper_planted", Vector3(float(sx), 0.1, -28.0 - k * 1.6), rng.randf_range(0, 360), 2.4, {"collision": "none", "tint": Color(1.0, 0.98, 0.94)})
+	KD.ground_text(root, "this way, probably", Vector3(0, 0, -31.0), 0.0, 24, Color(0.45, 0.5, 0.3), "body")
+	Props.place(root, "signpost_contradictory", Vector3(6.0, 0, -30.0), 0.0, 0.9, {"collision": "cylinder"})
 
 
 static func _lights(root: Node3D) -> void:

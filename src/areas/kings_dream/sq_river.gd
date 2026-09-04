@@ -40,11 +40,15 @@ static func build(area: AreaBase, root: Node3D, ctx: Dictionary) -> Dictionary:
 	_boat(area, root, state)
 	_island(area, root)
 	_rushes(area, root)
+	_charm(area, root, state)
 	_lights(root)
 	var out := {}
 	out["edge_y"] = {"N": QUAY_Y}
 	out["on_process"] = func(delta: float) -> void:
 		state.t += delta
+		if not Game.time_frozen and state.t - float(state.get("gull", 0.0)) > 24.0:
+			state["gull"] = state.t
+			Audio.sfx("seagull_wrong", Vector3(area.rng.randf_range(-30.0, 30.0), 8.0, -4.0) + root.global_position, -10.0)
 	out["on_freeze"] = func(frozen: bool) -> void:
 		_freeze(state, frozen)
 	out["usher"] = Vector3(-30.0, QUAY_Y, -30.0)
@@ -58,7 +62,7 @@ static func _shop(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 	var hw := SHOP_W * 0.5
 	var hd := SHOP_D * 0.5
 	var wall := "wall/plaster_tavern"
-	Kit.floor(root, c + Vector3(0, 0.02, 0), Vector2(SHOP_W, SHOP_D), "wood/planks_warm", {"tile": 1.5, "thick": 0.1})
+	Kit.floor(root, c + Vector3(0, 0.1, 0), Vector2(SHOP_W, SHOP_D), "wood/planks_warm", {"tile": 1.5, "thick": 0.14})
 	Kit.ceiling(root, c + Vector3(0, SHOP_H, 0), Vector2(SHOP_W, SHOP_D), "wood/planks_dark", {"tile": 1.5})
 	Kit.box(root, c + Vector3(0, SHOP_H + 0.5, 0), Vector3(SHOP_W + 1.0, 1.0, SHOP_D + 1.0), "wood/thatch", {"tile": 2.0, "solid": false})
 	# three walls; the south one has the door; the north side is open to the deck
@@ -269,6 +273,25 @@ static func _quay(area: AreaBase, root: Node3D) -> void:
 	KD.hedge(root, Vector3(KD.HALF + 1.2, QUAY_Y, -KD.RIM), Vector3(KD.HALF + 1.2, QUAY_Y, QUAY_Z), {"tint": Color(0.9, 1.0, 0.9)})
 	Kit.particles(root, Vector3(0, QUAY_Y + 0.5, QUAY_Z - 10.0), "fog", Vector3(40.0, 0.5, 8.0), 20)
 	area.rng.randf()
+
+
+## Shells on the sand, a gull that is wrong, and bottles the river has not taken.
+static func _charm(area: AreaBase, root: Node3D, state: Dictionary) -> void:
+	var rng := area.rng
+	for i in 10:
+		var p := Vector3(rng.randf_range(-40.0, 40.0), 0, rng.randf_range(14.0, 40.0))
+		if absf(p.x - SHOP.x) < SHOP_W * 0.5 + 2.0 and absf(p.z - SHOP.z) < SHOP_D * 0.5 + 2.0:
+			continue
+		Props.place(root, ["shell", "rock_pale", "bottle_moonlight"][i % 3], p, rng.randf_range(0, 360), rng.randf_range(0.8, 1.4), {"collision": "none"})
+	for sx in [-28.0, 30.0]:
+		Props.place(root, "lantern_post", Vector3(float(sx), 0, 14.5), 0.0, 1.0, {"collision": "cylinder"})
+		Kit.light(root, Vector3(float(sx), 2.8, 14.5), CANDLE, 0.9, 9.0)
+	Props.place(root, "moon_face", Vector3(-30.0, 14.0, -30.0), 30.0, 1.5, {"collision": "none"})
+	state["gull"] = 0.0
+	Readable.create(root, Vector3(-20.0, 0.5, 30.0), 0.0, "Look at the shells", [
+		"Shells, and a bottle with nothing in it, and a rock that is paler than the sand.",
+		"Every so often, out over the water, a gull says the wrong thing.",
+	], {"name": "Shells", "size": Vector3(3.0, 1.0, 3.0)})
 
 
 static func _lights(root: Node3D) -> void:

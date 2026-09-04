@@ -9,8 +9,9 @@ extends Node
 const PATH := "user://settings.json"
 const DEFAULTS := {
 	"dither": 0.42,      # ordered dither strength in the post-process (authored 0.55)
-	"wobble": 0.8,       # vertex snapping (0 = no wobble)
-	"warp": 0.7,         # affine texture warp (0 = perspective-correct)
+	"wobble": 0.3,       # vertex snapping (0 = no wobble); high values make touching surfaces flicker
+	"warp": 0.05,        # affine texture warp (0 = perspective-correct): just above nothing
+	"picture_version": 2,  # bumped when the picture defaults change, so old saves take the new ones
 	"pixel": 3,          # render at 1/pixel of the window
 	"levels": 32,        # colour steps per channel in the post-process (256 = none)
 	"aura": 0.6,         # how visible the glow on things you can use is
@@ -111,3 +112,9 @@ func load_settings() -> void:
 		for k in DEFAULTS:
 			if parsed.has(k):
 				values[k] = parsed[k]
+		# a save from before the wobble and warp defaults were turned down keeps
+		# everything else and takes the new picture defaults once
+		if int(parsed.get("picture_version", 0)) < int(DEFAULTS.picture_version):
+			values["wobble"] = DEFAULTS.wobble
+			values["warp"] = DEFAULTS.warp
+			values["picture_version"] = DEFAULTS.picture_version

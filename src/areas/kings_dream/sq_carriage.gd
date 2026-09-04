@@ -25,10 +25,12 @@ const LAMP := Color(0.85, 0.95, 0.9)
 static func build(area: AreaBase, root: Node3D, ctx: Dictionary) -> Dictionary:
 	var d: Dictionary = ctx.def
 	var state := {"seam": null, "scenery": [], "t": 0.0, "clack": 0.0, "van": null}
-	# no ground: the train runs through nothing, and the gates stand on their own strips
+	# the gates stand on their own strips; the train runs on a trackbed three metres
+	# down, which is where you land if you step off, with stairs back up
 	Kit.floor(root, Vector3(0, 0, 41.0), Vector2(KD.SQ + 2.0, 9.0), String(d.ground), {"tint": d.tint, "tile": 2.0, "thick": 0.2})
 	Kit.floor(root, Vector3(0, 0, -41.0), Vector2(KD.SQ + 2.0, 9.0), String(d.ground), {"tint": d.tint, "tile": 2.0, "thick": 0.2})
 	Kit.floor(root, Vector3(0, 0, 36.0), Vector2(6.0, 4.0), "wall/concrete", {"tile": 1.5, "thick": 0.2})
+	_trackbed(area, root, d)
 	_carriage(area, root, state)
 	_doors(area, root, state)
 	_scenery(area, root, state)
@@ -65,12 +67,14 @@ static func _carriage(_area: AreaBase, root: Node3D, _state: Dictionary) -> void
 			if m % 2 == 0:
 				Kit.wall(root, a, b, H, WALL)
 			else:
-				# sill, lintel and two posts round an opening 1.1 to 2.3 m up
-				Kit.box(root, Vector3(x, 0.55, (za + zb) * 0.5), Vector3(0.2, 1.1, za - zb), WALL, {"tile": 2.0})
-				Kit.box(root, Vector3(x, 2.6, (za + zb) * 0.5), Vector3(0.2, 0.6, za - zb), WALL, {"tile": 2.0})
-				Kit.box(root, Vector3(x, 1.7, za - 0.25), Vector3(0.2, 1.2, 0.5), WALL, {"tile": 2.0})
-				Kit.box(root, Vector3(x, 1.7, zb + 0.25), Vector3(0.2, 1.2, 0.5), WALL, {"tile": 2.0})
-				Kit.blocker(root, Vector3(x, 1.7, (za + zb) * 0.5), Vector3(0.1, 1.2, za - zb))
+				# sill, lintel and two piers round an opening the size of the window frame,
+				# 1.1 to 2.3 m up, so the frame sits in the hole and not beside it
+				var zc := (za + zb) * 0.5
+				Kit.box(root, Vector3(x, 0.55, zc), Vector3(0.2, 1.1, za - zb), WALL, {"tile": 2.0})
+				Kit.box(root, Vector3(x, 2.6, zc), Vector3(0.2, 0.6, za - zb), WALL, {"tile": 2.0})
+				Kit.box(root, Vector3(x, 1.7, (za + zc + 0.55) * 0.5), Vector3(0.2, 1.2, za - zc - 0.55), WALL, {"tile": 2.0})
+				Kit.box(root, Vector3(x, 1.7, (zb + zc - 0.55) * 0.5), Vector3(0.2, 1.2, zc - 0.55 - zb), WALL, {"tile": 2.0})
+				Kit.blocker(root, Vector3(x, 1.7, zc), Vector3(0.1, 1.2, 1.1))
 		zz -= 4.0
 		m += 1
 	# the outside of the carriage: dark green coachwork, a roof, and wheels that never turn
@@ -99,11 +103,16 @@ static func _carriage(_area: AreaBase, root: Node3D, _state: Dictionary) -> void
 	# seats between the doors on the east side, and windows above them, both sides
 	z = z0 - 6.0
 	while z > z1 + 4.0:
-		Props.place(root, "carriage_seat", Vector3(W * 0.5 - 0.3, 0, z), -90.0, 1.0, {"collision": "box"})
+		Props.place(root, "carriage_seat", Vector3(W * 0.5 - 0.42, 0, z), 90.0, 1.0, {"collision": "box"})
+		Props.place(root, "crate_small", Vector3(-W * 0.5 + 0.35, 0, z + 1.6), 15.0, 0.7, {"collision": "box", "tint": Color(0.8, 0.7, 0.6)})
 		Props.place(root, "carriage_window", Vector3(W * 0.5 - 0.08, 1.7, z), 90.0, 1.0, {"collision": "none"})
 		Props.place(root, "carriage_window", Vector3(-W * 0.5 + 0.08, 1.7, z), -90.0, 1.0, {"collision": "none"})
 		z -= 8.0
 	Kit.particles(root, Vector3(0, 1.5, mid), "motes", Vector3(1.2, 1.0, len * 0.5), 60)
+	Readable.create(root, Vector3(W * 0.5 - 0.4, 1.7, z0 - 14.0), 90.0, "Look out of the window", [
+		"Country going past, painted, in squares. Then a town, with a church and a clock tower, and the clock says half past five.",
+		"It comes round again. The clock still says half past five. It is the same town every time and it has not noticed.",
+	], {"name": "WindowLook", "size": Vector3(0.3, 1.2, 1.2), "note_key": "dream_window", "note_title": "The town outside the train", "note_text": "A town goes past the carriage windows with a clock tower that says half past five. It comes round again, the same town, and does not notice."})
 
 
 ## Doors numbered on both sides, and 5½ among them. The corridor repeats.
@@ -160,6 +169,44 @@ static func _doors(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 	Puzzle.declare(area, "dream_train", "dream_off_train", ["keepsake:hourglass"], "hold the hour and walk to the front of the train, which has a front while it is held")
 
 
+## Under the train: ballast, sleepers and rails, and the drop from the strips
+## hedged so you do not take it by accident. Stairs at both ends come back up.
+static func _trackbed(area: AreaBase, root: Node3D, d: Dictionary) -> void:
+	var y := -3.0
+	Kit.floor(root, Vector3(0, y, 0), Vector2(KD.SQ + 2.0, 73.0), "ground/gravel", {"tint": Color(0.7, 0.68, 0.7), "tile": 2.0, "thick": 0.3})
+	# the faces of the strips, so the drop is a wall and not a hole in the world
+	Kit.box(root, Vector3(0, y * 0.5, 36.5), Vector3(KD.SQ + 2.0, -y, 0.3), "wall/concrete_dark", {"tile": 2.0})
+	Kit.box(root, Vector3(0, y * 0.5, -36.5), Vector3(KD.SQ + 2.0, -y, 0.3), "wall/concrete_dark", {"tile": 2.0})
+	var k := 0
+	var z := 34.0
+	while z > -34.0:
+		Kit.box(root, Vector3(0, y + 0.1, z), Vector3(6.0, 0.2, 0.5), "wood/planks_dark", {"tint": Color(0.5, 0.45, 0.4), "solid": false})
+		z -= 1.4
+		k += 1
+	for sx in [-1.2, 1.2]:
+		Kit.box(root, Vector3(float(sx), y + 0.3, 0), Vector3(0.14, 0.2, 68.0), "metal/iron", {"solid": false})
+	# hedges along the inner edge of both strips, with gaps for the gangway and the stairs
+	var hedge_tint: Color = d.hedge
+	for side in [1.0, -1.0]:
+		var hz: float = 36.5 * side
+		KD.hedge(root, Vector3(-KD.HALF - 1.2, 0, hz), Vector3(-3.2, 0, hz), {"tint": hedge_tint, "height": 2.2, "thick": 0.8})
+		KD.hedge(root, Vector3(3.2, 0, hz), Vector3(7.0, 0, hz), {"tint": hedge_tint, "height": 2.2, "thick": 0.8})
+		KD.hedge(root, Vector3(9.4, 0, hz), Vector3(KD.HALF + 1.2, 0, hz), {"tint": hedge_tint, "height": 2.2, "thick": 0.8})
+		# a stair from the trackbed up to the strip
+		var foot := Vector3(8.2, y, 36.0 * side - 5.6 * side)
+		Kit.stairs(root, foot, 180.0 if side > 0 else 0.0, 1.8, 12, -y / 12.0, 0.45, "wall/concrete", {"tile": 1.0, "name": "TrackStair%d" % int(side)})
+		Kit.light(root, Vector3(8.2, y + 3.0, 33.0 * side), LAMP, 0.9, 8.0)
+	# rails either side of the gangway, so the way into the carriage is a way and not an edge
+	for sx in [-3.1, 3.1]:
+		Kit.box(root, Vector3(float(sx), 0.5, 36.0), Vector3(0.1, 1.0, 4.4), "metal/iron")
+	Readable.create(root, Vector3(0, y + 0.5, 30.0), 0.0, "The track", [
+		"Sleepers and two rails, going both ways into the fog. The rails are warm. Nothing is on them; the train is beside them, which is not where trains go.",
+		"Steps at either end lead back up to the strips. Somebody expected people to fall.",
+	], {"name": "TrackLook", "size": Vector3(4.0, 1.5, 4.0)})
+	Kit.light(root, Vector3(0, y + 2.5, 0), Color(0.8, 0.85, 1.0), 0.8, 14.0)
+	area.rng.randf()
+
+
 static func ctx_index(_area: AreaBase) -> int:
 	return 1
 
@@ -194,8 +241,14 @@ static func _ticket(area: AreaBase) -> void:
 
 
 static func _guard(n: NPC) -> void:
+	if Game.active_is("hourglass"):
+		await n.say([
+			"The Guard looks at the hourglass in your hand and, for the first time, at you.",
+			"\"That,\" he says. \"Turn that, and the country stops, and a train that is not moving has a front. Go and look at it while it lasts.\"",
+		])
+		return
 	if not Game.has_flag("dream_ticket"):
-		await n.say(["\"Ticket,\" says the Guard, and looks at you through a telescope, then through a microscope, then through opera glasses.", "\"No ticket,\" he says. \"You'll have to go back as luggage.\" He does not say back where."])
+		await n.say(["\"Ticket,\" says the Guard, and looks at you through a telescope, then through a microscope, then through opera glasses.", "\"No ticket,\" he says. \"You'll have to go back as luggage.\" He does not say back where.", "\"There is a dispenser by the door you came in by,\" he says. \"It will give you a number. It is always the same number. Bring it anyway.\""])
 		return
 	if Game.active_is("crown"):
 		await n.say(["The Guard looks at the crown, then at the ticket. \"Your Majesty travels as luggage,\" he says, \"like everyone.\""])
@@ -204,8 +257,10 @@ static func _guard(n: NPC) -> void:
 		"You show the ticket. He looks at it through a telescope, then a microscope, then opera glasses.",
 		"\"5½,\" he says. \"That is not a number. That is an address.\" He punches it anyway. The punch says 5½.",
 		"\"Wrong way round,\" he says. \"You must go back as luggage.\" Behind every door, softly, in chorus: as luggage.",
+		"\"And before you ask,\" he says, \"this train does not stop. Not for anyone. If you wanted off, you would need to stop everything at once, and I have only ever seen one thing that does that. Glass. Sand in it. Runs sideways.\"",
 	])
 	Game.set_flag("dream_guard_seen", true)
+	Game.note("dream_guard", "The Guard", "The Guard on the train punches a ticket that says 5½ and says you must go back as luggage. The train does not stop for anyone; to get off you would have to stop everything at once, and only the Hourglass does that.")
 
 
 # --- the world going past the windows -------------------------------------------------
@@ -247,6 +302,29 @@ static func _scenery(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 		var mi := Kit.add_mesh(cw.body, Kit.mesh_from_quads(quads, qcols), Kit.vertex_mat({"unshaded": true, "double": true}), Vector3.ZERO, {"solid": false, "cast_shadow": false, "name": "Country"})
 		state.scenery.append(cw)
 		mi.extra_cull_margin = 400.0
+		# a town in front of the country: houses, a church, trees, and a clock tower
+		# that says half past five every time it comes round
+		var town_r := r - 6.0
+		var a_town := PI if side > 0 else 0.0
+		for k in 9:
+			var a := a_town + (k - 4) * 0.032
+			var hp := Vector3(cos(a) * town_r, -2.0, sin(a) * town_r)
+			var hh := rng.randf_range(4.0, 8.0)
+			var house := Kit.box(cw.body, hp + Vector3(0, hh * 0.5, 0), Vector3(3.0 + rng.randf() * 2.0, hh, 3.0), "stone/blocks_city", {"tile": 2.5, "solid": false, "tint": Color(1.0, 0.95, 0.9)})
+			house.rotation.y = -a
+			Kit.box(cw.body, hp + Vector3(0, hh + 0.5, 0), Vector3(4.0, 1.0, 3.6), "wood/planks_dark", {"tint": Color(0.5, 0.35, 0.35), "solid": false}).rotation.y = -a
+		var ta := a_town + 0.02
+		var tp := Vector3(cos(ta) * (town_r - 3.0), -2.0, sin(ta) * (town_r - 3.0))
+		Kit.box(cw.body, tp + Vector3(0, 9.0, 0), Vector3(3.2, 18.0, 3.2), "stone/blocks_clocktower", {"tile": 2.5, "solid": false})
+		Kit.box(cw.body, tp + Vector3(0, 19.0, 0), Vector3(4.0, 2.0, 4.0), "metal/brass", {"tile": 2.0, "solid": false})
+		var face_dir: float = -side
+		var face := Kit.sign(cw.body, "metal/clock_face", tp + Vector3(face_dir * 1.62, 15.0, 0), -90.0 if face_dir > 0 else 90.0, Vector2(2.4, 2.4))
+		face.name = "TownClock"
+		Kit.light(cw.body, tp + Vector3(face_dir * 3.0, 15.0, 0), Color(1.0, 0.9, 0.7), 1.2, 12.0)
+		for k in 14:
+			var a := a_town + rng.randf_range(-0.25, 0.25)
+			var tr := town_r - rng.randf_range(2.0, 12.0)
+			Props.place(cw.body, ["tree_oak_1", "tree_pine_1", "tree_autumn"][k % 3], Vector3(cos(a) * tr, -2.0, sin(a) * tr), rng.randf_range(0, 360), rng.randf_range(1.2, 2.2), {"collision": "none"})
 	Kit.box(root, Vector3(0, -3.2, 0), Vector3(30.0, 0.2, 200.0), "ground/gravel", {"solid": false, "tint": Color(0.6, 0.6, 0.65), "tile": 3.0})
 
 

@@ -75,9 +75,11 @@ static func rim(parent: Node, y: float, tint: Color = HEDGE_TINT) -> void:
 	for i in 4:
 		var a: Vector3 = corners[i]
 		var b: Vector3 = corners[(i + 1) % 4]
-		var mid := (a + b) * 0.5 + Vector3(0, FENCE_H * 0.5, 0)
+		# the fence reaches well below ground too: a trench, a river bed or a
+		# flooded street must not open onto the void at the square's edge
+		var mid := (a + b) * 0.5 + Vector3(0, FENCE_H * 0.5 - 20.0, 0)
 		var horizontal := absf(a.x - b.x) > absf(a.z - b.z)
-		Kit.blocker(parent, mid, Vector3(SQ + 4.0 if horizontal else 1.0, FENCE_H, 1.0 if horizontal else SQ + 4.0))
+		Kit.blocker(parent, mid, Vector3(SQ + 4.0 if horizontal else 1.0, FENCE_H + 20.0, 1.0 if horizontal else SQ + 4.0))
 
 
 ## The inner hedge line before a ford, with a gap in the middle of it.
@@ -94,18 +96,18 @@ static func ford(parent: Node, edge: String, y: float, this_def: Dictionary, oth
 	var ns := edge == "N" or edge == "S"
 	var strip := func(along: float, depth: float, tex: String, tint: Color, lift: float) -> void:
 		var size := Vector2(SQ + 2.0, depth) if ns else Vector2(depth, SQ + 2.0)
-		Kit.floor(parent, at(edge, along, 0.0, y + lift), size, tex, {"tint": tint, "tile": 2.0, "thick": 0.05})
+		Kit.floor(parent, at(edge, along, 0.0, y + lift), size, tex, {"tint": tint, "tile": 2.0, "thick": 0.12})
 	if bool(opts.get("gate", true)):
 		gate(parent, edge, y, this_def.get("hedge", HEDGE_TINT), float(opts.get("gap", GATE_W)))
 	# the near bank
-	strip.call(GATE + 1.0, 2.0, String(this_def.ground), this_def.get("tint", Color.WHITE), 0.04)
+	strip.call(GATE + 1.0, 2.0, String(this_def.ground), this_def.get("tint", Color.WHITE), 0.1)
 	# the bed and the water
-	strip.call(BROOK, BROOK_W, "ground/pebbles", Color(0.9, 0.95, 1.0), 0.03)
+	strip.call(BROOK, BROOK_W, "ground/pebbles", Color(0.9, 0.95, 1.0), 0.09)
 	var wsize := Vector2(SQ + 2.0, BROOK_W) if ns else Vector2(BROOK_W, SQ + 2.0)
-	var water := Kit.water(parent, at(edge, BROOK, 0.0, y + 0.16), wsize, "nature/water_sea", {"tint": opts.get("water", this_def.get("water", Color(0.8, 0.85, 1.0, 0.75))), "uv_scale": 0.5, "speed": 0.05, "swell": 0.02})
+	var water := Kit.water(parent, at(edge, BROOK, 0.0, y + 0.2), wsize, "nature/water_sea", {"tint": opts.get("water", this_def.get("water", Color(0.8, 0.85, 1.0, 0.75))), "uv_scale": 0.5, "speed": 0.05, "swell": 0.02})
 	water.name = "Brook_" + edge
 	# the far bank, which is the other square's
-	strip.call(BROOK + BROOK_W * 0.5 + 1.3, 2.6, String(other_def.ground), other_def.get("tint", Color.WHITE), 0.04)
+	strip.call(BROOK + BROOK_W * 0.5 + 1.3, 2.6, String(other_def.ground), other_def.get("tint", Color.WHITE), 0.1)
 	# stones on both banks
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash(edge) + int(y * 7.0) + hash(String(this_def.id))

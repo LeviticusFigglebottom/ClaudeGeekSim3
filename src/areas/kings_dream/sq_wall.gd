@@ -31,7 +31,12 @@ const LAMP := Color(1.0, 0.85, 0.6)
 static func build(area: AreaBase, root: Node3D, ctx: Dictionary) -> Dictionary:
 	var d: Dictionary = ctx.def
 	var state := {"egg": null, "fallen": false, "npc": null, "knights": [], "shards": null}
-	Kit.floor(root, Vector3.ZERO, Vector2(KD.SQ, KD.SQ), String(d.ground), {"tint": d.tint, "tile": 2.0, "thick": 0.2})
+	# the ground either side of the street; the street itself lies lower, under water
+	var hw := STREET_W * 0.5 + 4.0
+	Kit.floor(root, Vector3(-(hw + KD.HALF) * 0.5, 0, 0), Vector2(KD.HALF - hw, KD.SQ), String(d.ground), {"tint": d.tint, "tile": 2.0, "thick": 0.2})
+	Kit.floor(root, Vector3((hw + KD.HALF) * 0.5, 0, 0), Vector2(KD.HALF - hw, KD.SQ), String(d.ground), {"tint": d.tint, "tile": 2.0, "thick": 0.2})
+	Kit.floor(root, Vector3(0, 0, (KD.HALF + 38.0) * 0.5), Vector2(hw * 2.0, KD.HALF - 38.0), String(d.ground), {"tint": d.tint, "tile": 2.0, "thick": 0.2})
+	Kit.floor(root, Vector3(0, 0, -(KD.HALF + 38.0) * 0.5), Vector2(hw * 2.0, KD.HALF - 38.0), String(d.ground), {"tint": d.tint, "tile": 2.0, "thick": 0.2})
 	_street(area, root)
 	_wall(area, root, state)
 	_tower(area, root)
@@ -56,6 +61,14 @@ static func _street(area: AreaBase, root: Node3D) -> void:
 	Kit.water(root, Vector3(0, 0.0, 0), Vector2(STREET_W + 8.0, KD.SQ - 14.0), "nature/water_dark", {"tint": Color(0.55, 0.62, 0.75, 0.8), "uv_scale": 0.3, "speed": 0.01, "swell": 0.03})
 	Kit.ramp(root, Vector3(0, 0, 38.0), 0.0, STREET_W + 8.0, 3.0, STREET_Y, "stone/cobble_city", {"tile": 1.5})
 	Kit.ramp(root, Vector3(0, 0, -38.0), 180.0, STREET_W + 8.0, 3.0, STREET_Y, "stone/cobble_city", {"tile": 1.5})
+	for sx in [-1.0, 1.0]:
+		Kit.box(root, Vector3(sx * (hw + 4.0), STREET_Y * 0.5, 0), Vector3(0.3, -STREET_Y, KD.SQ - 14.0), "stone/blocks_city", {"tile": 1.5})
+	# rubble, a stall, a boat that is a cart, and gulls' worth of debris in the water
+	Props.place(root, "rubble_pile", Vector3(-hw + 1.5, STREET_Y, 14.0), 20.0, 1.0)
+	Props.place(root, "rubble_pile", Vector3(hw - 2.0, STREET_Y, -26.0), 200.0, 0.8)
+	Props.place(root, "market_stall", Vector3(hw - 2.6, STREET_Y, 30.0), -90.0, 0.9)
+	for i in 6:
+		Props.place(root, "barrel", Vector3(rng.randf_range(-hw + 1.0, hw - 1.0), STREET_Y + 0.1, rng.randf_range(-32.0, 32.0)), rng.randf_range(0, 360), 0.8, {"collision": "none", "rotation": Vector3(90, rng.randf_range(0, 360), 0)})
 	# houses either side, bone-coloured, shuttered, taller than they should be
 	for side in [-1.0, 1.0]:
 		var z := 34.0

@@ -90,6 +90,19 @@ static func _ground(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 		"\"You are playing,\" says the Umpire.",
 		"\"Am I winning?\" \"The score is going up.\" \"Is that the same thing?\" \"It is here.\"",
 	], "reactions": {"crown": ["\"Her Majesty is playing,\" says the Umpire. \"Her Majesty is going up.\""], "knife": ["The Umpire looks at the knife. \"That is not a mallet,\" it says, and does not move."]}, "flee_knife": false})
+	# banners on posts, a hedgehog in a cage waiting to be a ball, and spikes for the look of the place
+	for post in [Vector3(-30.0, 0, 34.0), Vector3(30.0, 0, 36.0), Vector3(-34.0, 0, 12.0)]:
+		Kit.box(root, post + Vector3(0, 3.0, 0), Vector3(0.14, 6.0, 0.14), "metal/iron")
+		Props.place(root, "banner_eye", post + Vector3(0, 5.6, 0.1), 0.0, 1.0, {"collision": "none", "tint": Color(1.0, 0.6, 0.6)})
+	var cagep := Vector3(-8.0, 0, 32.0)
+	Props.place(root, "cage", cagep, 0.0, 0.8, {"collision": "box"})
+	Props.place(root, "mushroom_red", cagep + Vector3(0, 0.05, 0), 0.0, 0.6, {"collision": "none"})
+	Readable.create(root, cagep + Vector3(0, 0.6, 0.8), 0.0, "Look in the cage", [
+		"A ball, in a cage, waiting. It is red and it has spines and it is breathing.",
+		"It looks at you the way the balls in this game look at the mallets.",
+	], {"name": "CagedBall", "size": Vector3(1.2, 1.2, 0.6)})
+	Props.place(root, "spike_cluster", Vector3(26.0, 0, 38.0), 30.0, 1.0, {"collision": "box"})
+	Props.place(root, "spike_cluster", Vector3(-36.0, 0, 26.0), 120.0, 0.8, {"collision": "box"})
 	# heat: embers without fire, and a red light
 	Kit.particles(root, Vector3(0, 0.5, 22.0), "embers", Vector3(30.0, 0.3, 12.0), 60)
 	Kit.light(root, Vector3(0, 5.0, 24.0), RED, 1.2, 30.0)
@@ -127,12 +140,21 @@ static func _trench(area: AreaBase, root: Node3D) -> void:
 		Kit.light(root, Vector3(-30.0 + i * 20.0, TRENCH_Y + 2.0, cz), Color(1.0, 0.35, 0.2), 1.6, 14.0)
 	Kit.particles(root, Vector3(0, TRENCH_Y + 1.0, cz), "embers", Vector3(44.0, 0.5, depth * 0.4), 200)
 	Kit.particles(root, Vector3(0, 1.0, cz), "fog", Vector3(44.0, 0.5, depth * 0.4), 30)
-	# the way back up, for the ones who fell, at the far east end: a stair to the south side
-	Kit.stairs(root, Vector3(40.0, TRENCH_Y, cz + depth * 0.5 - 0.5), 180.0, 2.0, 24, -TRENCH_Y / 24.0, 0.4, "stone/blocks_furnace", {"tile": 1.0, "name": "TrenchStair"})
+	# the ends of the trench are walled: it is a trench, not a way off the board
+	for sx in [-1.0, 1.0]:
+		Kit.box(root, Vector3(sx * (KD.HALF + 0.5), TRENCH_Y * 0.5, cz), Vector3(1.0, -TRENCH_Y, depth + 2.0), "stone/blocks_furnace", {"tile": 2.0})
+	# the way back up, for the ones who fell: a stair along the north wall at the east
+	# end, rising west to the far side, and one along the south wall at the west end,
+	# rising east to the side you came from
+	Kit.stairs(root, Vector3(42.0, TRENCH_Y, TRENCH_Z1 + 1.0), 90.0, 1.8, 24, -TRENCH_Y / 24.0, 0.4, "stone/blocks_furnace", {"tile": 1.0, "name": "TrenchStairN"})
+	Kit.floor(root, Vector3(32.0, 0.0, TRENCH_Z1 + 0.2), Vector2(2.4, 2.4), "stone/blocks_furnace", {"tile": 1.0})
+	Kit.stairs(root, Vector3(-42.0, TRENCH_Y, TRENCH_Z0 - 1.0), -90.0, 1.8, 24, -TRENCH_Y / 24.0, 0.4, "stone/blocks_furnace", {"tile": 1.0, "name": "TrenchStairS"})
+	Kit.floor(root, Vector3(-32.0, 0.0, TRENCH_Z0 - 0.2), Vector2(2.4, 2.4), "stone/blocks_furnace", {"tile": 1.0})
 	Kit.light(root, Vector3(40.0, TRENCH_Y + 3.0, cz), EMBER, 1.0, 10.0)
+	Kit.light(root, Vector3(-40.0, TRENCH_Y + 3.0, cz), EMBER, 1.0, 10.0)
 	Readable.create(root, Vector3(0, TRENCH_Y + 0.6, cz), 0.0, "The bottom of the trench", [
 		"Ash, warm through your shoes. No fire. It is like standing in a room somebody has just left.",
-		"At the east end, a stair up. Somebody expected people down here.",
+		"At each end, a stair up: east to the far side, west to the side you came from. Somebody expected people down here.",
 	], {"name": "TrenchBottom", "size": Vector3(6.0, 1.5, 4.0)})
 	Kit.trigger(root, Vector3(0, 1.0, TRENCH_Z1 - 3.0), Vector3(KD.SQ, 3.0, 4.0), func(_p: Node) -> void:
 		if not Game.has_flag("dream_trench_crossed"):

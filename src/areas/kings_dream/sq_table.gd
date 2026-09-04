@@ -270,7 +270,18 @@ static func _edges(area: AreaBase, root: Node3D) -> void:
 		var p := Kit.polar(r, a)
 		if absf(p.x) < 4.0 or absf(p.z) < 4.0:
 			continue
-		Props.place(root, ["tree_autumn", "tree_oak_2", "tree_autumn"][i % 3], p, rng.randf_range(0, 360), rng.randf_range(0.9, 1.4), {"collision": "cylinder", "tint": Color(1.1, 0.95, 0.75)})
+		Props.place(root, ["tree_autumn", "tree_oak_2", "tree_autumn"][i % 3], p, rng.randf_range(0, 360), rng.randf_range(0.9, 1.4), {"collision": "cylinder", "collision_scale": 0.22, "tint": Color(1.1, 0.95, 0.75)})
+	# paper lanterns hung over the table from nothing, and a cake nobody has cut
+	for i in 12:
+		var a := i * 30.0 + 15.0
+		Props.place(root, "lantern_hanging", Kit.polar((R_IN + R_OUT) * 0.5, a, 4.2), 0.0, 1.0, {"collision": "none", "tint": [Color(1.0, 0.8, 0.85), Color(0.85, 0.9, 1.0), Color(1.0, 0.95, 0.75)][i % 3]})
+	var cake := Kit.polar(R_IN + 1.5, 20.0, TABLE_H)
+	for k in 3:
+		Kit.cylinder(root, cake + Vector3(0, k * 0.22, 0), 0.5 - k * 0.13, 0.22, "", {"tint": [Color(1.0, 0.92, 0.95), Color(0.98, 0.85, 0.9), Color(1.0, 0.92, 0.95)][k], "solid": false, "segments": 10})
+	Readable.create(root, cake + Vector3(0, 0.4, 0), 0.0, "Look at the cake", [
+		"A cake, uncut. On the top, in icing: EAT ME. Under it, smaller: no, don't.",
+		"It goes round with the table. So does the knife beside it, which nobody has touched, out of etiquette.",
+	], {"name": "Cake", "size": Vector3(1.2, 1.0, 1.2)})
 	for i in 4:
 		var a := i * 90.0 + 45.0
 		Props.place(root, "lantern_post", Kit.polar(33.5, a), 0.0, 1.0, {"collision": "cylinder"})

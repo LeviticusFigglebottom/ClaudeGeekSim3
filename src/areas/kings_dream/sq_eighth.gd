@@ -38,8 +38,8 @@ static func build(area: AreaBase, root: Node3D, ctx: Dictionary) -> Dictionary:
 
 static func _approach(area: AreaBase, root: Node3D) -> void:
 	var tint := Color(1.0, 1.0, 1.05)
-	Kit.floor(root, Vector3(0, 0.02, 26.0), Vector2(4.0, 24.0), "stone/marble_black", {"tint": tint, "tile": 1.5, "thick": 0.06})
-	Kit.floor(root, Vector3(0, 0.02, -26.0), Vector2(4.0, 24.0), "stone/marble_black", {"tint": tint, "tile": 1.5, "thick": 0.06})
+	Kit.floor(root, Vector3(0, 0.1, 26.0), Vector2(4.0, 24.0), "stone/marble_black", {"tint": tint, "tile": 1.5, "thick": 0.12})
+	Kit.floor(root, Vector3(0, 0.1, -26.0), Vector2(4.0, 24.0), "stone/marble_black", {"tint": tint, "tile": 1.5, "thick": 0.12})
 	# chess pieces stand along the way in, the ranks you have walked
 	var rng := area.rng
 	for i in 8:
@@ -64,8 +64,9 @@ static func _approach(area: AreaBase, root: Node3D) -> void:
 
 static func _rotunda(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 	var c := CENTRE
-	Kit.ring(root, c, 0.0, R + 1.0, 36, "stone/blocks_nexus")
-	Kit.ring(root, c + Vector3(0, 0.02, 0), 3.2, 4.6, 36, "stone/marble_black", {"solid": false})
+	Kit.ring(root, c + Vector3(0, 0.12, 0), 0.0, R + 1.0, 36, "stone/blocks_nexus")
+	Kit.ring(root, c + Vector3(0, 0.14, 0), 3.2, 4.6, 36, "stone/marble_black", {"solid": false})
+	Kit.ring(root, c + Vector3(0, 0.12, 0), R + 1.0, R + 3.0, 36, "stone/marble_black", {"tint": Color(0.8, 0.8, 0.9)})
 	# the wall, with the way in at the south and the way out at the north
 	Kit.round_wall(root, c, R, 9.0, 36, "stone/blocks_nexus", {"gaps": [[90.0, 16.0], [270.0, 16.0]]})
 	Kit.ring(root, c + Vector3(0, 9.0, 0), 5.0, R + 1.0, 36, "stone/blocks_nexus", {"down": true})
@@ -73,9 +74,9 @@ static func _rotunda(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 	# the rune ring, the wrong way round
 	var q := QuadMesh.new()
 	q.size = Vector2(9.0, 9.0)
-	Kit.add_mesh(root, q, Kit.mat("props/rune_ring_floor", {"unshaded": false}), c + Vector3(0, 0.03, 0), {"solid": false, "rotation": Vector3(-90, 0, 180)})
+	Kit.add_mesh(root, q, Kit.mat("props/rune_ring_floor", {"unshaded": false}), c + Vector3(0, 0.15, 0), {"solid": false, "rotation": Vector3(-90, 0, 180)})
 	# no well: the place it stood is where the crown is put on
-	Kit.ring(root, c + Vector3(0, 0.05, 0), 0.0, 1.4, 16, "stone/marble_white", {"solid": false})
+	Kit.ring(root, c + Vector3(0, 0.17, 0), 0.0, 1.4, 16, "stone/marble_white", {"solid": false})
 	Kit.light(root, c + Vector3(0, 2.5, 0), Color(0.5, 0.6, 1.0), 1.2, 9.0)
 	# the plaque, mirrored
 	Kit.box(root, c + Vector3(-6.0, 0.5, -2.2), Vector3(1.2, 1.0, 0.4), "stone/blocks_nexus")
@@ -108,6 +109,8 @@ static func _rotunda(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 		Kit.add_mesh(door, sq, Kit.static_mat({"brightness": 0.9}), Vector3(0, 1.4, 0), {"solid": false, "rotation": Vector3(0, 180, 0)})
 		Kit.label(root, World.area_name(id), c + Kit.polar(R - 1.35, a, 3.7), yaw, 40, Color(0.85, 0.8, 0.65), "display", {"pixel_size": 0.016})
 		Kit.light(root, c + Kit.polar(R - 2.2, a, 3.2), Color(0.8, 0.8, 0.8), 0.7, 6.0)
+		if i % 3 == 0:
+			Props.place(root, "tv_crt", c + Kit.polar(R - 2.4, a + 9.0, 0.12), yaw + 30.0, 0.9, {"collision": "box"})
 		Interactable.make(root, c + Kit.polar(R - 1.0, a), Vector3(1.6, 2.8, 0.9), "Step into the static", func(_p: Node, _it: Node) -> void:
 			Game.toast.emit("Every door out of the King's dream is the same door, and it is between channels.")
 			Audio.sfx("static_burst", null, -4.0)
@@ -117,6 +120,9 @@ static func _rotunda(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 		"They are in the wrong order. The Hollow Wood is where the Static should be. You have stood in a room like this from the other side of a mirror.",
 	], {"name": "DoorsLook", "size": Vector3(2.0, 2.6, 2.0)})
 	Kit.particles(root, c + Vector3(0, 3, 0), "motes", Vector3(10, 3, 10), 70)
+	for k in 6:
+		var orb := Clockwork.create(root, c + Vector3(0, 5.0 + k * 0.5, 0), {"mode": "rotate", "axis": Vector3.UP, "speed_deg": 6.0 + k * 2.0, "name": "Orb%d" % k})
+		Props.place(orb.body, "orb", Kit.polar(6.0 + k * 0.8, k * 60.0), 0.0, 0.6, {"collision": "none"})
 	# the crown, put on at the centre, with no ceremony
 	Kit.trigger(root, c + Vector3(0, 1.0, 0), Vector3(3.0, 3.0, 3.0), func(_p: Node) -> void:
 		_crown(area, state), {"name": "CrownSpot", "once": true})
