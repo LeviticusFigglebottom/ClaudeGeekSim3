@@ -227,9 +227,42 @@ func _arrive(_p: Node, j: int, from_i: int, backwards: bool) -> void:
 			(a.on_return as Callable).call()
 		Game.set_flag("dream_back_" + String(d.id), true)
 		Game.note("dream_back_" + String(d.id), "A brook that runs backwards", "The brook out of %s put you back in %s, from a side you had not come in by. It is not the square you crossed. Crossing it changed it." % [sq[from_i].def.name, d.name])
+	elif String(d.id) == "wood":
+		Game.toast.emit(String(d.rank) + ": ")
 	else:
 		Game.toast.emit(String(d.rank) + ": " + String(d.name))
 	Game.set_flag("dream_reached_" + String(d.id), true)
+	_flush_notes()
+
+
+## The wood will not let the journal write. Notes made there are kept until the
+## player is somewhere that has names again.
+func defer_note(key: String, title: String, text: String) -> void:
+	if current >= 0 and String(sq[current].def.id) == "wood" and not Game.has_flag("dream_back_wood"):
+		for n in _pending_notes:
+			if n[0] == key:
+				return
+		_pending_notes.append([key, title, text])
+		return
+	Game.note(key, title, text)
+
+
+func _flush_notes() -> void:
+	if _pending_notes.is_empty():
+		return
+	for n in _pending_notes:
+		Game.note(n[0], n[1], "(Written afterwards. The wood would not let you write it there.) " + n[2])
+	_pending_notes.clear()
+	Game.toast.emit("Your hand remembers what it could not write in the wood.")
+
+
+func _process(delta: float) -> void:
+	if not built or current < 0:
+		return
+	_t += delta
+	var a: Dictionary = sq[current].anchors
+	if a.has("on_process"):
+		(a.on_process as Callable).call(delta)
 
 
 ## Only the square you are in is drawn; the others are a hundred metres off and

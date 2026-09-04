@@ -70,6 +70,12 @@ func _ready() -> void:
 			pt.name = "Playtest"
 			pt.set_script(load("res://tools/playtest.gd"))
 			add_child(pt)
+		elif a.begins_with("--probe="):
+			# attach any script as a node: ad-hoc headless probes while building an area
+			var pr := Node.new()
+			pr.name = "Probe"
+			pr.set_script(load(a.trim_prefix("--probe=")))
+			add_child(pr)
 		elif a == "--brooks":
 			var bt := Node.new()
 			bt.name = "BrooksTest"
