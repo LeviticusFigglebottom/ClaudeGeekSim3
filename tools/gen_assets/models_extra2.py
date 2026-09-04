@@ -18,7 +18,7 @@ import numpy as np
 
 from glb import GLB, MeshBuilder, compose, mat_rot_x, mat_rot_y, mat_rot_z, mat_scale, mat_translate  # noqa: E402
 from models import single, vary  # noqa: E402
-from models_extra import reg, _bar, _limb, _disc, _quadn, _trin, WHITE, PI, TAU  # noqa: E402
+from models_extra import reg, _bar, _limb, _disc, _quadn, _trin, WHITE, PI, TAU, SKIN  # noqa: E402
 
 CREAM = (0.97, 0.94, 0.86)
 IVORY = (0.92, 0.9, 0.84)
@@ -269,3 +269,87 @@ def mallet_hook(rng):
 
 
 reg("mallet_hook", mallet_hook)
+
+
+# --------------------------------------------------------------------------
+# the beanstalk, the vase, and the King as he is
+# --------------------------------------------------------------------------
+
+STALK = "tex:nature/stalk"
+LEAF = (0.42, 0.7, 0.34)
+
+
+def _leaf(m, base, length, width, yaw, tilt, col=LEAF):
+    """A pointed leaf lying out from `base` along yaw, tilted up by tilt."""
+    m.push(compose(mat_translate(*base), mat_rot_y(yaw), mat_rot_x(-tilt)))
+    m.quad((-width * 0.5, 0, -length * 0.45), (width * 0.5, 0, -length * 0.45), (0, 0.02, -length), (0, 0.02, -length), "flat", col, double=True)
+    m.quad((-width * 0.12, 0, 0), (width * 0.12, 0, 0), (width * 0.5, 0, -length * 0.45), (-width * 0.5, 0, -length * 0.45), "flat", col, double=True)
+    m.pop()
+
+
+def beanstalk_small(rng):
+    """A sprout a little taller than a man: a twisting stem with a few leaves and a curl at the top."""
+    m = MeshBuilder()
+    pts = [(0, 0, 0)]
+    for i in range(1, 8):
+        a = i * 0.9
+        pts.append((math.cos(a) * 0.12 * i / 7, i * 0.24, math.sin(a) * 0.12 * i / 7))
+    for i in range(len(pts) - 1):
+        _limb(m, pts[i], pts[i + 1], 0.06 - i * 0.005, 0.055 - i * 0.005, STALK, WHITE)
+    # the curl
+    top = pts[-1]
+    for i in range(6):
+        a = i * 0.7
+        p0 = (top[0] + math.cos(a) * 0.12, top[1] + 0.06 * i, top[2] + math.sin(a) * 0.12)
+        p1 = (top[0] + math.cos(a + 0.7) * 0.12, top[1] + 0.06 * (i + 1), top[2] + math.sin(a + 0.7) * 0.12)
+        _limb(m, p0, p1, 0.02, 0.015, STALK, WHITE)
+    for i, p in enumerate(pts[2:7]):
+        _leaf(m, p, 0.5 + rng.random() * 0.2, 0.3, i * 1.9 + rng.random() * 0.5, 0.35)
+    return single("beanstalk_small", m, {"collision": "none"})
+
+
+reg("beanstalk_small", beanstalk_small)
+
+
+def beanstalk_leaf(rng):
+    """One great leaf, four metres long, to hang off the giant stalk."""
+    m = MeshBuilder()
+    _leaf(m, (0, 0, 0), 4.0, 2.2, 0.0, 0.2, vary(rng, LEAF, 0.05))
+    _limb(m, (0, -0.02, 0), (0, 0.6, -3.6), 0.06, 0.02, STALK, WHITE)
+    return single("beanstalk_leaf", m, {"collision": "none"})
+
+
+reg("beanstalk_leaf", beanstalk_leaf)
+
+
+def vase(rng):
+    """A cream vase with a blue band, for three paper roses."""
+    m = MeshBuilder()
+    m.lathe([(0.1, 0.0), (0.15, 0.08), (0.14, 0.24), (0.08, 0.34), (0.1, 0.42)], 10, "flat", (0.94, 0.9, 0.84), smooth=True)
+    m.lathe([(0.152, 0.12), (0.152, 0.17)], 10, "flat", (0.3, 0.42, 0.68), smooth=False, cap_top=False, cap_bottom=False)
+    return single("vase", m, {"collision": "none"})
+
+
+reg("vase", vase)
+
+
+def king_coma(rng):
+    """The Red King as he is: no crown, no colour, lying very still under a sheet."""
+    m = MeshBuilder()
+    sheet = "tex:fabric/sheet"
+    pale = (0.92, 0.9, 0.86)
+    m.box((-0.75, 0.06, 0.05), (0.5, 0.12, 0.42), "flat", (0.9, 0.88, 0.8))
+    m.push(compose(mat_translate(0.1, 0.22, 0), mat_scale(1.0, 0.6, 1.0), mat_rot_z(PI / 2)))
+    m.lathe([(0.3, -0.7), (0.34, -0.2), (0.3, 0.4), (0.26, 0.7)], 8, sheet, WHITE, smooth=True, uv_scale=(2.0, 1.0))
+    m.pop()
+    _limb(m, (-0.5, 0.3, -0.18), (0.05, 0.22, -0.3), 0.08, 0.07, sheet, WHITE)
+    m.box((0.12, 0.2, -0.3), (0.12, 0.06, 0.12), SKIN, pale)
+    m.push(compose(mat_translate(-0.62, 0.22, -0.02), mat_rot_z(PI / 2)))
+    m.lathe([(0.08, 0.0), (0.08, 0.12)], 6, SKIN, pale)
+    m.pop()
+    m.sphere((-0.8, 0.2, -0.02), 0.16, 5, 8, SKIN, pale)
+    m.card((-0.8, 0.21, -0.19), (0.3, 0.32), "tex:faces/king", pale, yaw=PI)
+    return single("king_coma", m, {"collision": "box"})
+
+
+reg("king_coma", king_coma)

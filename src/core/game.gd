@@ -85,6 +85,7 @@ const ITEMS := {
 	"dog_biscuit": {"name": "Dog Biscuit", "desc": "Shaped like a bone. Smells of nothing at all."},
 	"page": {"name": "Torn Page", "desc": "A page from the house journal. The handwriting changes halfway down."},
 	"candle_stub": {"name": "Candle Stub", "desc": "Black wax. It has been lit from both ends, and the middle."},
+	"bonemeal": {"name": "Bonemeal", "desc": "Grey and fine and warm. Whatever it was, it was old, and it wanted to be a garden."},
 	"rose": {"name": "Paper Rose", "desc": "Folded from a page of the infinite library. It smells of dust and, faintly, of rain."},
 }
 

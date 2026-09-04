@@ -426,7 +426,8 @@ static func _hill(area: AreaBase, root: Node3D) -> void:
 	var top_l := HILL + Kit.polar(r, flights * 45.0, HILL_TOP)
 	Kit.floor(root, top_l + Vector3(0, 0.03, 0), Vector2(1.9, 1.9), tex, {"tint": Color(0.95, 0.9, 0.95), "tile": 1.0})
 	Kit.floor(root, (top_l + HILL + Vector3(0, HILL_TOP, 0)) * 0.5, Vector2(1.6, r), tex, {"tint": Color(0.95, 0.9, 0.95), "tile": 1.0, "yaw": Kit.dir_to_yaw((HILL - top_l).normalized()) + 90.0})
-	Props.place(root, "arch_pastel", HILL + Vector3(0, HILL_TOP, 0), 90.0, 1.2, {"collision": "none"})
+	_beanstalk(area, root)
+	area.add_spawn("hilltop", HILL + Vector3(0, HILL_TOP + 0.1, 2.9), 0.0)
 	Kit.light(root, HILL + Vector3(0, HILL_TOP + 3.0, 0), Color(1.0, 0.9, 0.95), 1.2, 14.0)
 	for k in 5:
 		Props.place(root, "cloud", HILL + Kit.polar(7.0 + k * 1.5, k * 72.0 + 20.0, HILL_TOP + 3.0 + k * 1.2), k * 50.0, 1.4, {"collision": "none"})
@@ -436,6 +437,72 @@ static func _hill(area: AreaBase, root: Node3D) -> void:
 		"The wind is warm and comes from below, as if something under the garden were breathing out.",
 	], {"name": "HillView", "size": Vector3(2.0, 1.4, 1.0), "note_key": "dream_hill", "note_title": "The hill in the garden", "note_text": "A pink hill with a stair round it, at the east side of the garden. From the top the maze is not a maze. The wind comes up from below, warm, as if something were breathing."})
 	Puzzle.declare(area, "dream_hill", "", [], "climb the pink hill on the east side of the garden and look down")
+
+
+# --- the beanstalk -----------------------------------------------------------------------
+
+const STALK_H := 30.0
+
+## A sprout on the hill top, always, a little taller than you. Fed the meal
+## from the ossuary altar it becomes the stalk, with a stair of leaves round
+## it to a leaf at the top that is a door into the sky.
+static func _beanstalk(area: AreaBase, root: Node3D) -> void:
+	var base := HILL + Vector3(0, HILL_TOP, 0)
+	if not Game.has_flag("beanstalk_grown"):
+		Props.place(root, "beanstalk_small", base, 20.0, 1.3, {"collision": "none"})
+		Interactable.make(root, base + Vector3(0, 0.9, 0), Vector3(1.0, 1.8, 1.0), "The sprout", func(_p: Node, _it: Node) -> void:
+			_feed(area), {"name": "Sprout"})
+		Puzzle.declare(area, "dream_beanstalk", "beanstalk_grown", ["item:bonemeal"], "feed the sprout on top of the garden's hill the meal from the altar", {"route": "kings_mind:from_beanstalk"})
+		return
+	var top := HILL_TOP + STALK_H
+	Kit.cylinder(root, base, 2.2, STALK_H - 0.4, "nature/stalk", {"segments": 10, "tile": 1.5, "tint": Color(0.95, 1.0, 0.9)})
+	# the stair of leaves: twelve flights of sixty degrees, as the hill's own stair
+	var flights := 12
+	var rise := STALK_H / flights
+	var r := 3.7
+	for i in flights:
+		var a0 := i * 60.0 + 30.0
+		var a1 := (i + 1) * 60.0 + 30.0
+		var l0 := HILL + Kit.polar(r, a0, HILL_TOP + i * rise)
+		var l1 := HILL + Kit.polar(r, a1, HILL_TOP + (i + 1) * rise)
+		var d := l1 - l0
+		d.y = 0.0
+		var steps := 9
+		Kit.stairs(root, l0, Kit.dir_to_yaw(d.normalized()), 1.6, steps, rise / steps, d.length() / steps, "nature/hedge", {"tint": Color(0.75, 1.0, 0.7) if i % 2 == 0 else Color(0.6, 0.9, 0.55), "tile": 1.2, "name": "StalkFlight%d" % i})
+		Kit.floor(root, l0 + Vector3(0, 0.03, 0), Vector2(1.9, 1.9), "nature/hedge", {"tint": Color(0.7, 0.95, 0.65), "tile": 1.2})
+		Props.place(root, "beanstalk_leaf", HILL + Kit.polar(2.0, a0 + 100.0, HILL_TOP + i * rise + 1.2), -(a0 + 100.0) - 90.0, 1.0 + (i % 3) * 0.2, {"collision": "none"})
+		if i % 3 == 1:
+			Kit.light(root, l0 + Vector3(0, 2.0, 0), Color(0.8, 1.0, 0.8), 0.7, 8.0)
+	var top_l := HILL + Kit.polar(r, flights * 60.0 + 30.0, top)
+	Kit.floor(root, top_l + Vector3(0, 0.03, 0), Vector2(1.9, 1.9), "nature/hedge", {"tint": Color(0.7, 0.95, 0.65), "tile": 1.2})
+	# the leaf at the top, and the sky it opens onto
+	Kit.cylinder(root, HILL + Vector3(0, top - 0.4, 0), 3.0, 0.4, "nature/hedge", {"segments": 12, "tile": 1.5, "tint": Color(0.8, 1.0, 0.75)})
+	for k in 6:
+		Props.place(root, "beanstalk_leaf", HILL + Kit.polar(2.4, k * 60.0 + 15.0, top - 0.1), -(k * 60.0 + 15.0) - 90.0, 1.2, {"collision": "none"})
+	for k in 4:
+		Props.place(root, "cloud", HILL + Kit.polar(6.0 + k * 1.5, k * 90.0 + 45.0, top + 1.0 + k * 0.8), k * 50.0, 1.6, {"collision": "none"})
+	Kit.light(root, HILL + Vector3(0, top + 2.5, 0), Color(1.0, 0.95, 1.0), 1.3, 12.0)
+	Door.create(root, HILL + Vector3(0, top, 0), 0.0, "kings_mind", "from_beanstalk", {"kind": "none", "label": "Climb on, into the sky", "name": "StalkDoor", "fade_color": Color(0.9, 0.85, 0.95), "fade_duration": 1.4, "sound": "wind_gust"})
+	Kit.label(root, "up", HILL + Vector3(0, top + 1.6, 0), 0.0, 24, Color(0.95, 1.0, 0.9), "body", {"pixel_size": 0.012})
+	Puzzle.declare(area, "dream_beanstalk", "beanstalk_grown", ["item:bonemeal"], "feed the sprout on top of the garden's hill the meal from the altar", {"route": "kings_mind:from_beanstalk"})
+
+
+static func _feed(area: AreaBase) -> void:
+	if World.hud == null:
+		return
+	if not Game.has_item("bonemeal"):
+		await World.hud.say("", ["A sprout, on top of a hill, on top of a dream. It is a little taller than you and it has not grown since you got here.", "The soil round it is pink and thin. Something this small, this high up, would need feeding."])
+		return
+	Game.take_item("bonemeal")
+	Game.set_flag("beanstalk_grown", true)
+	await World.hud.say("", [
+		"You pour the grey meal round the sprout's foot. The hill takes it like a drink.",
+		"The sprout thinks about it. Then it goes up.",
+		"It goes up past you, past the clouds you put there, past the hedges' idea of how tall a thing can be, and the leaves come out of it in a stair, and it is still going.",
+	])
+	Game.note("beanstalk", "The beanstalk", "The sprout on the garden's hill, fed the bonemeal, is a stalk now, higher than the dream. There is a stair of leaves round it. Whatever is at the top is above the King's sleep, which means it is in his head.")
+	Audio.sfx("wind_gust", null, -4.0)
+	World.reload_here("hilltop", {"color": Color(0.85, 0.95, 0.8), "duration": 0.9})
 
 
 # --- the field with the mailbox, from the Nowhere House ------------------------------------

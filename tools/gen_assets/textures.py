@@ -523,6 +523,66 @@ def book_spines(rng, size=64, levels=12):
     return T.quantize(T.draw_on(img, fn), levels)
 
 
+
+def brain_wall(rng, size=64, levels=12):
+    """Grey matter: pink-grey convolutions with dark grooves between them."""
+    base = plaster(rng, "#c48a98", "#a86a7c", size, levels=64)
+    im = T.to_pil(base)
+    from PIL import ImageDraw
+    d = ImageDraw.Draw(im)
+    groove = (94, 40, 56)
+    light = (222, 172, 184)
+    for i in range(26):
+        x = rng.random() * size
+        y = rng.random() * size
+        w = rng.uniform(8, 18)
+        h = rng.uniform(5, 12)
+        a0 = rng.uniform(0, 360)
+        for ox in (-size, 0, size):
+            for oy in (-size, 0, size):
+                d.arc([x + ox - w, y + oy - h, x + ox + w, y + oy + h], a0, a0 + rng.uniform(120, 300), fill=groove, width=2)
+                d.arc([x + ox - w + 1, y + oy - h - 2, x + ox + w + 1, y + oy + h - 2], a0, a0 + 90, fill=light, width=1)
+    out = T.from_pil(im)
+    return T.quantize(T.grain(out[..., :3], rng, 0.04), levels)
+
+
+def book_wall(rng, size=64, levels=12):
+    """A wall that is all bookshelf: rows of spines with a plank between each."""
+    cols = ["#5a2a2a", "#2a3a5a", "#3a4a2a", "#6a5a2a", "#4a2a5a", "#2a2a2a", "#7a3a2a", "#3a5a5a", "#8a6a3a"]
+    img = T.solid(size, "#1a1410")
+    def fn(d, sz):
+        w, h = sz
+        rows = 3
+        rh = h // rows
+        for r in range(rows):
+            y0 = r * rh
+            d.rectangle([0, y0, w, y0 + 3], fill=(96, 62, 34))
+            x = 0
+            while x < w:
+                bw = int(rng.integers(3, 8))
+                c = tuple(int(v * 255) for v in T.hexc(cols[int(rng.integers(0, len(cols)))]))
+                top = y0 + 4 + int(rng.integers(0, 4))
+                d.rectangle([x, top, x + bw - 2, y0 + rh - 1], fill=c)
+                gold = (200, 170, 90)
+                for yy in range(top + 4, y0 + rh - 3, 7):
+                    d.line([(x + 1, yy), (x + bw - 3, yy)], fill=gold)
+                x += bw
+    return T.quantize(T.draw_on(img, fn), levels)
+
+
+def stalk(rng, size=64, levels=10):
+    """A beanstalk's skin: green, fibrous, ridged along its length."""
+    base = plaster(rng, "#4e8a3a", "#2f5a24", size, levels=64)
+    im = T.to_pil(base)
+    from PIL import ImageDraw
+    d = ImageDraw.Draw(im)
+    for i in range(10):
+        x = int(rng.integers(0, size))
+        d.line([(x, 0), (x + int(rng.integers(-3, 4)), size)], fill=(38, 74, 30), width=2)
+        d.line([(x + 2, 0), (x + 2 + int(rng.integers(-3, 4)), size)], fill=(120, 190, 96), width=1)
+    out = T.from_pil(im)
+    return T.quantize(T.grain(out[..., :3], rng, 0.03), levels)
+
 def tv_static(rng, size=64, face=False, levels=8):
     n = rng.random((size, size)).astype(np.float32)
     img = np.repeat(n[..., None], 3, axis=-1) * 0.8 + 0.1
@@ -931,6 +991,10 @@ def build_catalog():
     reg("sky/cistern", lambda r: sky("#0a2a2c", "#12484d", "#2f8f95"))
     reg("sky/dawn", lambda r: sky("#2a1a3a", "#a04a5a", "#f0a060", stars=20, rng=r))
     reg("sky/kings_dream", lambda r: sky("#4a2a58", "#f0a0b8", "#fff0c0", stars=0, bands=0.04))
+    reg("sky/kings_mind", lambda r: sky("#1a1030", "#6a4070", "#f0c8d8", stars=60, bands=0.02))
+    reg("organic/brain", brain_wall, surface="flesh")
+    reg("wood/book_wall", book_wall, surface="wood")
+    reg("nature/stalk", stalk, surface="grass")
 
     # brick / wood
     reg("brick/red", lambda r: stone_blocks(r, "#7a3a2a", "#5e2c22", "#3a3028", rows=8, cols=4, cracks=1), surface="stone")
@@ -1049,6 +1113,8 @@ def build_catalog():
     reg("signs/kd_charge", lambda r: sign(["THE CHARGE", "that the accused", "was somewhere", "and is not", "there now"], "#efe6cf", "#2a2030", size=(128, 128), kind="body", font_size=14, frame_color="#6a1a1e"))
     reg("signs/kd_rules", lambda r: sign(["RULES OF THE GAME", "1. you are playing", "2.", "(the rest is torn off)"], "#e8d8c0", "#4a1a18", size=(128, 96), kind="body", font_size=13, frame_color="#8a3a30"))
     reg("signs/kd_between", lambda r: sign(["BETWEEN"], "#2a3040", "#f0e8d0", size=(128, 48), kind="display", font_size=26, frame_color="#8a8478"))
+    reg("signs/km_plate", lambda r: sign(["HIS MAJESTY", "is not", "receiving"], "#2a1a24", "#e8d0c8", size=(128, 64), kind="body", font_size=15, frame_color="#8a6a5a"))
+    reg("signs/km_shelf", lambda r: sign(["EVERYTHING HE", "HAS BEEN TOLD", "shelved by", "who told him"], "#e6dcc4", "#3a2a20", size=(128, 96), kind="body", font_size=13, frame_color="#6a4a2a"))
     reg("signs/kd_menu", lambda r: sign(["TEA", "tea", "more tea", "no room"], "#f8f0e0", "#3a2a30", size=(96, 128), kind="body", font_size=15, frame_color="#c0a070"))
     reg("signs/king_asleep", lambda r: sign(["the king", "is asleep"], "#1a1a20", "#b8963e", size=(128, 64), kind="title", font_size=22))
     reg("signs/no_vacancy", lambda r: sign(["NO VACANCY", "(one room)"], "#3a1a1a", "#ffb0a0", size=(128, 64), kind="body", font_size=22, frame_color="#8a4a3a"))

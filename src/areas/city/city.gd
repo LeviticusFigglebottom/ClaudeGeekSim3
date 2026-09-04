@@ -368,6 +368,28 @@ func _gate_street() -> void:
 
 # --- the west gate: the road to the Hollow Wood -----------------------------------
 
+func _on_altar(_p: Node, _it: Node) -> void:
+	if World.hud == null:
+		return
+	if Game.has_flag("bonemeal_made"):
+		await World.hud.say("", ["The black candle stands between the two tall ones, out. The altar is clean. Whatever was in it has gone with you."])
+		return
+	if not Game.has_item("candle_stub"):
+		await World.hud.say("", ["Two tall candles and a space between them the width of a third.", "Under the altar slab, when you put your hand on it, something dry shifts and settles, like a drawer of teeth."])
+		return
+	Game.take_item("candle_stub")
+	await World.hud.say("", [
+		"You stand the black stub between the two tall candles. It lights itself, at both ends and the middle, which is not how candles work.",
+		"The tall candles go out. The clock with no hands, over the altar, ticks once.",
+		"Under the slab the dry things shift again, and go on shifting, and grow quieter, and finer, until what pours out of the crack at the altar's foot is a grey warm meal.",
+		"You take a handful. It is the whole of somebody, and it is enough to feed a garden.",
+	])
+	Game.set_flag("bonemeal_made", true)
+	Game.gain_item("bonemeal")
+	Audio.sfx("whisper", null, -6.0)
+	Game.note("bonemeal", "The altar and the candle", "The black candle burnt from both ends went on the ossuary altar between the two tall ones, and the bones under the slab came out as meal. Old bone makes a garden grow. Something somewhere is waiting to be fed.")
+
+
 func _west_gate() -> void:
 	Kit.floor(self, Vector3(-24.0, 0, -13.6), Vector2(6.0, 18.2), "stone/cobble_city", {"tile": 2.0})
 	_building(-33.0, -27.1, -22.5, -12.5, 10.0, "wood/planks_dark", "e")
@@ -517,6 +539,12 @@ func _cathedral() -> void:
 	Props.place(self, "candle_tall", altar + Vector3(-1.5, 0, 0.3), 0.0, 1.0, {"collision": "none"})
 	Props.place(self, "candle_tall", altar + Vector3(1.5, 0, 0.3), 0.0, 1.0, {"collision": "none"})
 	Kit.light(self, altar + Vector3(0, 1.6, 0.6), CANDLE, 1.5, 9.0)
+	# the altar itself: the black candle from the forge belongs among the others,
+	# and what it burns down to is what the bones beneath were waiting for
+	if Game.has_flag("bonemeal_made"):
+		Props.place(self, "candle_cluster", altar + Vector3(0, 1.05, 0.2), 0.0, 0.5, {"collision": "none", "tint": Color(0.15, 0.12, 0.14)})
+	Interactable.make(self, altar + Vector3(0, 0.9, 0.2), Vector3(2.2, 1.2, 1.2), "The altar", _on_altar, {"name": "OssuaryAltar"})
+	Puzzle.declare(self, "ossuary_bonemeal", "bonemeal_made", ["item:candle_stub"], "set the candle burnt from both ends on the ossuary altar", {"item": "bonemeal"})
 	Props.place(self, "lectern", Vector3(12.4, 0, -45.4), -35.0, 1.0)
 	Readable.create(self, Vector3(12.4, 0.9, -45.4), -35.0, "Read the register", [
 		"The register of the drowned. Every line is the same name, in the same hand, and the name is the word WATER.",

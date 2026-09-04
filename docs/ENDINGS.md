@@ -30,8 +30,12 @@ speculatively.
   things. The bottom of the well is a door now. It is not open yet. Something
   is still missing, and it is not a thing."* There is no fourth state and no
   descent.
-* Two items with no lock, the Paper Rose and the Candle Stub, which
-  `tools/verify.sh` warns about by name. A third rose is specified in
-  `docs/areas/KINGS_DREAM.md`. What any of the three are for is open.
+* The Candle Stub from the forge goes on the Ossuary altar in the Drowned
+  City and becomes Bonemeal. Bonemeal fed to the sprout on the hill in the
+  King's Dream grows the beanstalk into the King's Mind
+  (`docs/areas/KINGS_MIND.md`). The three Paper Roses go in the vase by the
+  King's bed there. After the third, he has stopped dreaming about you and is
+  waiting. What he is waiting for, and what happens next, is open: the flag is
+  `roses_all_placed` and nothing reads it yet.
 * `Game.stats` counts doors, wakes, falls, distance and playtime, and survives
   a save. Any ending that wants to read the run can.

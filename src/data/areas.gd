@@ -103,6 +103,11 @@ const AREAS := {
 		"name": "The King's Dream", "subtitle": "he is dreaming about you",
 		"realm": "kings_dream", "ambience": "sea",
 	},
+	"kings_mind": {
+		"scene": "res://src/areas/kings_mind/kings_mind.tscn",
+		"name": "The King's Mind", "subtitle": "everything he has been told",
+		"realm": "kings_mind", "ambience": "cistern",
+	},
 }
 
 ## Areas the player can reach without any keepsake, straight from the first sleep.

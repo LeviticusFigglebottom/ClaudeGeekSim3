@@ -546,7 +546,7 @@ func _undertavern() -> void:
 	Props.place(self, "mug", table + Vector3(-0.6, 2.34, 0.9), 40.0, s, {"collision": "cylinder"})
 	Props.place(self, "candle", table + Vector3(0.9, 2.34, -0.6), 0.0, s, {"collision": "none"})
 	Kit.light(self, table + Vector3(0.9, 3.5, -0.6), CANDLE, 1.2, 7.0)
-	Pickup.create(self, table + Vector3(0.1, 2.34, -0.3), {"item": "rose", "requires_keepsake": "mouse", "name": "PaperRose", "prompt": "Take the paper rose"})
+	Pickup.create(self, table + Vector3(0.1, 2.34, -0.3), {"item": "rose", "requires_keepsake": "mouse", "name": "PaperRose", "key": "picked_rose_tavern", "prompt": "Take the paper rose"})
 	Props.place(self, "stool", c + Vector3(-2.5, 0, 3.0), 0.0, s, {"collision": "box"})
 	Props.place(self, "stool", c + Vector3(6.5, 0, 3.5), 30.0, s, {"collision": "box"})
 	Props.place(self, "mug", c + Vector3(-6.0, 0, -4.5), -20.0, s, {"collision": "cylinder"})
@@ -690,7 +690,7 @@ func _barkeep_talk(_p: Node, _npc: Node) -> bool:
 	if Game.active_is("knife"):
 		await World.hud.say("The Barkeep", ["\"Put that away.\"", "He does not move. He does not need to. The room does it for him."])
 		return true
-	var i: int = await World.hud.ask("The Barkeep", "What'll it be?", ["Ale", "A riddle", "A trade", "A room"])
+	var i: int = await World.hud.ask("The Barkeep", "What'll it be?", ["Ale", "A riddle", "A trade", "A room", "A rumour"])
 	match i:
 		0:
 			await World.hud.say("The Barkeep", ["\"It's warm. Everything here is warm. That's the point.\"", "You drink it. It is."])
@@ -701,7 +701,53 @@ func _barkeep_talk(_p: Node, _npc: Node) -> bool:
 			await _trade()
 		3:
 			await _room()
+		4:
+			await _rumour()
 	return true
+
+
+## What the room is saying. He listens to everyone and repeats the one thing
+## that would help, sideways, and never says where he heard it.
+func _rumour() -> void:
+	Game.bump("rumours")
+	var lines: Array = []
+	var roses := Game.count("roses_placed")
+	if Game.has_flag("roses_all_placed"):
+		lines = ["\"Three paper flowers in a glass, by a bed that isn't in any house. He hears them, they say. Nobody's said yet what he'll do about it.\"", "He wipes a glass that was already dry.", "\"That's not a rumour. That's the end of the rumours. Come back when there's more.\""]
+	elif Game.has_flag("visited_kings_mind"):
+		var where: Array = []
+		if not Game.has_flag("picked_rose_castle"):
+			where.append("\"One's in a keep, where the books are kept behind the chair nobody sits in.\"")
+		if not Game.has_flag("picked_rose_tavern"):
+			where.append("\"One's under this floor. You'd have to be a good deal smaller than you are to fetch it.\"")
+		if not Game.has_flag("picked_rose_maze"):
+			where.append("\"One's in a hedge that spells a word, in a garden that's asleep. You'd want wings to see the word.\"")
+		lines = ["\"Paper flowers. Three of them, folded from the same book. A glass by a bed is waiting for all three.\""]
+		if where.is_empty():
+			lines.append("\"You've got them all, I hear. So it's only the walk back up.\"")
+		else:
+			lines.append_array(where)
+		lines.append("\"Paper keeps, so long as it's dry. %d in the glass so far, they say.\"" % roses)
+	elif Game.has_flag("beanstalk_grown"):
+		lines = ["\"Something on a hill in a garden has grown taller than the hill, and the hill's in a dream.\"", "\"Things that grow that fast are asking to be climbed. Take anything paper you've got. There's a glass up there with nothing in it.\""]
+	elif Game.has_item("bonemeal"):
+		lines = ["\"Old bone makes a garden grow. Everyone knows that. What they don't say is which garden.\"", "\"There's a hill in the King's sleep with a sprout on it that's never been fed. That's the rumour. Don't quote me.\""]
+	elif Game.has_item("candle_stub"):
+		lines = ["\"A candle that burns at both ends wants an altar, not a pocket.\"", "\"The drowned city has one. Clock over it with no hands. Two candles on it, and room between them for a third.\""]
+	elif Game.has_flag("visited_kings_dream"):
+		lines = ["\"Under the hill, in the forge, there's an iron maiden with nobody in it.\"", "\"Open it anyway. The last one who did came out with a candle and a look on his face.\""]
+	elif Game.has_keepsake("wings") and Game.has_keepsake("hourglass"):
+		if Game.has_flag("king_disturbed") and Game.has_flag("tapestry_cut"):
+			lines = ["\"The king in the keep's been woken and doesn't like it. They say if you ask him again, holding the right things, he'll take you where he goes.\""]
+		elif Game.has_flag("king_disturbed"):
+			lines = ["\"The king in the keep's awake, more or less. There's something hanging behind him that he can't see past. Somebody with a blade could fix that.\""]
+		else:
+			lines = ["\"There's a king asleep in a keep who's dreaming about somebody. Nobody's dared wake him. Somebody should.\""]
+	elif Game.has_keepsake("wings") or Game.has_keepsake("hourglass"):
+		lines = ["\"To get into somebody's sleep you'd want to fly, and you'd want to stop the clocks. One without the other's no use.\""]
+	else:
+		lines = ["\"Nine things, nine places. Hold one of them and the doors know you.\"", "He does not say which doors. He may not know."]
+	await World.hud.say("The Barkeep", lines)
 
 
 func _riddle() -> void:

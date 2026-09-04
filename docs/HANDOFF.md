@@ -278,9 +278,10 @@ Render screenshots at every step and look at them.
 ## 9. Things that are not your job
 
 * **Endings are undesigned and are not yours to design.** `docs/ENDINGS.md`
-  records one decided rule and marks the rest open. Do not invent endings, do
-  not build the well descent, do not give the Paper Rose or the Candle Stub a
-  use. Your area produces the third rose and stops there.
+  records one decided rule and marks the rest open. Do not invent endings and
+  do not build the well descent. The Candle Stub and the Paper Roses now have
+  their uses (the altar, the beanstalk, the vase in the King's Mind); the
+  thread stops at `roses_all_placed` and nothing reads that flag yet.
 * There is no roadmap and no backlog. Known imperfections that are not worth
   your time: some faces on the Slow Sea are flat sprites, round moving
   platforms use box collision, the Drowned City's main street does not flood
