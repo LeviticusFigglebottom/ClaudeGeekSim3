@@ -17,7 +17,7 @@ extends AreaBase
 ##                 the crypt under the churchyard west of the nave
 ##   the palace    south of the street, x in [-25, -11]
 ##   drowned lane  south from x in [16, 24] down into the flooded lower town
-##   the alley     south at x in [-9, -6.5] (where the tavern's back door lands)
+##   the alley     south at x in [-9, -6.5] (a door with no handle, the song behind it)
 
 const SH := 4.5
 const SEAM_X := 32.0
@@ -702,7 +702,7 @@ func _palace_front(ox: float, phantom: bool) -> void:
 	Kit.label(self, "THE PALACE", Vector3(px, 5.4, SH - 0.08), 0.0, 30, Color(0.8, 0.75, 0.6), "display", {"pixel_size": 0.012})
 
 
-# --- the alley (the tavern's back door lands here) --------------------------------
+# --- the alley (a door with no handle, and the tavern's song behind it) -----------
 
 func _alley() -> void:
 	var cx := -7.75
@@ -711,8 +711,8 @@ func _alley() -> void:
 	Kit.sign(self, "wood/door_dark", Vector3(cx, 1.05, 12.68), 0.0, Vector2(1.0, 2.1), {"tint": Color(0.7, 0.62, 0.6)})
 	Readable.create(self, Vector3(cx, 0, 12.5), 0.0, "A door with no handle", [
 		"A door with no handle on this side. Through it, very faintly, a song that has no end, and the smell of somewhere warm.",
-		"It only opens from the other side, and only onto here sometimes.",
-	], {"name": "BackDoorRead", "size": Vector3(1.2, 2.1, 0.5), "offset": Vector3(0, 1.05, 0), "note_key": "city_alley_door", "note_title": "The alley", "note_text": "The tavern's back door opens onto an alley off the long street, sometimes. From this side it has no handle. You can hear the song through it."})
+		"It does not open from this side, and nobody has seen it open from the other.",
+	], {"name": "BackDoorRead", "size": Vector3(1.2, 2.1, 0.5), "offset": Vector3(0, 1.05, 0), "note_key": "city_alley_door", "note_title": "The alley", "note_text": "A door with no handle in an alley off the long street. You can hear the tavern's song through it, but it does not open."})
 	Kit.sign(self, "signs/graffiti_wake", Vector3(-6.53, 1.5, 8.2), 90.0, Vector2(1.7, 0.5))
 	Readable.create(self, Vector3(-6.6, 1.5, 8.2), 90.0, "Read the graffiti", [
 		"WAKE UP, in dripping paint. Under it, smaller, in a different hand: we tried. the water came anyway.",

@@ -15,12 +15,12 @@ the verifier (`tools/verify.sh`) checks all of them.
 | `corridor` | The Halden Arms | apartment (`flat_door`), offices (`from_stairs`) | 5½ → `apartment:front`; 7 → `apartment:front` (mirrored); stairs → `offices:from_stairs`; lift (3 calls) → `static:lift` | looping corridor, knock-backs |
 | `hallway` | The Hallway | apartment (`entrance`), house (`side`), nexus/catacombs (`end`, `stairs`) | closet → `apartment:closet`; side door (after measuring) → `house:field`; big door → `nexus:from_hallway`; stair (3 loops) → `catacombs:from_stairs` | measurement puzzle → `door_code`; lantern inscriptions; growth; loop |
 | `nexus` | The Anteroom | every realm (`from_<id>`), hallway (`from_hallway`), mirror_nexus (`from_mirror`), workshop (`from_workshop`) | twelve doors → `<realm>:from_nexus`; workshop (13 bells) | bell unlocks castle door; the well counts keepsakes, and with all nine held over it lets go: the Cistern drains (`cistern_drained`) |
-| `forest` | The Hollow Wood | nexus (`from_nexus`), city (`road`), catacombs (`well_top`), tavern back door (`clearing`) | gate → `nexus:from_forest`; road → `city:west_gate`; well (rain) → `catacombs:from_well` | **Lantern** (hermit hut; light 3 braziers in stone order); **moonlight** (canopy, needs wings); standing stones; giant trees |
-| `city` | The Drowned City | nexus, forest (`west_gate`), catacombs (`sewer_top`), clocktower (`from_tower`), tavern back door (`alley`) | gate → `nexus:from_city`; west gate → `forest:road`; sewer (lantern) → `catacombs:from_sewer`; tower door (tower key) → `clocktower:from_city` | **Bell** (cathedral crypt, bell-order puzzle); **tower key** (palace, stone knights admit the crowned); wrapping streets |
-| `tavern` | The Last Lamp | nexus, sea (`from_sea`), furnace (`from_furnace`, the cellar) | door → `nexus:from_tavern`; back door → random of `forest:clearing`, `city:alley`, `house:field`, `sea:shore`; inn bed → `sea:from_tavern`; mouse gap → undertavern; cellar iron door (rope cut) → `furnace:from_tavern` | riddle → **coin**; moonlight trade → **Umbrella**; bard, patrons, barkeep |
-| `house` | The Nowhere House | hallway (`field`), nexus (`from_nexus`), tavern back door (`field`), cistern (`basement`), offices (`from_offices`) | lone door in the field → `nexus:from_house`; basement stair (loops) → `cistern:from_basement`; kitchen wing (visit ≥ 3) → `offices:from_house` | **Tin Mouse** (visit ≥ 2); dog + biscuit; photos that change; mirrored on visit 2; bigger bathroom; backwards door; attic (photo) |
+| `forest` | The Hollow Wood | nexus (`from_nexus`), city (`road`), catacombs (`well_top`) | gate → `nexus:from_forest`; road → `city:west_gate`; well (rain) → `catacombs:from_well` | **Lantern** (hermit hut; light 3 braziers in stone order); **moonlight** (canopy, needs wings); standing stones; giant trees |
+| `city` | The Drowned City | nexus, forest (`west_gate`), catacombs (`sewer_top`), clocktower (`from_tower`) | gate → `nexus:from_city`; west gate → `forest:road`; sewer (lantern) → `catacombs:from_sewer`; tower door (tower key) → `clocktower:from_city` | **Bell** (cathedral crypt, bell-order puzzle); **tower key** (palace, stone knights admit the crowned); wrapping streets |
+| `tavern` | The Last Lamp | nexus, sea (`from_sea`), furnace (`from_furnace`, the cellar) | door → `nexus:from_tavern`; inn bed → `sea:from_tavern`; mouse gap → undertavern; cellar iron door (rope cut) → `furnace:from_tavern` | riddle → **coin**; moonlight trade → **Umbrella**; bard, patrons, barkeep |
+| `house` | The Nowhere House | hallway (`field`), nexus (`from_nexus`), cistern (`basement`), offices (`from_offices`) | lone door in the field → `nexus:from_house`; basement stair (loops) → `cistern:from_basement`; kitchen wing (visit ≥ 3) → `offices:from_house` | **Tin Mouse** (visit ≥ 2); dog + biscuit; photos that change; mirrored on visit 2; bigger bathroom; backwards door; attic (photo) |
 | `castle` | The Keep of Hours | nexus | gate → `nexus:from_castle`; bedchamber mirror (shard) → `mirror_nexus:default`; library shelf → `castle:wardrobe` | **Paper Crown** (rotating rooms; hourglass steadies them); tapestry (knife) → the King's dream; infinite library; throne; the bedchamber mirror with the Dark Glass → `mirror_nexus:open` (`mirror_open`) |
-| `sea` | The Slow Sea | tavern (`from_tavern`), nexus, tavern back door (`shore`) | pier door → `nexus:from_sea`; sleeping shore → `tavern:from_sea` | **Moth Wings** (highest platform; clockwork platforms); giant faces; colour-shifting sky |
+| `sea` | The Slow Sea | tavern (`from_tavern`), nexus | pier door → `nexus:from_sea`; sleeping shore → `tavern:from_sea` | **Moth Wings** (highest platform; clockwork platforms); giant faces; colour-shifting sky |
 | `catacombs` | The Ossuary | forest (`from_well`), city (`from_sewer`), hallway (`from_stairs`), nexus | ladder → `forest:well_top`; grate → `city:sewer_top`; door → `nexus:from_catacombs` | **Mirror Shard** (reflecting pool; needs lantern to find the way); gravestone name puzzle; lantern-only paths |
 | `furnace` | The Furnace | mirror_nexus (`from_mirror`), nexus, tavern cellar (`from_tavern`) | iron door → `nexus:from_furnace`; mirror gate (shard) → `mirror_nexus:from_furnace`; small iron door (after the rope) → `tavern:from_furnace` | **Kitchen Knife** (the chained giant holds it out); the pit of slow fire (fall in: the Static); the forge and the Stoker; **candle stub** (iron maiden); the choir that sings one note (the bell stops it); the gallows rope (knife) opens every cage |
 | `cistern` | The Cistern | house (`from_basement`), nexus | drain ladder → `house:basement`; tiled door → `nexus:from_cistern` | **torn page** (follow the reading voice to the showers); the great sunken bath and its writing on the bottom; the lifeguard who climbed down; the corridor that only goes on (three passes → the glass float); the umbrella makes it rain indoors; higher water on the second visit; once the well has let go, no water at all: the bath empty, what it was keeping on the bottom, the rest of the writing, and a drain the size of a door down to `pipes:from_cistern` (back up: `from_pipes`) |
@@ -44,7 +44,7 @@ the verifier (`tools/verify.sh`) checks all of them.
 | Umbrella | Last Lamp, the barkeep | Bottle of Moonlight |
 | Mirror Shard | Ossuary, reflecting pool | Lantern (to see the way); reach the Ossuary (city sewer with Lantern, forest well with Umbrella, or the hallway stair) |
 | Kitchen Knife | Furnace, the giant's hand | Mirror Shard (the flat's bathroom mirror) |
-| Tin Mouse | Nowhere House, second visit | reach the house (hallway side door after measuring with the tape measure, or the tavern back door) |
+| Tin Mouse | Nowhere House, second visit | reach the house (hallway side door after measuring with the tape measure) |
 
 ## Waking-world chain (the House of Leaves thread)
 sleep → wake with a keepsake (`has_woken`) → tape measure in the drawer →
@@ -109,14 +109,17 @@ the Hallway stair (three descents) → `catacombs:from_stairs`.
   `docs/areas/STATIC_END.md`.
 
 * `pipes` — The Waterworks. Down the drain at the bottom of the drained
-  Cistern. Pipes, tiled halls with channels, the turning room whose block
-  keeps its doorway in the far face until it gives up, the stair that goes
+  Cistern. Pipes, tiled halls with channels and footbridges, the turning
+  room whose blank block seals the way in behind you at a quarter turn
+  clockwise and gives up a doorway after three laps, the stair that goes
   round three times, and the Dark Glass at the top. Hatch back to the
   Cistern. Spec: `docs/areas/PIPES.md`.
-* `hospital` — St. Nowhere. Above the Other Anteroom with its roof off. A
-  lobby with a visitors' book, wards, a chapel, a morgue, a theatre, the far
-  corridor that goes round, and room 5½ with the one in the bed. Three
-  visits. Spec: `docs/areas/HOSPITAL.md`.
+* `hospital` — St. Nowhere. Above the Other Anteroom with its roof off. Two
+  floors, a hundred metres wide: lobby, wards, chapel, nurses, pharmacy,
+  morgue, theatre, X-ray, children's ward, laundry, records; six memory
+  fragments hidden in it, the dark after four, the far door after six, the
+  far corridor that goes round, and room 5½ with the one in the bed, which
+  is waking up. Spec: `docs/areas/HOSPITAL.md`.
 
 All the choices default to "No" or "Do nothing"; no ending scene is made
 yet (`docs/ENDINGS.md`). Neither `promotion` nor `static_end` has a door

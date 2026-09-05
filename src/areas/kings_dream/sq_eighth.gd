@@ -334,10 +334,10 @@ static func _on_board(state: Dictionary) -> void:
 		])
 		Game.note("dream_board", "The board", "In the rotunda at the end of the dream, a chessboard on a table with a game nearly over: your pawn on the seventh rank, the red king in the corner. A chair pulled out on your side.")
 		return
-	var i: int = await World.hud.ask("", "Your move, and it is the last one either way. The pawn to the eighth is mate, and a pawn that gets there stays there. Or the king lies down, and that is the plug. The Usher waits. Neither can be taken back, and the board says so. Doing nothing is allowed.", [
+	var i: int = await World.hud.ask("", "Your move, and it is the last one either way. The king in the corner is you, the way the ward sees you: still, in a bed, with nowhere to go. Checkmate is the pawn to the eighth, and it leaves him exactly there, with nowhere to go, for good: it is coming to terms with it. Conceding is laying the king down, and the plug that goes with it is yours. Neither can be taken back, and the board says so. Doing nothing is allowed.", [
 		"Do nothing. Leave the board as it is.",
-		"Concede. Lay the king down, and pull the plug. (an ending)",
-		"Checkmate. The pawn to the eighth, and stay on the board. (an ending)",
+		"Concede. Lay the king down, and pull the plug on yourself. (an ending)",
+		"Checkmate. Trap the king where he lies, and come to terms with it. (an ending)",
 	])
 	if i != 1 and i != 2:
 		return
@@ -347,11 +347,11 @@ static func _on_board(state: Dictionary) -> void:
 	state.speed = 0.0
 	if i == 1:
 		Game.set_flag("plug_pulled", true)
-		Game.note("plug", "Concede", "At the board at the end of the dream you laid the king down. The monitor by the empty bed went to a dot, and the doors went to static and stayed there.")
+		Game.note("plug", "Concede", "At the board at the end of the dream you laid the king down, which is you, in the bed, and the plug that goes with him is yours to pull. The monitor by the empty bed went to a dot.")
 		World.travel("static_end", "from_banquet", {"color": Color.WHITE, "duration": 1.8})
 	else:
 		Game.set_flag("promotion_taken", true)
-		Game.note("promotion", "Checkmate", "At the board at the end of the dream you took the pawn to the eighth rank. A pawn that reaches the last rank is promoted: it becomes whatever it is told to be, and it never leaves the board.")
+		Game.note("promotion", "Checkmate", "At the board at the end of the dream you took the pawn to the eighth rank and mated the king, who is you, in the bed, as the ward sees you: nowhere to go, and staying there. The promotion is coming to terms with that.")
 		World.travel("promotion", "from_banquet", {"color": Color(0.1, 0.06, 0.14), "duration": 1.8})
 
 

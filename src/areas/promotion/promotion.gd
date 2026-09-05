@@ -273,7 +273,7 @@ func _last(c: Vector3) -> void:
 	# the toppled piece, the stone with your name, and the square with nothing on it
 	Props.place(self, "chess_queen", c + Vector3(-3.5, 0.55, 2.5), 0.0, 2.4, {"collision": "none", "tint": RED, "rotation": Vector3(0, 30, 90)})
 	Props.place(self, "gravestone_you", c + Vector3(3.5, 0, 1.5), 200.0, 1.1, {"collision": "box"})
-	Readable.create(self, c + Vector3(3.5, 0.6, 1.5), 200.0, "Read the stone", ["The stone from the Ossuary, with your name on it. The dates are still blank.", "The chalk underneath has been rubbed out."], {"name": "YourStoneAgain", "size": Vector3(1.0, 1.2, 0.8)})
+	Readable.create(self, c + Vector3(3.5, 0.6, 1.5), 200.0, "Read the stone", ["The stone from the Ossuary, with your name on it. The dates are still blank, and if you stay they stay blank: nobody buries a king who is still in the corner.", "The chalk underneath has been rubbed out."], {"name": "YourStoneAgain", "size": Vector3(1.0, 1.2, 0.8)})
 	var last := c + Vector3(0, 0, -3.5)
 	Kit.floor(self, last + Vector3(0, 0.12, 0), Vector2(3.2, 3.2), WHITE, {"tile": 1.0, "thick": 0.12, "tint": Color(1.0, 1.0, 1.0)})
 	Kit.light(self, last + Vector3(0, 4.0, 0), Color(1.0, 1.0, 1.0), 1.4, 9.0)
@@ -284,14 +284,14 @@ func _last(c: Vector3) -> void:
 func _on_last(_p: Node, _it: Node) -> void:
 	if World.hud == null:
 		return
-	var i: int = await World.hud.ask("", "The eighth square. A pawn that stands here is promoted: it becomes whatever it is told to be, and it never leaves the board. This is an ending. Stand on it?", ["No. Not yet.", "Stand on it, and stay."])
+	var i: int = await World.hud.ask("", "The eighth square. The king you mated is in the corner of this board too, in a bed, with nowhere to go, and the pawn that mated him stands here and is promoted: it becomes what it is told it is, which is him. Standing on it is agreeing to that: the bed, the ward, the visitor, the years, and no more walking. It is coming to terms. This is an ending. Stand on it?", ["No. Not yet.", "Stand on it, and come to terms."])
 	if i != 1:
 		return
 	var y: int = await World.hud.ask("", "There is no coming back from this one. Are you sure?", ["No.", "Yes."])
 	if y != 1:
 		return
 	await Ending.play("limbo", "The last rank", [
-		"You stand on the square. Nothing is put on your head. Nothing needs to be.",
-		"The pieces along the rank turn, all of them, the way a room turns when somebody important comes in.",
-		"You are a piece now. The board will keep you. It keeps everything it has not finished with, and it has not finished with you.",
+		"You stand on the square. Nothing is put on your head. Nothing needs to be. You are the king in the corner, and you know it now, and knowing it is the promotion.",
+		"The pieces along the rank turn, all of them, the way a ward turns when somebody's eyes move under the lids.",
+		"You stay. The board keeps you, and the bed keeps you, and somebody comes in the afternoons. That is what there is, and you have agreed to it.",
 	], Color(0.95, 0.93, 0.9))

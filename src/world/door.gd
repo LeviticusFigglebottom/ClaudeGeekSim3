@@ -4,7 +4,7 @@ extends Interactable
 ##
 ## Doors can require a keepsake, an item or a flag; they can be walk-through
 ## (no prompt), and they can be *unstable*: the target is decided when you open
-## them (the tavern's back door goes somewhere different every time). Unstable
+## them (a door that goes somewhere different every time). Unstable
 ## doors list their `possible_targets` so the world-graph verifier can see them.
 
 @export var target_area := ""

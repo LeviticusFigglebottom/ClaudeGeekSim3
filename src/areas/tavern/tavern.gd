@@ -2,7 +2,7 @@ extends AreaBase
 ## The Last Lamp — the tavern at the end of every road. Warm where nothing
 ## else is. A taproom of faceless patrons, a bard playing a song with no end, a
 ## barkeep with a riddle, a trade and a room he will not let. A kitchen nook
-## with a back door that goes somewhere different every time. A cellar. A
+## A cellar. A
 ## rented room upstairs whose bed opens onto the Slow Sea. Behind the bar, a
 ## hole only the Tin Mouse fits through, and under the floorboards a second
 ## tavern, three times too large.
@@ -14,7 +14,6 @@ const ORIGIN := Vector3(-8, 0, -10)
 const UT := Vector3(50, 0, -50)
 const WARM := Color(1.0, 0.78, 0.5)
 const CANDLE := Color(1.0, 0.85, 0.6)
-const BACK_DOOR_TARGETS := [["forest", "clearing"], ["city", "alley"], ["house", "field"], ["sea", "shore"]]
 const PORTRAIT_BEFORE := ["A man in a good coat, holding a lamp. His eyes follow you. That is what portraits do.", "This one is doing it from slightly further away than it was."]
 const PORTRAIT_AFTER := ["Where the portrait was, there is a painting of a door.", "It is painted from the other side."]
 
@@ -192,9 +191,6 @@ func _ground_floor() -> void:
 		"Something is simmering. It has been simmering since before the tavern.",
 		"It smells of nothing, warmly.",
 	], {"name": "Pot", "size": Vector3(0.8, 0.6, 0.6), "sound": "drip"})
-	# the back door: it goes somewhere
-	Door.create(self, Vector3(-5.84, 0, -5.0), -90.0, "", "", {"kind": "dark", "label": "The back door. It goes somewhere.", "name": "BackDoor",
-		"fade_color": Color(0.01, 0.01, 0.02), "fade_duration": 1.3, "unstable": _back_door_target, "possible_targets": BACK_DOOR_TARGETS})
 	Kit.light(self, Vector3(-5.0, 2.2, -5.0), Color(0.55, 0.6, 0.85), 0.5, 3.5)
 	# a stair down to the cellar leaves through the kitchen's north door
 	Kit.stairs(self, Vector3(-3.0, 0, -10.0), 0.0, 1.9, 14, -0.243, 0.32, "wood/planks_dark", {"name": "CellarStairs"})
@@ -222,13 +218,6 @@ func _ground_floor() -> void:
 			"You are not a resident. You are barely a guest.",
 		], {"name": "RopeSign", "size": Vector3(0.5, 1.2, 1.0)})
 	Dog.maybe_spawn(self, Vector3(-2.5, 0.1, 2.0))
-
-
-func _back_door_target() -> Array:
-	var pick: Array = BACK_DOOR_TARGETS[Game.rng.randi_range(0, BACK_DOOR_TARGETS.size() - 1)]
-	Game.bump("back_door_used")
-	Game.note("back_door", "The back door", "The back door of the Last Lamp opens onto a different place each time. The barkeep does not seem to know this, or mind.")
-	return pick
 
 
 func _shelf(pos: Vector3) -> void:

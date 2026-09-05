@@ -52,12 +52,16 @@ the hedge maze of the Garden (the Wings). After the third, flag
 
 ## The King, and M
 
-"The King" (`KingLook`) is a look before the third rose. After it, it asks
-"Sit with him. (an ending)", "No" first, then asks again, and plays the `m`
-ending (`ending_m`): the chair by the bed has a shape worn into it and the
-shape is yours. You were M all along, the visitor who read to him and
-brought the roses one at a time; you sign the book on the way out with one
-letter. Finished as a choice; its scene is not made yet (`docs/ENDINGS.md`).
+"The King" (`KingLook`) is a look before the third rose. After it, it
+says what it is: the chair by the bed has a shape worn into it and the
+shape is M's, and sitting in it you are not him any more but the one who
+visits, every afternoon. It asks "Sit in M's chair. (an ending: the
+visitor's)", "No" first, then asks again, and plays the `m` ending
+(`ending_m`), told from the chair: you are M, you have read to him and
+brought the roses one at a time, his breathing does not change and you
+come anyway, you sign the book with one letter, go home, and come back
+tomorrow. It is the same room from the visitor's point of view. Finished as
+a choice; its scene is not made yet (`docs/ENDINGS.md`).
 Declared as `kings_mind_m`, requires `flag:roses_all_placed`.
 
 ## Hints

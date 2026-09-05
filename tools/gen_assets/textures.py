@@ -640,12 +640,15 @@ def clock_face(rng, size=256, levels=16):
         w, h = sz
         cx, cy = w / 2, h / 2
         r = w / 2 - 2
-        # the bezel: dark rim, brass, a highlight, a thin black inner line
+        # the bezel, turned: a shadow under it, dark rim, brass, a highlight along the upper left, brass, a black inner line
+        d.ellipse([cx - r + 1, cy - r + 3, cx + r + 1, cy + r + 3], fill=(30, 22, 14))
         d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=brass_dk)
         d.ellipse([cx - r + 3, cy - r + 3, cx + r - 3, cy + r - 3], fill=brass)
-        d.ellipse([cx - r + 6, cy - r + 6, cx + r - 6, cy + r - 6], fill=brass_hi)
+        d.ellipse([cx - r + 5, cy - r + 5, cx + r - 5, cy + r - 5], fill=(112, 82, 36))
+        d.arc([cx - r + 5, cy - r + 5, cx + r - 5, cy + r - 5], 190, 300, fill=brass_hi, width=3)
         d.ellipse([cx - r + 9, cy - r + 9, cx + r - 9, cy + r - 9], fill=brass)
-        rd = r - 13
+        d.ellipse([cx - r + 12, cy - r + 12, cx + r - 12, cy + r - 12], fill=brass_dk)
+        rd = r - 14
         d.ellipse([cx - rd, cy - rd, cx + rd, cy + rd], fill=(230, 220, 192), outline=ink, width=2)
         # sixty ticks, the fives longer and heavier
         for i in range(60):
@@ -688,7 +691,15 @@ def clock_face(rng, size=256, levels=16):
         cr = size * 0.02
         d.ellipse([cx - cr, cy - cr, cx + cr, cy + cr], fill=brass_dk)
         d.ellipse([cx - cr * 0.5, cy - cr * 0.5, cx + cr * 0.5, cy + cr * 0.5], fill=brass_hi)
-    return T.quantize(T.draw_on(img, fn), levels, dither=0.15)
+        # the glass: a soft reflection across the upper left of the dial
+        d.arc([cx - rd + 6, cy - rd + 6, cx + rd - 6, cy + rd - 6], 200, 250, fill=(250, 248, 240), width=2)
+    out = T.quantize(T.draw_on(img, fn), levels, dither=0.15)
+    # nothing outside the bezel: the corners of the square are see-through
+    h, w = out.shape[0], out.shape[1]
+    yy, xx = np.mgrid[0:h, 0:w]
+    rr = np.sqrt((xx - w / 2) ** 2 + (yy - h / 2 - 1.5) ** 2)
+    alpha = (rr <= w / 2 - 0.5).astype(np.float32)
+    return T.add_alpha(out[..., :3], alpha)
 
 
 def test_card(rng, size=256, levels=16):
@@ -1141,7 +1152,7 @@ def build_catalog():
     reg("metal/bars", _bars, alpha=True)
     reg("metal/grate", _grate, alpha=True)
     reg("metal/gear", lambda r: gear(r), alpha=True)
-    reg("metal/clock_face", clock_face)
+    reg("metal/clock_face", clock_face, alpha=True)
     reg("fabric/cloth_red", lambda r: plaster(r, "#7a1f1f", "#5a1414", levels=10), surface="carpet")
     reg("fabric/velvet", lambda r: plaster(r, ca["velvet"], ca["velvet2"], levels=10), surface="carpet")
     reg("fabric/curtain", lambda r: T.quantize(T.shade(plaster(r, "#3a1a2a", "#2a1220", levels=64), T.stripes_v(64, 6, 0.5), 0.2), 10), surface="carpet")
@@ -1256,8 +1267,13 @@ def generate(only=None, sheet=False):
         h, w = img.shape[:2]
         manifest[name] = {"w": int(w), "h": int(h), "surface": opts.get("surface", "stone"), "alpha": bool(opts.get("alpha", False) or img.shape[-1] == 4)}
         written.append(path)
-    if not only:
-        (OUT / "manifest.json").write_text(json.dumps(manifest, indent=1, sort_keys=True))
+    # a partial run merges into the manifest on disk, so a texture regenerated
+    # on its own keeps its size and alpha flag current
+    if only and (OUT / "manifest.json").exists():
+        merged = json.loads((OUT / "manifest.json").read_text())
+        merged.update(manifest)
+        manifest = merged
+    (OUT / "manifest.json").write_text(json.dumps(manifest, indent=1, sort_keys=True))
     if sheet:
         T.contact_sheet(sorted(written), T.ROOT / "screenshots" / "textures_sheet.png", cols=12)
     return written

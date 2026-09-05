@@ -50,11 +50,19 @@ ground in front of it:
 The Usher stands near the last square and vanishes when looked at, as
 everywhere.
 
-## The ending
+## The ending: coming to terms
 
-"Stand on the last square" (`LastSquare`) asks, "No" first, then asks
-again. Yes plays the `limbo` ending: nothing is put on your head, the pieces
-turn, the board keeps you.
+"Stand on the last square" (`LastSquare`) says what it is before it asks:
+the king you mated is in the corner of this board too, in a bed, with
+nowhere to go, and the pawn that mated him is promoted into him; standing
+on the square is agreeing to the bed, the ward, the visitor, the years, and
+no more walking. "No. Not yet." first, then "Stand on it, and come to
+terms.", then the second ask. Yes plays the `limbo` ending: nothing is put
+on your head, you are the king in the corner and you know it now, the
+pieces turn the way a ward turns when somebody's eyes move under the lids,
+and the board keeps you and the bed keeps you and somebody comes in the
+afternoons. The stone on the eighth square says the dates stay blank if
+you stay: nobody buries a king who is still in the corner.
 
 ## Debug
 

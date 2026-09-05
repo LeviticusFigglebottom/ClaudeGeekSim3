@@ -88,6 +88,7 @@ const ITEMS := {
 	"bones": {"name": "Bones", "desc": "Three people's worth, from three niches, given up. They are lighter than they should be."},
 	"bonemeal": {"name": "Bonemeal", "desc": "Grey and fine and warm. Whatever it was, it was old, and it wanted to be a garden."},
 	"rose": {"name": "Paper Rose", "desc": "Folded from a page of the infinite library. It smells of dust and, faintly, of rain."},
+	"memory": {"name": "Memory Fragment", "desc": "Something you had forgotten, remembered. It weighs nothing and you will not put it down."},
 	"dark_glass": {"name": "Dark Glass", "desc": "A shard that shows nothing: not you, not the room, not the light. The mirror shard turned over. Held up to the right mirror it shows the other side with the roof off."},
 }
 

@@ -316,7 +316,7 @@ func _black(node: Node) -> void:
 func _on_plug(_p: Node, _it: Node) -> void:
 	if World.hud == null:
 		return
-	var i: int = await World.hud.ask("", "The plug is warm. The monitor is the last channel, and the picture on it is him, and he is you. This is an ending. Pull it?", ["No. Leave it in.", "Pull the plug."])
+	var i: int = await World.hud.ask("", "The plug is warm. The monitor is the last channel, and the picture on it is him, and he is you, in the bed, on the machine. Pulling it is not a picture of anything. It is you, killing yourself, and it is the only thing in here that is not a picture. This is an ending. Pull it?", ["No. Leave it in.", "Pull the plug on yourself."])
 	if i != 1:
 		return
 	var y: int = await World.hud.ask("", "There is no coming back from this one. Are you sure?", ["No.", "Yes."])
@@ -325,5 +325,5 @@ func _on_plug(_p: Node, _it: Node) -> void:
 	await Ending.play("unplugged", "Off air", [
 		"You pull the plug. The monitor goes to a dot, and out in the dark every screen still lit goes to a dot with it, and the dots stay a while, and go.",
 		"The hiss stops. For the first time since you fell asleep, nothing is between channels, because there are no channels.",
-		"The one on the bed does not move. He was never going to. It was always going to be you.",
+		"The one on the bed does not move. He was never going to. It was always going to be you, and it was always going to be your hand on the plug, and now it is.",
 	], Color.WHITE)

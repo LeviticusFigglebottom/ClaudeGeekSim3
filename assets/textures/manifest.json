@@ -246,10 +246,10 @@
   "w": 64
  },
  "metal/clock_face": {
-  "alpha": false,
-  "h": 128,
+  "alpha": true,
+  "h": 256,
   "surface": "stone",
-  "w": 128
+  "w": 256
  },
  "metal/gear": {
   "alpha": true,

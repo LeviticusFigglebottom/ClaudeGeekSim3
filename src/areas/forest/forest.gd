@@ -540,7 +540,7 @@ func _road() -> void:
 	add_spawn("road", ROAD + Vector3(-3.5, 0.1, 0), 90.0)
 
 
-# --- the clearing (where the tavern's back door lands you) ------------------------
+# --- the clearing ---------------------------------------------------------------
 
 func _clearing() -> void:
 	Kit.ring(self, CLEARING + Vector3(0, 0.025, 0), 0.0, 4.8, 12, "nature/grass_moss", {"solid": false})

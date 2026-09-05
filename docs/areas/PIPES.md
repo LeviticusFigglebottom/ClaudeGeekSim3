@@ -29,32 +29,40 @@ Cistern carried on:
 * **Hall one.** White and cyan tile, pillars, a knee-deep channel cut across
   it with planks over it. OUTFLOW and INFLOW on the walls.
 * **Hall two, the junction.** Four channels crossing, all flowing the same
-  way, a valve wheel the size of a cartwheel turned as far as it goes (DO
-  NOT CLOSE WHILE OCCUPIED), the Usher at the far end.
-* **The turning room.** A square room with a tiled block in the middle,
-  taller than the room, rising through the ceiling. The block has a doorway
-  in its far face, and a stair visible through it. Walk round to it and it
-  is not there: it is in the far face again. See below.
-* **The tower.** Inside the block: two loops of stair (flights along the
-  north and south walls, landings east and west) with a seam at the foot of
-  the second loop back to the foot of the first (`pipes_stair_loops`); after
-  three rounds it ends. At the top, a platform, a black pedestal with the
-  **Dark Glass** (item `dark_glass`, key `picked_dark_glass`), and the
-  hatch.
+  way, tiled on the bottom with water over them, and eight footbridges
+  (`_bridge`: warm planks on brass posts with rails and a light) where the
+  walks cross the channels, so there is no gap on the way through. A valve
+  wheel the size of a cartwheel turned as far as it goes, the Usher at the
+  far end. Nothing to read in here or in the turning room: the one label is
+  OUTFLOW over the way out, and the looks at the pipe, the channel and the
+  pedestal are kept.
+* **The turning room.** A square room with a blank tiled block in the
+  middle, taller than the room, rising through the ceiling. Nothing on any
+  face. See below.
+* **The tower.** Inside the block: two loops of stair, each 5 m of rise,
+  a flight along the north wall going east, a landing, a flight along the
+  south wall going west, a landing, 1.7 m wide at 0.25 m a step (the Kit's
+  ramp collider, so they are walked); a seam at the foot of the second loop
+  back to the foot of the first (`pipes_stair_loops`); after three rounds it
+  ends. At the top, a platform, a black pedestal with the **Dark Glass**
+  (item `dark_glass`, key `picked_dark_glass`), and the hatch.
 
 ## The turning
 
-`_process` watches which sector of the room the player is in (east, west,
-or neither, by the angle round the block's centre). The doorway is on face
-`door_face`. When the player comes round into the doorway's sector the
-block "turns": the doorway seals on that face and opens on the opposite one
-(`Game.bump("pipes_turns")`, a grind). On the sixth turn the wall gives up:
-the doorway stays where the player is, `pipes_opened` is set, and the
-tower is open from then on (also at build if the flag is set). Toasts mark
-the first, second and fourth turns.
+`_process` keeps the angle of the player round the block's centre and adds
+up only the clockwise part of it (`_progress`, degrees; walking back the
+other way is not counted and does not undo anything). At a quarter turn the
+way you came in is a wall: `entrance_seal`, a tiled box in the doorway from
+the junction hall, becomes visible and solid, a grind, and a toast says so.
+Toasts again at the first and second full laps. At three laps
+(`LAPS_NEEDED`) the block gives up: a doorway opens in whichever of its
+east or west faces the player is nearer (`door_face`), `pipes_opened` is
+set, and the tower is open from then on (also at build if the flag is set:
+the east face). The entrance stays sealed; the only way on is up.
 
-Seals are tiled boxes in the doorways whose mesh and collision are toggled
-(`_set_solid`). The blank faces are the north and south.
+Seals are tiled boxes whose mesh and collision are toggled (`_set_solid`):
+one in each of the block's east and west faces, one in the room's entrance.
+The north and south faces are blank.
 
 ## Declared for the solver
 
@@ -66,6 +74,8 @@ twice, the second time with `pipes_opened` set.
 ## Debug
 
 `tools/shot.sh pipes out.png from_cistern "0,-6"` for the shaft room;
-`--pos=11,1.6,-4 --look=-90,-6` for hall one; `--pos=-14,1.6,14 --look=90,-4`
-for the turning room from the entry; `--flag=pipes_opened --pos=-23,12.2,13
---look=0,-10` for the top of the tower.
+`--pos=11,0.2,24 --look=0,-10 --fly` for the junction hall and its
+footbridges; `--pos=-14,0.2,14 --look=90,0 --fly` for the turning room from
+the entry; `--flag=pipes_opened --visits=pipes:2 --pos=-23,0.3,15.5
+--look=0,10 --fly` for the foot of the tower stair and `--pos=-23,10.3,15.5
+--look=0,-20` for the top.

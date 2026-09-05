@@ -52,7 +52,7 @@ for the full graph and `docs/AREA_AUTHORING.md` for how to add one):
 | **The Anteroom** | twelve doors, a plaque, a bell, a well that counts what you carry |
 | **The Hollow Wood** | giant trees, standing stones, a hermit with a lantern |
 | **The Drowned City** | streets that wrap, a cathedral with four bells, a palace of stone knights |
-| **The Last Lamp** | a tavern with a riddle, a bard, and a back door that goes somewhere different every time |
+| **The Last Lamp** | a tavern with a riddle, a bard, a barkeep who has heard things, and a bed that goes somewhere else |
 | **The Nowhere House** | a different house each visit (myhouse.wad): mirrored, then bigger, then wrong |
 | **The Keep of Hours** | a sleeping king, rooms that turn, a library with no end |
 | **The Slow Sea** | a pastel shore under a colour-shifting sky, sleeping faces, platforms that drift |

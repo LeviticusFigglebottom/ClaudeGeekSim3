@@ -60,9 +60,13 @@ still on. The bed, the one who ushered you on it, black, face up (the
 showing the last channel, and a cable running to a socket in a wall the
 size of a building, which is the picture between channels up close.
 
-"The plug" (`Plug`, at the socket) asks, "No" first, then asks again. Yes
-plays the `unplugged` ending: every screen still lit goes to a dot, the
-hiss stops, he was never going to move, it was always going to be you.
+"The plug" (`Plug`, at the socket) says what it is before it asks: the
+picture on the last channel is him, and he is you, in the bed, on the
+machine, and pulling it is not a picture of anything, it is you killing
+yourself. "No. Leave it in." first, then "Pull the plug on yourself.", then
+the second ask. Yes plays the `unplugged` ending: every screen still lit
+goes to a dot, the hiss stops, he was never going to move, it was always
+going to be you and your hand on the plug.
 
 The distinction from the Last Rank is deliberate and should stay legible:
 there, the things are whole and lit and the board keeps them; here they
