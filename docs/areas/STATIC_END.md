@@ -2,60 +2,76 @@
 
 Area id `static_end`. Display name **Off Air**, subtitle *"the set turned
 off"*. Built in `src/areas/static_end/static_end.gd`. Realm preset `static`
-with heavier fog.
+overridden to a near-black void with almost no fog and no sky; ambience
+`static`.
 
-This is where pulling the plug goes. It is one of the three ends of the
-game, and its ending scene is not made yet: `Ending.play("unplugged", ...)`
-sets `ending_unplugged`, fades to white, and for now wakes the player in the
-flat.
+This is where conceding at the board goes. It is one of the four ends of
+the game, and its ending scene is not made yet: `Ending.play("unplugged",
+...)` sets `ending_unplugged`, fades to white, and for now wakes the player
+in the flat.
 
 ## Getting there
 
 At the board in the rotunda of the eighth square of the King's Dream, once
 the banquet has begun, "The board" asks for your move. "Concede. Lay the
 king down, and pull the plug. (an ending)" asks again, "No" first, then sets
-`plug_pulled` and travels to `static_end:from_banquet`. The plug it means is
-the cable from the monitor beside the empty hospital bed in that room to the
-socket on the pillar behind it.
+`plug_pulled` and travels to `static_end:from_banquet`.
 
-The route is declared on the cloth's square (`kings_dream_plug`, done flag
+The route is declared on the eighth square (`kings_dream_plug`, done flag
 `ending_unplugged`, requires `flag:dream_banquet_begun`).
 
 ## The place
 
-The Static with the set turned off. The ground is snow the way the Static's
-is, going down for ever; the one firm thing is a strip of plate running
-north. Along it stand the same eight things as the last rank, in the same
-order, each with its word on the plate and each watched by a television the
-size of a wardrobe showing snow. The things themselves are grey and half
-sunk, the way things get under snow that is not cold:
+The station shutting down. Out in a dark with nothing under it but a floor
+of static far below (decoration: falling lands in the Static), eight
+**stages** hang on cables, each a steel plate fourteen metres across with a
+lip and unseen walls, numbered 8 to 1 in tape, and between them the road: a
+plate deck slung on cables with rails either side and one thick cable
+underneath carrying the signal. The stages rise a little as they go.
 
-BORN a cot with three small pawns · SMALL a pawn and a chair · TAUGHT a desk
-and the clock · KEPT a filing cabinet and the ticket dispenser · LOVED a
-table, a chair and a paper rose · HOME the white door and the mailbox · KEPT
-AGAIN the iron bed and the chair · OFF a blank gravestone.
+Each stage is the same life as the Last Rank's, being **struck**: tape on
+the floor where the thing stood, a crate stencilled with its name, and what
+is left of it.
 
-The distinction from the Last Rank is deliberate and should stay legible:
-there, the things are whole and lit and the board keeps them; here they are
-grey, sinking, and every one has a set watching it, because this is what is
-left when the picture is taken away.
+| Stage | Word | What is left |
+|---|---|---|
+| 8 | BORN | the cot under a dust sheet, the mobile's pieces in a box |
+| 7 | SMALL | hopscotch in tape, a chair too small, a pawn your height |
+| 6 | TAUGHT | the desk with its chair upside down on it, the rules board face down, the clock face down |
+| 5 | KEPT | the filing cabinet on its side, the ticket dispenser, the number being served |
+| 4 | LOVED | two chairs stacked, two mugs on the floor, a paper rose in a crate |
+| 3 | HOME | the white door laid flat like a struck flat, the mailbox knocked over |
+| 2 | KEPT AGAIN | the iron bed stripped to its frame, the drip, the chair |
+| 1 | OFF | a circle of light with nobody in it, the tape outline of where they were, the blank stone face down |
 
-## The bed
+Every stage has a set the size of a room beside it, still on, and a
+spotlight over its middle. **Coming onto a stage puts the one before it
+out**: the spotlight fades, the set goes to black with a `tv_off`, and the
+count on the card in the sky comes down (`_arrive`). Forty-four more
+screens drift slowly out in the dark on either side (`_drift`), and over
+the end hangs a broadcast test card forty-eight metres wide, TRANSMISSION
+ENDS under it, and the count of channels still on.
 
-Past OFF, a floor of white ward tile. On an iron bed lies the one who
-ushered you, black, face up, head on the pillow (the `usher` prop laid down,
-`TheOneOnTheBed`). A chair beside him. On a crate, the set that watches him,
-showing snow, and a cable from it across the floor to a socket in a wall of
-snow. Looking at him: *he has your face*, a wristband with nothing on it and
-a tick in your handwriting under nothing.
+## The end
+
+Past stage 1, on the cable's end, a round tiled floor under the one light
+still on. The bed, the one who ushered you on it, black, face up (the
+`usher` prop laid down, `TheOneOnTheBed`), a chair, the monitor on a crate
+showing the last channel, and a cable running to a socket in a wall the
+size of a building, which is the picture between channels up close.
 
 "The plug" (`Plug`, at the socket) asks, "No" first, then asks again. Yes
-plays the `unplugged` ending: the set goes to a dot, the snow stops going
-down, he was never going to move, it was always going to be you.
+plays the `unplugged` ending: every screen still lit goes to a dot, the
+hiss stops, he was never going to move, it was always going to be you.
+
+The distinction from the Last Rank is deliberate and should stay legible:
+there, the things are whole and lit and the board keeps them; here they
+are being packed away and the lights are going out behind you, and it
+ends.
 
 ## Debug
 
-`tools/shot.sh static_end out.png from_banquet "0,-8"` for BORN;
-`--pos=0,0.1,-30` for the strip; `--pos=0,0.1,-107.5 --look=0,-22` for the
-bed; `--pos=-2.5,0.1,-109 --look=60,-14` for the socket. The coplanar audit
-is clean.
+`tools/shot.sh static_end out.png from_banquet "0,-6"` for stage 8;
+`--pos=0,0.1,-6 --look=-21,-4 --fly` for the first cable;
+`--pos=11.9,11.9,-217 --look=0,-8 --fly` for the bed; `--pos=11.9,11.9,-200
+--look=0,4 --fly` for the card.

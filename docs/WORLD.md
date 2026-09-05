@@ -102,9 +102,11 @@ the Hallway stair (three descents) → `catacombs:from_stairs`.
   eight squares, BORN to a square with nothing on it; standing on the last
   is the ending. Spec: `docs/areas/PROMOTION.md`.
 * `static_end` — Off Air. From the same board, by conceding: the plug. The
-  same eight things, grey and sinking, each watched by a set showing snow;
-  the Usher on a bed at the end, and the plug. Pulling it is the ending.
-  Spec: `docs/areas/STATIC_END.md`.
+  station shutting down: eight stages on cables in the dark where the same
+  life is being struck, the lights going out behind you, screens drifting,
+  a test card in the sky counting the channels down; the Usher on a bed
+  under the last light, and the plug. Pulling it is the ending. Spec:
+  `docs/areas/STATIC_END.md`.
 
 * `pipes` — The Waterworks. Down the drain at the bottom of the drained
   Cistern. Pipes, tiled halls with channels, the turning room whose block

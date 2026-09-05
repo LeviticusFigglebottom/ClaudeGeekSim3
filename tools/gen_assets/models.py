@@ -900,8 +900,6 @@ def clock_grandfather(rng):
     g.add("Body", m, extras={"collision": "box"})
     f = MeshBuilder()
     f.card((0, 1.75, -0.19), (0.45, 0.45), "tex:metal/clock_face", (1, 1, 1), yaw=math.pi, double=False)
-    f.box((0, 1.85, -0.205), (0.02, 0.16, 0.01), "flat", (0.1, 0.08, 0.06))
-    f.box((0.06, 1.75, -0.205), (0.12, 0.02, 0.01), "flat", (0.1, 0.08, 0.06))
     g.add("Face", f)
     p = MeshBuilder()
     p.box((0, -0.45, 0), (0.02, 0.9, 0.02), "flat", hexc("#b58a3c"))

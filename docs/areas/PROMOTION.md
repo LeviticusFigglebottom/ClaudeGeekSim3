@@ -30,7 +30,7 @@ squares are missing, some are static. Pawns the size of houses stand along
 both sides and invisible walls above them keep the player to the file.
 Knocked-off pieces lie on the edge squares; every fifth fence pawn and some
 of the fallen are covered in static (`_corrupt`). Behind the first square
-the rank you came from is painted out with a wall of snow. Falling off the
+the rank you came from is painted out with a wall of static. Falling off the
 edge squares lands in the Static as everywhere; no route needs a fall.
 
 The rank is the progression of a life, and each square has its word on the
@@ -44,7 +44,7 @@ ground in front of it:
 | 4 | KEPT | filing cabinets, a desk, a phone that never rings, the ticket dispenser, the floor going to static |
 | 5 | LOVED | a table for two, two warm mugs, two queens of opposite colours together, paper roses |
 | 6 | HOME | the white door from the field, ajar, the mailbox with 5½ on it, a window that shows night |
-| 7 | KEPT AGAIN | an iron bed with hospital corners, a drip, a chair somebody sat in a long time, a set showing snow, the clock at half past five |
+| 7 | KEPT AGAIN | an iron bed with hospital corners, a drip, a chair somebody sat in a long time, a set showing static, the clock at half past five |
 | 8 | (no word) | a toppled red queen, the stone from the Ossuary with your name, and a raised white square with nothing on it |
 
 The Usher stands near the last square and vanishes when looked at, as

@@ -203,7 +203,7 @@ func _kept(c: Vector3) -> void:
 	Kit.light(self, c + Vector3(0, 4.5, 0), Color(0.9, 0.95, 1.0), 1.0, 11.0)
 	Readable.create(self, c + Vector3(1.5, 0.9, -1.0), 0.0, "The desk", [
 		"A desk, and on it the day's number, which is the same as yesterday's. The phone does not ring. It has never had to.",
-		"The floor is going. Where it has gone there is only the picture of a floor, and the picture is snow.",
+		"The floor is going. Where it has gone there is only the picture of a floor, and the picture is static.",
 	], {"name": "Desk", "size": Vector3(1.6, 1.2, 1.2)})
 
 
@@ -265,8 +265,8 @@ func _kept_again(c: Vector3) -> void:
 	Kit.light(self, c + Vector3(-2.2, 1.2, 0.4), Color(0.8, 0.85, 1.0), 0.6, 4.0)
 	Readable.create(self, c + Vector3(0, 0.9, -1.0), 0.0, "The bed", [
 		"An iron bed, made with hospital corners. A chair beside it, facing it, with a dent in the cushion the shape of somebody who sat a long time.",
-		"The set on the crate shows snow. The clock on the wall says half past five, like the clock in the town outside the train, like every clock you have seen since you fell asleep.",
-	], {"name": "IronBed", "size": Vector3(2.0, 1.4, 2.6), "note_key": "rank_bed", "note_title": "The seventh square", "note_text": "The seventh square of the last rank is an iron bed with hospital corners, a chair that somebody sat in a long time, and a set showing snow. The clock says half past five."})
+		"The set on the crate shows static. The clock on the wall says half past five, like the clock in the town outside the train, like every clock you have seen since you fell asleep.",
+	], {"name": "IronBed", "size": Vector3(2.0, 1.4, 2.6), "note_key": "rank_bed", "note_title": "The seventh square", "note_text": "The seventh square of the last rank is an iron bed with hospital corners, a chair that somebody sat in a long time, and a set showing static. The clock says half past five."})
 
 
 func _last(c: Vector3) -> void:

@@ -91,16 +91,20 @@ static func _rotunda(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 	], {"name": "Plaque", "sign": "signs/plaque_mirror", "sign_size": Vector2(1.0, 0.5), "size": Vector3(1.2, 0.6, 0.2), "note_key": "dream_plaque_mirror", "note_title": "The plaque at the end", "note_text": "The rotunda at the eighth square is the Anteroom, and subtly the mirrored one: the plaque reads backwards and the doors run the other way round. All twelve are open and all twelve show static."})
 	# pillars and cold lanterns
 	for i in 12:
-		var a := i * 30.0 + 15.0
+		var a := i * 30.0
+		if absf(wrapf(a - 90.0, -180.0, 180.0)) < 20.0 or absf(wrapf(a - 270.0, -180.0, 180.0)) < 20.0:
+			continue    # nothing stands in the way in or the way out
 		Props.place(root, "pillar_nexus", c + Kit.polar(R - 1.6, a), 0.0, 1.0, {"collision": "cylinder"})
 		Props.place(root, "lantern_hanging_cold", c + Kit.polar(R - 4.0, a, 6.5), 0.0, 1.0, {"collision": "none"})
 		var l := Kit.light(root, c + Kit.polar(R - 4.0, a, 5.6), Color(0.6, 0.85, 0.85), 0.55, 7.0)
 		state.lights.append(l)
 	# the twelve doors, in the mirrored order, each an arch full of static
 	for i in DOOR_NAMES.size():
-		var a := 270.0 - i * 30.0     # the Anteroom goes the other way
-		if absf(wrapf(a - 90.0, -180.0, 180.0)) < 8.0 or absf(wrapf(a - 270.0, -180.0, 180.0)) < 8.0:
-			a += 12.0
+		var a := 255.0 - i * 30.0     # the Anteroom goes the other way; the doors sit between the ways in and out
+		for gap in [90.0, 270.0]:
+			var off := wrapf(a - gap, -180.0, 180.0)
+			if absf(off) < 18.0:
+				a += 7.0 * signf(off)     # and their names clear of the openings
 		var id: String = DOOR_NAMES[i]
 		var yaw := Kit.yaw_to_center(a)
 		Kit.arch(root, c + Kit.polar(R - 0.9, a), yaw, 1.5, 2.8, "stone/blocks_nexus", {"depth": 0.7, "post": 0.45, "top": 0.5, "pointed": true})
@@ -112,7 +116,7 @@ static func _rotunda(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 		door.rotation.y = deg_to_rad(yaw)
 		root.add_child(door)
 		Kit.add_mesh(door, sq, Kit.static_mat({"brightness": 0.9}), Vector3(0, 1.4, 0), {"solid": false, "rotation": Vector3(0, 180, 0)})
-		Kit.label(root, World.area_name(id), c + Kit.polar(R - 1.35, a, 3.7), yaw, 40, Color(0.85, 0.8, 0.65), "display", {"pixel_size": 0.016})
+		Kit.label(root, World.area_name(id), c + Kit.polar(R - 1.35, a, 3.7), yaw, 26, Color(0.85, 0.8, 0.65), "display", {"pixel_size": 0.014})
 		Kit.light(root, c + Kit.polar(R - 2.2, a, 3.2), Color(0.8, 0.8, 0.8), 0.7, 6.0)
 		if i % 3 == 0:
 			Props.place(root, "tv_crt", c + Kit.polar(R - 2.4, a + 9.0, 0.12), yaw + 30.0, 0.9, {"collision": "box"})
@@ -166,12 +170,12 @@ static func _banquet(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 	for g in guests:
 		var x := float(g[1])
 		var red: bool = g[2]
-		Props.place(root, "chair_white", tp + Vector3(x, 0, -2.0), 180.0, 1.0, {"collision": "box"})
-		var piece := Props.place(root, String(g[0]), tp + Vector3(x, 0.0, -1.9), 180.0, 1.6, {"collision": "none", "tint": Color(0.85, 0.2, 0.25) if red else Color(1, 1, 1)})
+		Props.place(root, "chair_white", tp + Vector3(x, 0, -2.6), 180.0, 1.0, {"collision": "box"})
+		var piece := Props.place(root, String(g[0]), tp + Vector3(x, 0.0, -2.5), 180.0, 1.6, {"collision": "none", "tint": Color(0.85, 0.2, 0.25) if red else Color(1, 1, 1)})
 		state.guests.append(piece)
-	Props.place(root, "chair_white", tp + Vector3(-5.6, 0, 0), -90.0, 1.2, {"collision": "box"})
-	Props.place(root, "chess_queen", tp + Vector3(-5.4, 0, 0), -90.0, 1.9, {"collision": "cylinder", "tint": Color(1, 1, 1)})
-	Readable.create(root, tp + Vector3(-5.4, 1.2, 0), -90.0, "The White Queen", [
+	Props.place(root, "chair_white", tp + Vector3(-6.2, 0, 0), -90.0, 1.2, {"collision": "box"})
+	Props.place(root, "chess_queen", tp + Vector3(-6.0, 0, 0), -90.0, 1.9, {"collision": "cylinder", "tint": Color(1, 1, 1)})
+	Readable.create(root, tp + Vector3(-6.0, 1.2, 0), -90.0, "The White Queen", [
 		"Asleep at the head of the table, upright, the way only a piece can sleep.",
 		"She snores in a very small voice. \"...jam tomorrow,\" she says. \"...never jam today.\"",
 	], {"name": "WhiteQueen", "size": Vector3(1.4, 2.4, 1.4)})
@@ -184,7 +188,7 @@ static func _banquet(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 		var a := i * 60.0
 		Props.place(turn.body, String(dishes[i][0]), Kit.polar(0.75, a, 0.02), a, 1.2, {"collision": "none"})
 	Readable.create(root, tp + Vector3(0.6, 1.3, 1.0), 0.0, "Be introduced to the food", [
-		"\"Allow me to introduce you,\" says the mutton. \"Pudding, Alice; Alice, pudding.\" You are not Alice. The pudding does not mind.",
+		"\"Allow me to introduce you,\" says the mutton. \"Pudding: the guest. The guest: pudding.\" It does not use your name. It does not have it. The pudding does not mind.",
 		"It is not etiquette to cut anyone you have been introduced to. The knife in your pocket, if you have it, agrees.",
 	], {"name": "FoodLook", "size": Vector3(2.8, 1.4, 1.4), "note_key": "dream_food", "note_title": "The food introduces itself", "note_text": "At the banquet in the eighth square the mutton introduces you to the pudding. It is not etiquette to cut anyone you have been introduced to."})
 	# candles that will grow to the ceiling
@@ -225,7 +229,7 @@ const BED := Vector3(-7.0, 0, 3.6)
 const BOARD := Vector3(6.6, 0, 2.0)
 
 ## An empty hospital bed, made up, that is the most familiar thing in the
-## room; a monitor beside it showing snow, with a cable to a socket on the
+## room; a monitor beside it showing static, with a cable to a socket on the
 ## pillar; and a chair by it with a letter from M.
 static func _bed(area: AreaBase, root: Node3D) -> void:
 	var b := BED
@@ -258,8 +262,8 @@ static func _bed(area: AreaBase, root: Node3D) -> void:
 	], {"name": "SocketLook", "size": Vector3(1.0, 1.0, 1.0)})
 	Readable.create(root, b + Vector3(0, 0.9, 0), 90.0, "The bed", [
 		"An iron bed with hospital corners, made up and empty, a dent in the pillow the shape of a head. It is the most familiar thing in the room and you could not say from where.",
-		"The monitor beside it shows snow. The cable from it runs to the wall. Nobody is in the bed, and it does not feel like nobody.",
-	], {"name": "BedLook", "size": Vector3(2.6, 1.4, 1.6), "note_key": "dream_bed", "note_title": "The empty bed", "note_text": "In the rotunda at the end of the dream stands an empty hospital bed you know from somewhere, a dent in the pillow, a monitor beside it showing snow, and a cable from the monitor to the wall. A chair by it has a letter on the seat, signed M."})
+		"The monitor beside it shows static. The cable from it runs to the wall. Nobody is in the bed, and it does not feel like nobody.",
+	], {"name": "BedLook", "size": Vector3(2.6, 1.4, 1.6), "note_key": "dream_bed", "note_title": "The empty bed", "note_text": "In the rotunda at the end of the dream stands an empty hospital bed you know from somewhere, a dent in the pillow, a monitor beside it showing static, and a cable from the monitor to the wall. A chair by it has a letter on the seat, signed M."})
 	# the chair, and the letter on it
 	var ch := b + Vector3(0.4, 0, -1.9)
 	Props.place(root, "chair", ch, 180.0, 1.0)
@@ -285,10 +289,10 @@ const RED := Color(0.85, 0.2, 0.25)
 ## on the seventh, his king in the corner. Your chair on the south side.
 static func _board(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 	var ct := BOARD
-	Kit.box(root, ct + Vector3(0, 0.86, 0), Vector3(2.3, 0.08, 2.3), "wood/planks_dark", {"tile": 1.0})
+	Kit.box(root, ct + Vector3(0, 0.86, 0), Vector3(3.2, 0.08, 2.6), "wood/planks_dark", {"tile": 1.0})
 	for sx in [-1.0, 1.0]:
 		for sz in [-1.0, 1.0]:
-			Kit.box(root, ct + Vector3(sx * 1.0, 0.41, sz * 1.0), Vector3(0.12, 0.82, 0.12), "wood/planks_dark", {"solid": false})
+			Kit.box(root, ct + Vector3(sx * 1.45, 0.41, sz * 1.15), Vector3(0.12, 0.82, 0.12), "wood/planks_dark", {"solid": false})
 	Kit.box(root, ct + Vector3(0, 0.905, 0), Vector3(2.02, 0.03, 2.02), "wood/planks_dark", {"solid": false, "tint": Color(0.6, 0.55, 0.5)})
 	var sq := 0.24
 	for f in 8:
@@ -298,15 +302,19 @@ static func _board(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 	# file a is the west, rank 1 is your side
 	var at := func(file: int, rank: int) -> Vector3:
 		return ct + Vector3((file - 3.5) * sq, 0.94, (3.5 - (rank - 1)) * sq)
-	var pieces := [["chess_pawn", 4, 7, false], ["chess_king", 5, 6, false], ["chess_queen", 1, 3, false], ["chess_king", 7, 8, true], ["chess_pawn", 6, 7, true], ["chess_knight", 0, 5, true]]
+	# mate in one for the pawn: the white king on g6 and the pawn on f7, the red
+	# king on h8 with nowhere to go once the pawn is a queen on f8
+	var pieces := [["chess_pawn", 5, 7, false], ["chess_king", 6, 6, false], ["chess_king", 7, 8, true], ["chess_pawn", 7, 6, true]]
 	for pc in pieces:
 		var model := String(pc[0])
 		if not Props.exists(model):
 			model = "chess_pawn"
-		Props.place(root, model, at.call(int(pc[1]), int(pc[2])), 0.0 if not pc[3] else 180.0, 0.3, {"collision": "none", "tint": RED if pc[3] else IVORY})
-	# the taken pieces, lying by the board
-	for k in 4:
-		Props.place(root, ["chess_pawn", "chess_knight", "chess_pawn", "chess_pawn"][k], ct + Vector3(-1.35 + k * 0.2, 0.96, 1.25 - (k % 2) * 0.3), k * 70.0, 0.26, {"collision": "none", "tint": IVORY if k % 2 == 0 else RED, "rotation": Vector3(90, k * 70.0, 0)})
+		Props.place(root, model, at.call(int(pc[1]), int(pc[2])), 0.0 if not pc[3] else 180.0, 0.34, {"collision": "none", "tint": RED if pc[3] else IVORY})
+	# the taken pieces, lying on the table's margin beside the board
+	for k in 5:
+		var sx := -1.0 if k < 3 else 1.0
+		var zz := -0.7 + (k % 3) * 0.55
+		Props.place(root, ["chess_pawn", "chess_knight", "chess_queen", "chess_pawn", "chess_knight"][k], ct + Vector3(sx * 1.32, 0.95, zz), 90.0 + k * 40.0, 0.28, {"collision": "none", "tint": IVORY if k % 2 == 0 else RED, "rotation": Vector3(90, 90.0 + k * 40.0, 0)})
 	Kit.light(root, ct + Vector3(0, 2.6, 0), Color(1.0, 0.95, 0.85), 1.0, 7.0)
 	Props.place(root, "chair", ct + Vector3(0, 0, 1.75), 0.0, 1.0)
 	Interactable.make(root, ct + Vector3(0, 1.1, 0), Vector3(2.5, 1.2, 2.5), "The board", func(_p: Node, _it: Node) -> void:
@@ -321,7 +329,7 @@ static func _on_board(state: Dictionary) -> void:
 		return
 	if not Game.has_flag("dream_banquet_begun"):
 		await World.hud.say("", [
-			"A board the size of a table, and a game on it nearly over: your pawn on the seventh, his king in the corner, and nothing else on it that matters.",
+			"A board on a table, and a game on it nearly over: your pawn on the seventh, your king beside it, his king in the corner with one pawn left to it, and the taken pieces lying along the edge.",
 			"It is not your move. Not yet. The chair on your side has been pulled out.",
 		])
 		Game.note("dream_board", "The board", "In the rotunda at the end of the dream, a chessboard on a table with a game nearly over: your pawn on the seventh rank, the red king in the corner. A chair pulled out on your side.")
@@ -339,7 +347,7 @@ static func _on_board(state: Dictionary) -> void:
 	state.speed = 0.0
 	if i == 1:
 		Game.set_flag("plug_pulled", true)
-		Game.note("plug", "Concede", "At the board at the end of the dream you laid the king down. The monitor by the empty bed went to a dot, and the doors went to snow and stayed there.")
+		Game.note("plug", "Concede", "At the board at the end of the dream you laid the king down. The monitor by the empty bed went to a dot, and the doors went to static and stayed there.")
 		World.travel("static_end", "from_banquet", {"color": Color.WHITE, "duration": 1.8})
 	else:
 		Game.set_flag("promotion_taken", true)

@@ -259,7 +259,7 @@ Paper Crown on their head, which stopped the King offering the dream again.
 That is gone; the dream can be re-entered any number of times.)
 
 Also in the rotunda: an empty hospital bed with a dent in the pillow (the
-most familiar thing in the room), a monitor beside it showing snow with a
+most familiar thing in the room), a monitor beside it showing static with a
 cable to a socket on the pillar, a chair with a letter from M on the seat,
 and a chessboard on a table with a game nearly over: your pawn on the
 seventh, the red king in the corner, your chair pulled out.

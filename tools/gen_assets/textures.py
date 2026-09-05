@@ -622,19 +622,102 @@ def gravestone(rng, name, size=(64, 96), levels=12):
     return T.quantize(T.grain(img, rng, 0.04), levels)
 
 
-def clock_face(rng, size=128, levels=12):
-    img = T.solid(size, "#efe6c8")
+def clock_face(rng, size=256, levels=16):
+    """A clock face for every wall in the game: a brass bezel, a cream dial gone
+    the colour of old paper, roman numerals, sixty ticks, and the hands at half
+    past five, which is the only time it ever is."""
+    from PIL import ImageDraw
+    img = T.solid(size, "#e6dcc0")
+    # the dial: paper that has yellowed more at the edge than the middle
+    img = T.shade(img, T.noise(size, 3, rng), 0.05)
+    img = T.vignette(img, 0.22, 2.0)
+    ink = (38, 28, 20)
+    brass = (150, 112, 52)
+    brass_dk = (74, 52, 22)
+    brass_hi = (214, 178, 96)
+
     def fn(d, sz):
         w, h = sz
-        cx, cy, r = w / 2, h / 2, w / 2 - 4
-        d.ellipse([cx - r, cy - r, cx + r, cy + r], outline=(40, 30, 20), width=3)
+        cx, cy = w / 2, h / 2
+        r = w / 2 - 2
+        # the bezel: dark rim, brass, a highlight, a thin black inner line
+        d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=brass_dk)
+        d.ellipse([cx - r + 3, cy - r + 3, cx + r - 3, cy + r - 3], fill=brass)
+        d.ellipse([cx - r + 6, cy - r + 6, cx + r - 6, cy + r - 6], fill=brass_hi)
+        d.ellipse([cx - r + 9, cy - r + 9, cx + r - 9, cy + r - 9], fill=brass)
+        rd = r - 13
+        d.ellipse([cx - rd, cy - rd, cx + rd, cy + rd], fill=(230, 220, 192), outline=ink, width=2)
+        # sixty ticks, the fives longer and heavier
+        for i in range(60):
+            a = i / 60 * 6.283 - 1.5708
+            long = i % 5 == 0
+            r0 = rd - (12 if long else 6)
+            x0, y0 = cx + np.cos(a) * (rd - 3), cy + np.sin(a) * (rd - 3)
+            x1, y1 = cx + np.cos(a) * r0, cy + np.sin(a) * r0
+            d.line([(x0, y0), (x1, y1)], fill=ink, width=3 if long else 1)
+        # the numerals
+        f = T.font("display", int(size * 0.11))
+        names = ["XII", "I", "II", "III", "IIII", "V", "VI", "VII", "VIII", "IX", "X", "XI"]
+        for i in range(12):
+            a = i / 12 * 6.283 - 1.5708
+            x, y = cx + np.cos(a) * (rd - 30), cy + np.sin(a) * (rd - 30)
+            bb = d.textbbox((0, 0), names[i], font=f)
+            d.text((x - (bb[2] - bb[0]) / 2 - bb[0], y - (bb[3] - bb[1]) / 2 - bb[1]), names[i], font=f, fill=ink)
+        # the maker, under the twelve, and a small seconds dial above the six
+        f2 = T.font("body", int(size * 0.055))
+        bb = d.textbbox((0, 0), "HALDEN", font=f2)
+        d.text((cx - (bb[2] - bb[0]) / 2 - bb[0], cy - rd * 0.5 - bb[1]), "HALDEN", font=f2, fill=(90, 70, 50))
+        sr = rd * 0.2
+        sy = cy + rd * 0.42
+        d.ellipse([cx - sr, sy - sr, cx + sr, sy + sr], outline=ink, width=1)
         for i in range(12):
             a = i / 12 * 6.283
-            x0, y0 = cx + np.cos(a) * (r - 4), cy + np.sin(a) * (r - 4)
-            x1, y1 = cx + np.cos(a) * (r - 12), cy + np.sin(a) * (r - 12)
-            d.line([(x0, y0), (x1, y1)], fill=(40, 30, 20), width=3 if i % 3 == 0 else 1)
-        d.ellipse([cx - 3, cy - 3, cx + 3, cy + 3], fill=(40, 30, 20))
-    return T.quantize(T.draw_on(img, fn), levels)
+            d.line([(cx + np.cos(a) * sr, sy + np.sin(a) * sr), (cx + np.cos(a) * (sr - 3), sy + np.sin(a) * (sr - 3))], fill=ink, width=1)
+        d.line([(cx, sy), (cx, sy - sr + 4)], fill=ink, width=2)
+        # the hands: half past five, spade shaped
+
+        def hand(angle, length, width):
+            ca, sa = np.cos(angle), np.sin(angle)
+            tip = (cx + ca * length, cy + sa * length)
+            base = (cx - ca * length * 0.18, cy - sa * length * 0.18)
+            mid = (cx + ca * length * 0.55, cy + sa * length * 0.55)
+            px, py = -sa * width, ca * width
+            d.polygon([(base[0] + px * 0.5, base[1] + py * 0.5), (mid[0] + px, mid[1] + py), tip, (mid[0] - px, mid[1] - py), (base[0] - px * 0.5, base[1] - py * 0.5)], fill=ink)
+        hand(-1.5708 + 5.5 / 12 * 6.283, rd * 0.55, size * 0.02)
+        hand(-1.5708 + 6 / 12 * 6.283, rd * 0.82, size * 0.014)
+        cr = size * 0.02
+        d.ellipse([cx - cr, cy - cr, cx + cr, cy + cr], fill=brass_dk)
+        d.ellipse([cx - cr * 0.5, cy - cr * 0.5, cx + cr * 0.5, cy + cr * 0.5], fill=brass_hi)
+    return T.quantize(T.draw_on(img, fn), levels, dither=0.15)
+
+
+def test_card(rng, size=256, levels=16):
+    """A broadcast test card: colour bars over a grey scale, a circle, and the
+    hour nobody is watching at."""
+    from PIL import ImageDraw
+    h = int(size * 0.75)
+    img = T.solid((size, h), "#101014")
+
+    def fn(d, sz):
+        w, hh = sz
+        bars = ["#c0c0c0", "#c0c000", "#00c0c0", "#00c000", "#c000c0", "#c00000", "#0000c0"]
+        bw = w / len(bars)
+        for i, c in enumerate(bars):
+            col = tuple(int(v * 255) for v in T.hexc(c))
+            d.rectangle([i * bw, 0, (i + 1) * bw, hh * 0.62], fill=col)
+        greys = [0, 40, 80, 120, 160, 200, 240]
+        gw = w / len(greys)
+        for i, g in enumerate(greys):
+            d.rectangle([i * gw, hh * 0.62, (i + 1) * gw, hh * 0.8], fill=(g, g, g))
+        d.rectangle([0, hh * 0.8, w, hh], fill=(16, 16, 20))
+        cx, cy, r = w / 2, hh * 0.42, hh * 0.36
+        d.ellipse([cx - r, cy - r, cx + r, cy + r], outline=(235, 235, 240), width=4)
+        d.ellipse([cx - r * 0.55, cy - r * 0.55, cx + r * 0.55, cy + r * 0.55], fill=(16, 16, 20), outline=(235, 235, 240), width=2)
+        f = T.font("display", int(size * 0.09))
+        for txt, y in (("5:30", cy - size * 0.05), ("OFF AIR", hh * 0.9 - size * 0.045)):
+            bb = d.textbbox((0, 0), txt, font=f)
+            d.text((cx - (bb[2] - bb[0]) / 2 - bb[0], y - bb[1]), txt, font=f, fill=(235, 235, 240))
+    return T.quantize(T.draw_on(img, fn), levels, dither=0.1)
 
 
 def gear(rng, size=64, teeth=12, color="#b58a3c"):
@@ -1113,6 +1196,8 @@ def build_catalog():
     reg("signs/ward_a", lambda r: sign(["WARD A"], "#e6ebe0", "#2a3a30", size=(128, 64), kind="body", font_size=24, frame_color="#6a7a6a"))
     reg("signs/ward_b", lambda r: sign(["WARD B"], "#e6ebe0", "#2a3a30", size=(128, 64), kind="body", font_size=24, frame_color="#6a7a6a"))
     reg("signs/ward_room", lambda r: sign(["5½"], "#e6ebe0", "#2a3a30", size=(64, 64), kind="display", font_size=34, frame_color="#6a7a6a"))
+    reg("signs/test_card", test_card)
+    reg("signs/off_air", lambda r: sign(["TRANSMISSION", "ENDS"], "#08080c", "#d8d8e0", size=(256, 96), kind="display", font_size=34, frame_color="#3a3a44"))
     reg("signs/hospital_name", lambda r: sign(["ST. NOWHERE", "GENERAL"], "#2a3a30", "#e6ebe0", size=(256, 64), kind="display", font_size=26, frame_color="#6a7a6a"))
     reg("signs/plaque_anteroom", lambda r: sign(["YOU ARE EARLY.", "WAIT HERE."], "#2a2440", nx["gold"], size=(128, 64), kind="display", font_size=15, frame_color=nx["gold"]))
     reg("signs/plaque_mirror", lambda r: sign([".ETAL ERA UOY", ".EREH TIAW"], "#2a2440", "#a7f3f0", size=(128, 64), kind="display", font_size=15, frame_color="#a7f3f0"))

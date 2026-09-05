@@ -368,7 +368,7 @@ func _on_bed(_p: Node, _it: Node) -> void:
 		return
 	await World.hud.say("", [
 		"The one in the bed is two people, and they are lying in it as one person. Half of him is under a sheet with hospital corners, with the King's face turned to the wall. Half of him is in a coat, with a hat on the pillow, with your face turned to the door.",
-		"The set shows snow. The roses are in the vase, three of them. The chair has your shape in it, and the book downstairs has your letter in it, and you have been here every day.",
+		"The set shows static. The roses are in the vase, three of them. The chair has your shape in it, and the book downstairs has your letter in it, and you have been here every day.",
 		"There is room in the bed. There was always only one of you.",
 	])
 	Game.note("hospital_bed", "Room 5½", "At the end of the far corridor, in room 5½: one bed, and the one in it half under the sheet and half in the coat, the King's face and yours. Three roses in the vase. The chair with your shape. There is room in the bed.")

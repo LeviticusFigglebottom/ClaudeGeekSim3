@@ -18,7 +18,7 @@ one. Are you sure?", "No" first). Nothing is chosen by accident.
 
 | Road | Where | Choice | Flag | Goes to |
 |---|---|---|---|---|
-| **Concede** (unplugged) | the board in the rotunda at the eighth square, once the banquet has begun | "Concede. Lay the king down, and pull the plug." | `plug_pulled`, then `ending_unplugged` at the socket | Off Air, `docs/areas/STATIC_END.md`: the same life told grey and sinking, each thing watched by a set showing snow; the Usher on a bed at the end, and the plug. Accepting death. |
+| **Concede** (unplugged) | the board in the rotunda at the eighth square, once the banquet has begun | "Concede. Lay the king down, and pull the plug." | `plug_pulled`, then `ending_unplugged` at the socket | Off Air, `docs/areas/STATIC_END.md`: the station shutting down, the same life on eight stages being struck, the lights going out behind you; the Usher on a bed at the end under the last light, and the plug. Accepting death. |
 | **Checkmate** (limbo) | the same board | "Checkmate. The pawn to the eighth, and stay on the board." | `promotion_taken`, then `ending_limbo` on the last square | The Last Rank, `docs/areas/PROMOTION.md`: eight squares from BORN to a square with nothing on it. The King and the Usher stay separated; the consciousness stays a piece. |
 | **M** | the King in his bed in the King's Mind, after the third rose (`roses_all_placed`) | "Sit with him." | `ending_m` | Nowhere yet. You were M all along: the one who came every day, read to him and brought the roses. Finished as a choice; its scene is next. |
 | **Whole** | the well in the Anteroom with all nine keepsakes, then down: the drained Cistern's drain, the Waterworks, the Dark Glass, the Keep's mirror, the Other Anteroom with its roof off, the hospital, three visits, room 5½ | "Lie down." | `cistern_drained` → `pipes_opened` → `picked_dark_glass` → `mirror_open` → `hospital_book_read` → `ending_whole` | The bed with the one in it half under the sheet and half in the coat: the King and the Usher, the body and the consciousness, one of you. Lying down beside him is the ending. `docs/areas/PIPES.md`, `docs/areas/HOSPITAL.md`. |
@@ -29,14 +29,14 @@ way back to the Anteroom.
 
 The Last Rank and Off Air are the same life told twice, and that is the
 point: on the board it is kept and lit, and the board keeps you; off air it
-is grey and going under, and it ends. Keep the distinction legible if either
-is touched.
+is being struck, the lights go out behind you, and it ends. Keep the
+distinction legible if either is touched.
 
 ## The rotunda at the eighth square
 
 Still the mirrored Anteroom with twelve doors of static. In it: an empty
 hospital bed with a dent in the pillow, the most familiar thing in the
-room; a monitor beside it showing snow, its cable running to a socket on
+room; a monitor beside it showing static, its cable running to a socket on
 the pillar behind; a chair with a letter from M on the seat; and the
 chessboard on its table, a game nearly over (your pawn on the seventh, the
 red king in the corner), your chair pulled out on the south side. Once the

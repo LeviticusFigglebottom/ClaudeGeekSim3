@@ -49,7 +49,7 @@ worse each time.
 |---|---|
 | 1 | Clean and lit. The far door is a wall with the sign over it. Sign the visitors' book (`hospital_book_read`): every line is room 5½ and one letter, M, in your hand. |
 | 2 (book signed) | Some tubes flicker. Water on the back corridor's floor and in the theatre. The morgue door is open. The far door is a door: the corridor beyond goes round twice (`hospital_loops`, seam at x 62 back to x 46) and ends at a wall with 5½ scratched in it and breathing behind it. Two jumpscares. |
-| 3 | The door in that wall. Room 5½: the bed, the one in it half under the sheet and half in the coat (`usher_king`), the chair with your shape, three roses in the vase, the set showing snow. Four jumpscares. |
+| 3 | The door in that wall. Room 5½: the bed, the one in it half under the sheet and half in the coat (`usher_king`), the chair with your shape, three roses in the vase, the set showing static. Four jumpscares. |
 
 ## The jumpscares
 
