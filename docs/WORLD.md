@@ -19,15 +19,15 @@ the verifier (`tools/verify.sh`) checks all of them.
 | `city` | The Drowned City | nexus, forest (`west_gate`), catacombs (`sewer_top`), clocktower (`from_tower`), tavern back door (`alley`) | gate → `nexus:from_city`; west gate → `forest:road`; sewer (lantern) → `catacombs:from_sewer`; tower door (tower key) → `clocktower:from_city` | **Bell** (cathedral crypt, bell-order puzzle); **tower key** (palace, stone knights admit the crowned); wrapping streets |
 | `tavern` | The Last Lamp | nexus, sea (`from_sea`), furnace (`from_furnace`, the cellar) | door → `nexus:from_tavern`; back door → random of `forest:clearing`, `city:alley`, `house:field`, `sea:shore`; inn bed → `sea:from_tavern`; mouse gap → undertavern; cellar iron door (rope cut) → `furnace:from_tavern` | riddle → **coin**; moonlight trade → **Umbrella**; bard, patrons, barkeep |
 | `house` | The Nowhere House | hallway (`field`), nexus (`from_nexus`), tavern back door (`field`), cistern (`basement`), offices (`from_offices`) | lone door in the field → `nexus:from_house`; basement stair (loops) → `cistern:from_basement`; kitchen wing (visit ≥ 3) → `offices:from_house` | **Tin Mouse** (visit ≥ 2); dog + biscuit; photos that change; mirrored on visit 2; bigger bathroom; backwards door; attic (photo) |
-| `castle` | The Keep of Hours | nexus | gate → `nexus:from_castle`; bedchamber mirror (shard) → `mirror_nexus:default`; library shelf → `castle:wardrobe` | **Paper Crown** (rotating rooms; hourglass steadies them); tapestry (knife) → the King's dream; infinite library; throne |
+| `castle` | The Keep of Hours | nexus | gate → `nexus:from_castle`; bedchamber mirror (shard) → `mirror_nexus:default`; library shelf → `castle:wardrobe` | **Paper Crown** (rotating rooms; hourglass steadies them); tapestry (knife) → the King's dream; infinite library; throne; the bedchamber mirror with the Dark Glass → `mirror_nexus:open` (`mirror_open`) |
 | `sea` | The Slow Sea | tavern (`from_tavern`), nexus, tavern back door (`shore`) | pier door → `nexus:from_sea`; sleeping shore → `tavern:from_sea` | **Moth Wings** (highest platform; clockwork platforms); giant faces; colour-shifting sky |
 | `catacombs` | The Ossuary | forest (`from_well`), city (`from_sewer`), hallway (`from_stairs`), nexus | ladder → `forest:well_top`; grate → `city:sewer_top`; door → `nexus:from_catacombs` | **Mirror Shard** (reflecting pool; needs lantern to find the way); gravestone name puzzle; lantern-only paths |
 | `furnace` | The Furnace | mirror_nexus (`from_mirror`), nexus, tavern cellar (`from_tavern`) | iron door → `nexus:from_furnace`; mirror gate (shard) → `mirror_nexus:from_furnace`; small iron door (after the rope) → `tavern:from_furnace` | **Kitchen Knife** (the chained giant holds it out); the pit of slow fire (fall in: the Static); the forge and the Stoker; **candle stub** (iron maiden); the choir that sings one note (the bell stops it); the gallows rope (knife) opens every cage |
-| `cistern` | The Cistern | house (`from_basement`), nexus | drain ladder → `house:basement`; tiled door → `nexus:from_cistern` | **torn page** (follow the reading voice to the showers); the great sunken bath and its writing on the bottom; the lifeguard who climbed down; the corridor that only goes on (three passes → the glass float); the umbrella makes it rain indoors; higher water on the second visit; once the well has let go, no water at all: the bath empty, what it was keeping on the bottom, the rest of the writing, and a drain the size of a door (the fourth road, unfinished) |
+| `cistern` | The Cistern | house (`from_basement`), nexus | drain ladder → `house:basement`; tiled door → `nexus:from_cistern` | **torn page** (follow the reading voice to the showers); the great sunken bath and its writing on the bottom; the lifeguard who climbed down; the corridor that only goes on (three passes → the glass float); the umbrella makes it rain indoors; higher water on the second visit; once the well has let go, no water at all: the bath empty, what it was keeping on the bottom, the rest of the writing, and a drain the size of a door down to `pipes:from_cistern` (back up: `from_pipes`) |
 | `offices` | The Waiting Halls | corridor (`from_stairs`), house (`from_house`), nexus | fire door → `corridor:from_stairs`; door 5½ (once your number is called) → `nexus:from_offices`; STAFF ONLY → `house:from_offices`; door 0604 (door code) → `hallway:end`; door 0001 → the same waiting room | **missing photo** (archive drawer marked 5½); take a number, wait three times; **dog biscuit** (vending machine, B4); the corridor of cubicles that goes round; the photocopier that prints a face; the shadow at the desk |
 | `clocktower` | The Clocktower | city (`from_city`), nexus (`from_nexus`, both at the bottom) | ground doors → `city:from_tower` and `nexus:from_clocktower`; top door → `nexus:from_clocktower` | **Hourglass** (top of the spiral; two great gears to ride, the wings make it easy); the clock whose hands move only when unseen; the great bell stops the works; the keeper; a chest with a clock hand with your name on it |
 | `static` | The Static | falling out of any world (`default`), corridor lift (`lift`), nexus | a screen → `nexus:from_static` | the Usher's home; nothing stays |
-| `mirror_nexus` | The Other Anteroom | apartment mirror (`default`), furnace (`from_furnace`) | mirror → `apartment:mirror`; furnace door → `furnace:from_mirror`; a crack → `nexus:from_mirror` | reversed plaque; mirror-only geometry |
+| `mirror_nexus` | The Other Anteroom | apartment mirror (`default`), furnace (`from_furnace`), castle mirror with the Dark Glass (`open`), hospital (`top`) | mirror → `apartment:mirror`; furnace door → `furnace:from_mirror`; a crack → `nexus:from_mirror`; with `mirror_open`, the stair of slabs up to a door → `hospital:from_mirror` | reversed plaque; mirror-only geometry; with the roof off, the platforms are real |
 | `workshop` | The Workshop (hidden) | nexus (13 bells) | door → `nexus:from_workshop` | every prop on a plinth |
 
 ## Keepsakes and the routes to them
@@ -105,6 +105,16 @@ the Hallway stair (three descents) → `catacombs:from_stairs`.
   same eight things, grey and sinking, each watched by a set showing snow;
   the Usher on a bed at the end, and the plug. Pulling it is the ending.
   Spec: `docs/areas/STATIC_END.md`.
+
+* `pipes` — The Waterworks. Down the drain at the bottom of the drained
+  Cistern. Pipes, tiled halls with channels, the turning room whose block
+  keeps its doorway in the far face until it gives up, the stair that goes
+  round three times, and the Dark Glass at the top. Hatch back to the
+  Cistern. Spec: `docs/areas/PIPES.md`.
+* `hospital` — St. Nowhere. Above the Other Anteroom with its roof off. A
+  lobby with a visitors' book, wards, a chapel, a morgue, a theatre, the far
+  corridor that goes round, and room 5½ with the one in the bed. Three
+  visits. Spec: `docs/areas/HOSPITAL.md`.
 
 All the choices default to "No" or "Do nothing"; no ending scene is made
 yet (`docs/ENDINGS.md`). Neither `promotion` nor `static_end` has a door

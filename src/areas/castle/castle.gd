@@ -591,7 +591,8 @@ func _west_wing() -> void:
 	Props.place(self, "candle_tall", Vector3(-16.4, 0.77, -1.4), 0.0, 1.0, {"collision": "none"})
 	Kit.light(self, Vector3(-16.4, 1.6, -1.8), CANDLE, 0.9, 5.0)
 	_torch(Vector3(-19.84, 2.2, -2.2), -90.0, 1.0, 6.0)
-	Mirror.create(self, Vector3(-15.8, 1.1, -5.95), 180.0, "mirror_nexus", "default", {"name": "ChamberMirror", "model": "mirror_tall", "lines_without": [
+	Puzzle.declare(self, "castle_dark_glass", "mirror_open", ["item:dark_glass"], "hold the dark glass up to the bedchamber mirror: the Other Anteroom with the roof off", {"route": "mirror_nexus:open"})
+	Mirror.create(self, Vector3(-15.8, 1.1, -5.95), 180.0, "mirror_nexus", "default", {"name": "ChamberMirror", "model": "mirror_tall", "alt_item": "dark_glass", "alt_area": "mirror_nexus", "alt_spawn": "open", "alt_flag": "mirror_open", "lines_without": [
 		"The mirror shows the bedchamber. It shows the bed.",
 		"There is somebody in the bed in the mirror. There is nobody in the bed behind you. You check twice.",
 	]})

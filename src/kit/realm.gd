@@ -25,6 +25,8 @@ const PRESETS := {
 	"kings_dream": {"bg": "#4a2a58", "ambient": "#f0cfc0", "ambient_energy": 1.34, "fog": "#f0cfc0", "fog_density": 0.010, "sun": [-38, -65, "#fff2cf", 0.8], "sky": "sky/kings_dream"},
 	"promotion": {"bg": "#1a1424", "ambient": "#b8a8c8", "ambient_energy": 1.15, "fog": "#3a2c48", "fog_density": 0.012, "sun": [-45, -30, "#e8d8ff", 0.6], "sky": "sky/kings_mind"},
 	"kings_mind": {"bg": "#1a1030", "ambient": "#d8b8d0", "ambient_energy": 1.2, "fog": "#c8a8c8", "fog_density": 0.007, "sun": [-30, -120, "#ffd8e8", 0.7], "sky": "sky/kings_mind"},
+	"pipes": {"bg": "#061a1c", "ambient": "#6fa9a6", "ambient_energy": 1.0, "fog": "#1e6a70", "fog_density": 0.04, "sun": null, "sky": "sky/cistern"},
+	"hospital": {"bg": "#cfd8cc", "ambient": "#e6efe4", "ambient_energy": 1.18, "fog": "#b9c8b6", "fog_density": 0.045, "sun": null, "sky": ""},
 	"mirror": {"bg": "#0a1818", "ambient": "#4a7070", "ambient_energy": 0.94, "fog": "#0e2424", "fog_density": 0.026, "sun": [-60, 200, "#86c0c0", 0.2], "sky": "sky/nexus"},
 }
 

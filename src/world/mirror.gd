@@ -6,6 +6,11 @@ extends Interactable
 @export var target_area := ""
 @export var target_spawn := "default"
 @export var model := "mirror_wall"
+## With this item held instead, the mirror opens somewhere else (and sets alt_flag).
+@export var alt_item := ""
+@export var alt_area := ""
+@export var alt_spawn := "default"
+@export var alt_flag := ""
 var lines_without: Array = ["The mirror shows the room behind you.", "It does not show you."]
 var lines_with_shard: Array = ["Through the shard the mirror is a doorway, and the room on the other side is waiting."]
 
@@ -18,6 +23,13 @@ func _ready() -> void:
 
 
 func _on_interact(_player: Node) -> void:
+	if alt_item != "" and alt_area != "" and Game.has_item(alt_item):
+		Audio.sfx("shard", global_position, -2.0)
+		if alt_flag != "":
+			Game.set_flag(alt_flag, true)
+		Game.set_flag("mirror_crossed", true)
+		World.travel(alt_area, alt_spawn, {"color": Color(0.1, 0.1, 0.12), "duration": 1.2})
+		return
 	if Game.mirror_sight and target_area != "":
 		Audio.sfx("shard", global_position, -2.0)
 		Game.set_flag("mirror_crossed", true)
@@ -40,5 +52,8 @@ static func create(parent: Node, pos: Vector3, yaw_deg: float, target_area_: Str
 		m.model = opts.model
 	if opts.has("lines_without"):
 		m.lines_without = opts.lines_without
+	for k in ["alt_item", "alt_area", "alt_spawn", "alt_flag"]:
+		if opts.has(k):
+			m.set(k, opts[k])
 	parent.add_child(m)
 	return m

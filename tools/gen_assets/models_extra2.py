@@ -366,3 +366,33 @@ def king_coma(rng):
 
 
 reg("king_coma", king_coma)
+
+
+def usher_king(rng):
+    """The one in the bed at the end: half under a sheet, half in the coat, one hat brim, one face."""
+    m = MeshBuilder()
+    sheet = "tex:fabric/sheet"
+    coat = "tex:fabric/coat"
+    pale = (0.92, 0.9, 0.86)
+    dark = (0.16, 0.15, 0.17)
+    m.box((-0.75, 0.06, 0.05), (0.5, 0.12, 0.42), "flat", (0.9, 0.88, 0.8))
+    for z, mat, col in ((-0.1, sheet, WHITE), (0.1, coat, dark)):
+        m.push(compose(mat_translate(0.1, 0.22, z), mat_scale(1.0, 0.6, 0.5), mat_rot_z(PI / 2)))
+        m.lathe([(0.3, -0.7), (0.34, -0.2), (0.3, 0.4), (0.26, 0.7)], 8, mat, col, smooth=True, uv_scale=(2.0, 1.0))
+        m.pop()
+    _limb(m, (-0.5, 0.3, -0.18), (0.05, 0.22, -0.3), 0.08, 0.07, sheet, WHITE)
+    _limb(m, (-0.5, 0.3, 0.18), (0.05, 0.22, 0.3), 0.08, 0.07, coat, dark)
+    m.box((0.12, 0.2, -0.3), (0.12, 0.06, 0.12), SKIN, pale)
+    m.box((0.12, 0.2, 0.3), (0.12, 0.06, 0.12), "flat", (0.92, 0.9, 0.86))
+    m.push(compose(mat_translate(-0.62, 0.22, -0.02), mat_rot_z(PI / 2)))
+    m.lathe([(0.08, 0.0), (0.08, 0.12)], 6, SKIN, pale)
+    m.pop()
+    m.sphere((-0.8, 0.2, -0.02), 0.16, 5, 8, SKIN, pale)
+    m.card((-0.8, 0.21, -0.19), (0.3, 0.32), "tex:faces/king", pale, yaw=PI)
+    # the hat, on the coat side of the pillow, brim and crown
+    m.box((-0.8, 0.3, 0.14), (0.4, 0.03, 0.22), "flat", (0.07, 0.07, 0.08))
+    m.box((-0.8, 0.39, 0.14), (0.24, 0.16, 0.16), "flat", (0.07, 0.07, 0.08))
+    return single("usher_king", m, {"collision": "box"})
+
+
+reg("usher_king", usher_king)

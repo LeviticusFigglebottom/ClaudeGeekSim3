@@ -113,6 +113,16 @@ const AREAS := {
 		"name": "Off Air", "subtitle": "the set turned off",
 		"realm": "static", "ambience": "static",
 	},
+	"pipes": {
+		"scene": "res://src/areas/pipes/pipes.tscn",
+		"name": "The Waterworks", "subtitle": "where the water went",
+		"realm": "pipes", "ambience": "cistern",
+	},
+	"hospital": {
+		"scene": "res://src/areas/hospital/hospital.tscn",
+		"name": "St. Nowhere", "subtitle": "visiting hours are over",
+		"realm": "hospital", "ambience": "offices",
+	},
 	"kings_mind": {
 		"scene": "res://src/areas/kings_mind/kings_mind.tscn",
 		"name": "The King's Mind", "subtitle": "everything he has been told",

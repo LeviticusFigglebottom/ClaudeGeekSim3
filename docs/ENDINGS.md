@@ -1,7 +1,7 @@
 # Endings
 
-**Status: four roads. Three have their choice in the game; the fourth has
-its start. No ending scene is made yet.**
+**Status: four roads, each with its choice in the game. No ending scene is
+made yet.**
 
 ## Who is who
 
@@ -21,7 +21,7 @@ one. Are you sure?", "No" first). Nothing is chosen by accident.
 | **Concede** (unplugged) | the board in the rotunda at the eighth square, once the banquet has begun | "Concede. Lay the king down, and pull the plug." | `plug_pulled`, then `ending_unplugged` at the socket | Off Air, `docs/areas/STATIC_END.md`: the same life told grey and sinking, each thing watched by a set showing snow; the Usher on a bed at the end, and the plug. Accepting death. |
 | **Checkmate** (limbo) | the same board | "Checkmate. The pawn to the eighth, and stay on the board." | `promotion_taken`, then `ending_limbo` on the last square | The Last Rank, `docs/areas/PROMOTION.md`: eight squares from BORN to a square with nothing on it. The King and the Usher stay separated; the consciousness stays a piece. |
 | **M** | the King in his bed in the King's Mind, after the third rose (`roses_all_placed`) | "Sit with him." | `ending_m` | Nowhere yet. You were M all along: the one who came every day, read to him and brought the roses. Finished as a choice; its scene is next. |
-| **Whole** | the well in the Anteroom, holding all nine keepsakes | "Hold them over the well." (not an ending itself) | `cistern_drained` | The Cistern drains. At the bottom of the empty bath is a drain the size of a door, warm air coming up out of it once for every four breaths. **The way down through it, and the ending (the King united with his consciousness, waking), is not made and not yet specified.** |
+| **Whole** | the well in the Anteroom with all nine keepsakes, then down: the drained Cistern's drain, the Waterworks, the Dark Glass, the Keep's mirror, the Other Anteroom with its roof off, the hospital, three visits, room 5½ | "Lie down." | `cistern_drained` → `pipes_opened` → `picked_dark_glass` → `mirror_open` → `hospital_book_read` → `ending_whole` | The bed with the one in it half under the sheet and half in the coat: the King and the Usher, the body and the consciousness, one of you. Lying down beside him is the ending. `docs/areas/PIPES.md`, `docs/areas/HOSPITAL.md`. |
 
 The board's third option, "Do nothing. Leave the board as it is.", is the
 default and is always allowed. The cloth on the banquet table is only the
@@ -61,8 +61,8 @@ and offers another afterwards.
 
 ## Open
 
-* **The fourth road's end**: what is under the drain, and how the King and
-  the Usher are made whole. Not to be designed here.
+* **The fourth road's scene**: the choice is in the bed in room 5½; what
+  the ending shows is open, like the other three.
 * **The well's other text states** still say "something is still missing";
   the nine-keepsake state now leads somewhere.
 * **The Paper Crown** has no use in the dream since the crowning was removed.

@@ -41,7 +41,7 @@ func build() -> void:
 	_presences()
 	Puzzle.declare(self, "cistern_loops", "cistern_shell_found", [], "walk the corridor that only goes on until it gives up")
 	Puzzle.declare(self, "cistern_page", "", [], "follow the voice reading aloud through the flooded corridors", {"item": "page"})
-	Puzzle.declare(self, "cistern_great_drain", "", ["flag:cistern_drained"], "with the water gone, the drain at the bottom of the great bath")
+	Puzzle.declare(self, "cistern_great_drain", "", ["flag:cistern_drained"], "with the water gone, the drain at the bottom of the great bath goes down", {"route": "pipes:from_cistern"})
 
 
 # --- coordinates: plan metres -> world -------------------------------------------------------
@@ -190,6 +190,8 @@ func _pool_hall() -> void:
 		Props.place(self, "figure_shadow", _m((bx0 + bx1) * 0.5, bz1 + 3.6, 1.7), 0.0, 0.8, {"collision": "none", "name": "ChairShadow"})
 	if drained:
 		_dry_bottom(bx0, bx1, bz0, bz1)
+	else:
+		add_spawn("from_pipes", _m((bx0 + bx1) * 0.5 + 2.4, (bz0 + bz1) * 0.5 + 1.2, -0.55), 90.0)
 	# lamps
 	for i in 4:
 		for j in 3:
@@ -210,7 +212,13 @@ func _dry_bottom(bx0: float, bx1: float, bz0: float, bz1: float) -> void:
 	Kit.cylinder(self, c - Vector3(0, 0.03, 0), 1.5, 0.025, "stone/blocks_dark", {"solid": false, "segments": 24, "mat": Kit.flat(Color(0.02, 0.02, 0.03), {"unshaded": true})})
 	Props.place(self, "drain_grate", c + Vector3(0, 0.01, 0), 0.0, 3.2, {"collision": "none", "name": "GreatDrainGrate"})
 	Kit.light(self, c + Vector3(0, 1.6, 0), Color(0.5, 0.7, 0.75), 0.9, 8.0)
-	Interactable.make(self, c + Vector3(0, 0.5, 0), Vector3(3.2, 1.2, 3.2), "The drain at the bottom", _on_great_drain, {"name": "GreatDrain"})
+	var down := Door.create(self, c, 0.0, "pipes", "from_cistern", {"kind": "none", "label": "Go down the drain", "name": "GreatDrainDown", "fade_color": Color.BLACK, "fade_duration": 1.5, "sound": "splash"})
+	down.add_box(Vector3(2.6, 1.2, 2.6), Vector3(0, 0.5, 0))
+	Readable.create(self, c + Vector3(2.2, 0.5, 0), 0.0, "Look down the drain", [
+		"The drain at the bottom of the bath, the size of a door, with no water over it for the first time in a hundred years.",
+		"Air comes up out of it, warm, in a slow rhythm: once for every four of your breaths. Whatever is down there is breathing, and you know the rate.",
+	], {"name": "GreatDrainLook", "size": Vector3(1.4, 1.0, 2.0), "note_key": "cistern_great_drain", "note_title": "The drain the size of a door", "note_text": "At the bottom of the emptied bath in the Cistern is a drain the size of a door. Warm air comes up out of it once for every four of your breaths. It goes down to the Waterworks."})
+	add_spawn("from_pipes", c + Vector3(2.4, 0.05, 1.2), 90.0)
 	# what the water was keeping
 	var kept := ["bottle", "mug", "teacup_stack", "shell", "candle", "bottle", "mug"]
 	for k in kept.size():
@@ -221,17 +229,6 @@ func _dry_bottom(bx0: float, bx1: float, bz0: float, bz1: float) -> void:
 		"A tide mark on the inside of the bath, one, at the very top. It was full once and never fuller.",
 		"Under the ladder the tiles go on: ...TO HOLD YOUR BREATH. THE OTHER HALF OF YOU IS HOLDING IT TOO.",
 	], {"name": "DryBottom", "size": Vector3(4.0, 1.0, 3.0), "note_key": "cistern_dry", "note_title": "The bath, empty", "note_text": "The great bath in the Cistern has drained. On the bottom, what the water was keeping, and the rest of the writing under the ladder: the other half of you is holding it too. In the middle, a drain the size of a door."})
-
-
-func _on_great_drain(_p: Node, _it: Node) -> void:
-	if World.hud == null:
-		return
-	await World.hud.say("", [
-		"The drain at the bottom of the bath, the size of a door, with no water over it for the first time in a hundred years.",
-		"Air comes up out of it, warm, in a slow rhythm: once for every four of your breaths. Whatever is down there is breathing, and you know the rate.",
-		"The way down through it is not made yet.",
-	])
-	Game.note("cistern_great_drain", "The drain the size of a door", "At the bottom of the emptied bath in the Cistern is a drain the size of a door. Warm air comes up out of it once for every four of your breaths. The way down through it is not made yet.")
 
 
 # --- the flooded corridors -------------------------------------------------------------------------
