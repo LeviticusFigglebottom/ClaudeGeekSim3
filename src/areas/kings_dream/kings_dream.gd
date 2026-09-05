@@ -195,7 +195,7 @@ func _gate_ford(node: Node3D, y: float, d: Dictionary, spec: Array) -> void:
 	gate.name = "Gate_N"
 	node.add_child(gate)
 	var at := KD.at("N", KD.GATE, 0.0, y)
-	KD.hedge_block(gate, at + Vector3(0, KD.HEDGE_H * 0.5, 0), Vector3(KD.GATE_W + 1.0, KD.HEDGE_H, KD.HEDGE_T), {"tint": d.get("hedge", KD.HEDGE_TINT)})
+	KD.hedge_block(gate, at + Vector3(0, KD.HEDGE_H * 0.5, 0), Vector3(KD.GATE_W + 1.0, KD.HEDGE_H, KD.HEDGE_T + 0.24), {"tint": d.get("hedge", KD.HEDGE_TINT)})
 	Kit.blocker(gate, at + Vector3(0, 20.0, 0), Vector3(KD.GATE_W + 1.0, 40.0, KD.HEDGE_T))
 	var last := {"t": -100.0}
 	Kit.trigger(node, at + Vector3(0, 1.5, 0), Vector3(16.0, 3.0, 9.0), func(_p: Node) -> void:

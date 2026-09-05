@@ -128,6 +128,13 @@ func _entry_hall() -> void:
 	Readable.create(self, _m(11.0, 2.2, 1.6), 180.0, "A tide mark", ["A brown line runs round the walls at the height of your chest.", "Above it, a second line at the height of your eyes. Above that, a third, fainter, that you have to look up for."], {"name": "TideMark", "size": Vector3(2.0, 1.2, 0.3), "note_key": "cistern_tide", "note_title": "Tide marks", "note_text": "The Cistern has been fuller than this. Three times at least, each time higher. The bath in the flat has a ring like it."})
 	Readable.create(self, _m(2.2, 4.0, 1.5), -90.0, "A locker", ["A tiled locker with no door. Inside: one shoe, a towel folded with hospital precision, a key with no number.", "You leave the key. Something in the water would want it."], {"name": "Locker", "size": Vector3(0.4, 1.4, 1.0)})
 	Kit.sign(self, "props/rune_ring", _m(2.05, 4.0, 1.5), -90.0, Vector2(0.8, 1.4), {"tint": Color(0.7, 0.8, 0.8)})
+	# what a changing hall has when nobody has used it for a long time
+	Props.place(self, "radiator", _m(2.35, 10.0), -90.0, 1.0)
+	Props.place(self, "shoe_pile", _m(3.1, 5.3), 30.0, 0.9, {"collision": "none"})
+	Props.place(self, "sink", _m(14.5, 11.65), 0.0, 1.0)
+	Props.place(self, "pool_ladder", _m(15.4, 2.7), 0.0, 1.0)
+	Props.place(self, "pool_float", _m(3.6, 11.0, 0.05), -40.0, 1.0, {"collision": "none"})
+	Props.place(self, "drain_grate", _m(8.0, 7.0, 0.01), 0.0, 1.0, {"collision": "none"})
 	_lamp(6.0, 7.0)
 	_lamp(12.0, 7.0)
 	Kit.particles(self, _m(8.0, 7.0, 2.0), "motes", Vector3(6.0, 1.5, 4.0), 24)

@@ -224,7 +224,7 @@ func _entrances() -> void:
 	Door.create(self, n + Vector3(0, 0, 0.7), 0.0, "nexus", "from_catacombs", {"kind": "dark", "label": "Back to the Anteroom", "name": "NexusDoor"})
 	_lamp(_c(14, 31) + Vector3(0.3, 0, 0.3))
 	_lamp(_c(19, 31) + Vector3(-0.3, 0, 0.3))
-	Kit.label(self, "EVERYONE IS HERE", n + Vector3(0, 2.75, 0.4), 0.0, 30, Color(0.75, 0.7, 0.55), "display", {"pixel_size": 0.011})
+	Kit.label(self, "EVERYONE IS HERE", n + Vector3(0, 2.75, 0.15), 0.0, 30, Color(0.75, 0.7, 0.55), "display", {"pixel_size": 0.011})
 	add_spawn("from_nexus", _c(16, 30) + Vector3(0, 0.1, 0.4), 0.0)
 	add_spawn("default", _c(16, 30) + Vector3(0, 0.1, 0.4), 0.0)
 	# north: the ladder up the well shaft
@@ -505,7 +505,7 @@ func _coffin_room() -> void:
 	_urn(_c(27, 27) + Vector3(0.5, 0, -0.5))
 	_bones(_c(26, 30) + Vector3(0.5, 0, 0.5), 1.0)
 	Props.place(self, "chain_hanging", _c(24, 28) + Vector3(0.6, H, 0), 0.0, 0.5, {"collision": "none"})
-	Props.place(self, "cage", _c(22, 28) + Vector3(-0.6, 0, 0.6), 0.0, 0.5, {"collision": "none"})
+	Props.place(self, "cage", _c(22, 28) + Vector3(-0.45, 0, 0.6), 0.0, 0.5, {"collision": "none"})
 	Kit.particles(self, k + Vector3(0, 1.4, 0), "motes", Vector3(5, 1.2, 4), 30)
 	add_spawn("coffin", _c(24, 26) + Vector3(0, 0.1, 0.4), 0.0)
 

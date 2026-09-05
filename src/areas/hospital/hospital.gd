@@ -267,6 +267,24 @@ func _corridors() -> void:
 	Props.place(self, "bed_iron", _c(30.0, 16.5), 90.0, 0.9, {"tint": Color(0.85, 0.85, 0.85)})
 	Props.place(self, "bed_iron", _c(70.0, 45.5), 90.0, 0.9, {"tint": Color(0.85, 0.85, 0.85)})
 	Props.place(self, "crate_small", _c(20.0, 45.6), 20.0, 0.7)
+	# what a corridor has along its walls when nobody has cleared it: chairs to
+	# wait in, a cooler, a machine, a phone nobody answers, plants that are not
+	for x in [26.0, 62.0]:
+		Props.place(self, "waiting_chairs", _c(x, 15.45), 180.0, 1.0)
+	Props.place(self, "water_cooler", _c(80.0, 15.35), 180.0, 1.0)
+	Props.place(self, "vending_machine", _c(66.0, 15.5), 180.0, 1.0)
+	Props.place(self, "radiator", _c(40.0, 15.2), 180.0, 1.0)
+	Props.place(self, "radiator", _c(84.0, 17.8), 0.0, 1.0)
+	Props.place(self, "phone_wall", _c(45.0, 15.05, 1.35), 180.0, 1.0, {"collision": "none"})
+	for x in [9.0, 95.0]:
+		Props.place(self, "potted_plant_fake", _c(x, 15.6), 0.0, 1.0)
+	Props.place(self, "exit_sign_wrong", _c(2.6, 16.5, 2.6), -90.0, 1.0, {"collision": "none"})
+	Props.place(self, "exit_sign_wrong", _c(97.4, 16.5, 2.6), 90.0, 1.0, {"collision": "none"})
+	Props.place(self, "boxes_moving", _c(84.0, 44.6), 10.0, 1.0)
+	Props.place(self, "cart_broken", _c(12.0, 45.4), 30.0, 0.7)
+	Props.place(self, "waiting_chairs", _c(30.0, 15.45, UP), 180.0, 1.0)
+	Props.place(self, "water_cooler", _c(60.0, 15.35, UP), 180.0, 1.0)
+	Props.place(self, "boxes_moving", _c(84.0, 16.0, UP), 20.0, 1.0)
 	for x in range(8, 96, 12):
 		Kit.water(self, _c(float(x), 45.5, 0.02), Vector2(6.0, 2.8), "nature/water_cistern", {"tint": Color(0.7, 0.75, 0.7, 0.45), "subdiv": 2})
 	Readable.create(self, _c(50.0, 16.5, 1.4), 0.0, "The corridor", [

@@ -218,7 +218,7 @@ func _reception() -> void:
 
 func _break_room() -> void:
 	Props.place(self, "kitchen_counter", _c(29.5, 14.4), 180.0, 1.0)
-	Props.place(self, "kitchen_sink", _c(31.0, 14.4), 180.0, 1.0)
+	Props.place(self, "kitchen_sink", _c(31.15, 14.4), 180.0, 1.0)
 	Props.place(self, "fridge", _c(36.8, 14.45), 180.0, 1.0)
 	Readable.create(self, _c(36.8, 14.9, 1.3), 180.0, "The fridge", ["A note on the fridge: PLEASE LABEL YOUR FOOD.", "Every container inside is labelled with the same name. It is not a name you can read twice."], {"name": "BreakFridge", "size": Vector3(0.7, 0.8, 0.4), "sign": "signs/note_offices", "sign_size": Vector2(0.3, 0.3)})
 	Props.place(self, "tv_crt", _c(30.3, 14.35, 0.92), 180.0, 0.8, {"collision": "none"})

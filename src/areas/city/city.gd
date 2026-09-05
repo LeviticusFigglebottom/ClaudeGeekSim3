@@ -247,7 +247,7 @@ func _torch(pos: Vector3, yaw: float) -> void:
 ## An iron plate with words on it. The Readable is the caller's business.
 func _plate(pos: Vector3, yaw: float, text: String, w: float = 2.4) -> void:
 	var out := Kit.yaw_to_dir(yaw)
-	Kit.box(self, pos + out * 0.03, Vector3(w, 0.5, 0.06), "metal/iron", {"solid": false, "yaw": yaw, "tile": 1.0})
+	Kit.box(self, pos + out * 0.045, Vector3(w, 0.5, 0.06), "metal/iron", {"solid": false, "yaw": yaw, "tile": 1.0})
 	Kit.label(self, text, pos + out * 0.075, yaw, 30, Color(0.85, 0.82, 0.7), "display", {"pixel_size": 0.011, "outline": 6})
 
 
@@ -261,11 +261,11 @@ func _dressing(ox: float, phantom: bool, lo: float, hi: float) -> void:
 	var inside := func(x: float) -> bool:
 		return ox + x > lo and ox + x < hi
 	if inside.call(-29.5):
-		_plate(Vector3(ox - 29.5, 3.1, -SH + 0.05), 180.0, "KING'S WAY", 2.8)
+		_plate(Vector3(ox - 29.5, 3.9, -SH + 0.05), 180.0, "KING'S WAY", 2.8)
 		Props.place(self, "barrel", Vector3(ox - 30.5, 0, 3.3), 0.0, 1.0)
 		Props.place(self, "crate", Vector3(ox - 29.4, 0, 3.5), 25.0, 0.8)
 	if inside.call(27.0):
-		_plate(Vector3(ox + 27.0, 3.1, SH - 0.05), 0.0, "QUEEN'S WAY", 3.0)
+		_plate(Vector3(ox + 27.0, 3.9, SH - 0.05), 0.0, "QUEEN'S WAY", 3.0)
 	if inside.call(-14.0):
 		Kit.label(self, "12", Vector3(ox - 19.1, 2.5, -SH + 0.04), 180.0, 52, Color(0.8, 0.78, 0.7), "body", {"pixel_size": 0.012})
 		Kit.label(self, "16", Vector3(ox - 10.1, 2.5, -SH + 0.04), 180.0, 52, Color(0.8, 0.78, 0.7), "body", {"pixel_size": 0.012})
@@ -335,7 +335,7 @@ func _gate_street() -> void:
 		_torch(g + Vector3(sx * 3.9, 2.6, -2.0), -90.0 if sx < 0 else 90.0)
 	# a little narrower than the gap between the houses, so its posts stand
 	# proud of their faces instead of in them
-	Kit.arch(self, g + Vector3(0, 0, -0.05), 0.0, 7.7, 6.5, "stone/blocks_city", {"depth": 2.0, "post": 0.6, "top": 0.8, "tile": 1.0})
+	Kit.arch(self, g + Vector3(0, 0, -0.05), 0.0, 7.7, 6.42, "stone/blocks_city", {"depth": 2.0, "post": 0.6, "top": 0.8, "tile": 1.0})
 	Kit.box(self, g + Vector3(0, 10.9, 0), Vector3(8.0, 7.2, 2.0), "stone/blocks_city", {"tile": 2.0})
 	for k in 5:
 		Kit.box(self, g + Vector3(-3.2 + k * 1.6, 15.1, -0.6), Vector3(0.8, 1.2, 0.8), "stone/blocks_city", {"tile": 1.0})
@@ -554,13 +554,13 @@ func _crypt() -> void:
 	Kit.stairs(self, Vector3(4.5, 0, -37.5), 90.0, 3.0, 21, -0.25, 0.4, "stone/flagstone", {"name": "CryptStairs", "tile": 1.0})
 	for i in range(0, 21, 2):
 		Kit.ceiling(self, Vector3(4.5 - (i + 1) * 0.4, 3.2 - 0.25 * (i + 1), -37.5), Vector2(1.0, 3.0), DARK, {"thick": 0.8, "all_faces": true, "tile": 1.0})
-	Kit.floor(self, Vector3(-4.7, CRYPT_Y - 0.01, -37.5), Vector2(1.6, 3.0), "stone/flagstone", {"tile": 1.0})
+	Kit.floor(self, Vector3(-4.7, CRYPT_Y - 0.02, -37.5), Vector2(1.6, 3.0), "stone/flagstone", {"tile": 1.0})
 	Kit.ceiling(self, Vector3(-4.6, CRYPT_Y + 3.2, -37.5), Vector2(1.9, 3.0), DARK, {"thick": 0.8, "all_faces": true, "tile": 1.0})
-	Kit.box(self, Vector3(-5.3, CRYPT_Y + 3.85, -37.5), Vector3(0.5, 1.5, 4.8), DARK, {"tile": 1.0})
+	Kit.box(self, Vector3(-5.25, CRYPT_Y + 3.85, -37.5), Vector3(0.5, 1.5, 4.8), DARK, {"tile": 1.0})
 	var e0 := CRYPT_C + Kit.polar(CRYPT_R, -22.5)
 	var e1 := CRYPT_C + Kit.polar(CRYPT_R, 22.5)
-	Kit.wall(self, e0, Vector3(e0.x, CRYPT_Y, -39.0), 4.5, DARK)
-	Kit.wall(self, Vector3(e1.x, CRYPT_Y, -36.0), e1, 4.5, DARK)
+	Kit.wall(self, e0, Vector3(e0.x, CRYPT_Y, -39.12), 4.5, DARK)
+	Kit.wall(self, Vector3(e1.x, CRYPT_Y, -35.88), e1, 4.5, DARK)
 	Kit.light(self, Vector3(6.2, 2.6, -37.5), CANDLE, 0.8, 5.0)
 	_torch(Vector3(0.5, -1.0, -38.98), 180.0)
 	Kit.light(self, Vector3(2.0, 0.4, -37.5), CANDLE, 0.9, 6.0)
@@ -723,7 +723,7 @@ func _alley() -> void:
 	Props.place(self, "barrel", Vector3(-6.95, 0, 11.3), 0.0, 0.8)
 	Kit.water(self, Vector3(cx, 0.01, 8.0), Vector2(1.6, 2.4), "nature/water_dark", {"tint": Color(0.5, 0.55, 0.6, 0.7), "subdiv": 2, "swell": 0.0})
 	Kit.box(self, Vector3(-8.6, 4.0, 8.5), Vector3(0.8, 0.14, 1.8), DARK, {"solid": false, "tile": 1.0})
-	Props.place(self, "window_lit", Vector3(-8.93, 4.85, 8.5), -90.0, 1.0, {"collision": "none"})
+	Props.place(self, "window_lit", Vector3(-8.89, 4.85, 8.5), -90.0, 1.0, {"collision": "none"})
 	_figure(Vector3(-8.55, 4.07, 8.5), -90.0)
 	Kit.light(self, Vector3(-8.2, 4.7, 8.5), WARM, 0.7, 5.0)
 	Kit.light(self, Vector3(cx, 3.0, 11.5), COOL, 0.6, 5.0)
@@ -808,7 +808,7 @@ func _lower_town() -> void:
 		"Something at the bottom is ringing, very slowly, once every few years.",
 	], {"name": "ChannelLook", "size": Vector3(2.0, 0.8, 0.6), "sound": "drip"})
 	# somebody in a drowned window
-	Props.place(self, "window_lit", Vector3(26.0, 1.3, 29.93), 0.0, 1.0, {"collision": "none"})
+	Props.place(self, "window_lit", Vector3(26.0, 1.3, 29.89), 0.0, 1.0, {"collision": "none"})
 	_figure(Vector3(26.0, LOW_Y, 29.4), 0.0)
 	Kit.light(self, Vector3(26.0, 1.4, 28.8), WARM, 0.7, 5.0)
 	_lantern(Vector3(11.3, LOW_Y, 13.8), -90.0)

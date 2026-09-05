@@ -247,8 +247,8 @@ func _drift() -> void:
 func _card() -> void:
 	var c := _stage_pos(7) + Vector3(0, 60.0, -60.0)
 	Kit.sign(self, "signs/test_card", c, 180.0, Vector2(48.0, 36.0), {"unshaded": true})
-	Kit.sign(self, "signs/off_air", c + Vector3(0, -17.0, 0), 180.0, Vector2(24.0, 9.0), {"unshaded": true})
-	countdown = Kit.label(self, str(channels_on), c + Vector3(0, -26.0, 0), 180.0, 160, Color(0.95, 0.95, 1.0), "display", {"pixel_size": 0.05, "outline": 0})
+	Kit.sign(self, "signs/off_air", c + Vector3(0, -17.0, 0.2), 180.0, Vector2(24.0, 9.0), {"unshaded": true})
+	countdown = Kit.label(self, str(channels_on), c + Vector3(0, -26.0, 0.2), 180.0, 160, Color(0.95, 0.95, 1.0), "display", {"pixel_size": 0.05, "outline": 0})
 	Kit.light(self, c + Vector3(0, -20.0, 10.0), Color(0.8, 0.85, 1.0), 1.5, 40.0)
 
 

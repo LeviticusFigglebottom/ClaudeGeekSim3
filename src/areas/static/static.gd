@@ -53,9 +53,20 @@ func build() -> void:
 	Readable.create(self, lift + Vector3(0, 1.0, -0.7), 0.0, "The lift buttons", ["There is one button. It says 3. You are on 3.", "You have always been on 3."], {"name": "LiftButtons", "size": Vector3(0.4, 0.6, 0.3), "note_key": "lift_buttons", "note_title": "The lift", "note_text": "One button. It says 3."})
 	# the Usher, at home, fully visible, pointing at the door
 	Usher.spawn(self, Vector3(4, 0, -9), {"start_visible": true, "vanish_delay": 6.0, "radius": 80.0})
-	for i in 3:
+	for i in 7:
 		if Props.exists("figure_shadow"):
-			Props.place(self, "figure_shadow", Vector3(rng.randf_range(-30, 30), 0, rng.randf_range(-30, 30)), rng.randf_range(0, 360), 1.0, {"collision": "none"})
+			Props.place(self, "figure_shadow", Vector3(rng.randf_range(-45, 45), 0, rng.randf_range(-45, 45)), rng.randf_range(0, 360), 1.0, {"collision": "none"})
+	# further out, sets still on with nobody watching, and one sign that points the wrong way
+	for i in 7:
+		var a := i * 51.4 + 20.0
+		var p := Kit.polar(rng.randf_range(28.0, 46.0), a)
+		var far_tv := Props.place(self, "tv_crt", p, rng.randf_range(0, 360), 1.0, {"collision": "box"})
+		var far_screen := Props.part(far_tv, "Screen")
+		if far_screen is MeshInstance3D:
+			(far_screen as MeshInstance3D).set_surface_override_material(0, Kit.static_mat({"brightness": 0.7}))
+		Kit.light(self, p + Vector3(0, 0.6, 0), Color(0.75, 0.8, 1.0), 0.9, 6.0)
+	Kit.box(self, Vector3(-16.0, 1.3, -6.0), Vector3(0.08, 2.6, 0.08), "metal/iron", {"solid": false})
+	Props.place(self, "exit_sign_wrong", Vector3(-16.0, 2.7, -6.0), 30.0, 1.0, {"collision": "none"})
 	# readables
 	Readable.create(self, Vector3(6.3, 1.9, -8.0), 180.0, "Read the screen", ["Between channels there is a room.", "This is the room.", "Sit anywhere. Nothing stays."], {"name": "ScreenText", "size": Vector3(0.7, 0.6, 0.7), "note_key": "static_room", "note_title": "The room between channels", "note_text": "You fell out of a world and landed on the snow between channels. A door stood there with a room behind it. The tall one was waiting."})
 	Kit.label(self, "NO SIGNAL", Vector3(0, 4.0, -20), 0.0, 96, Color(0.9, 0.9, 0.9), "body", {"pixel_size": 0.02})

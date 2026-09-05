@@ -95,7 +95,20 @@ autoloads exist. It will fail your build if:
 * an area or a keepsake is unreachable from the first sleep by any route
 * a `Puzzle` declares a `grants_route` that is not `area:spawn`
 
-and it warns if an item can be gained but nothing ever asks for it.
+and it warns if an item can be gained but nothing ever asks for it, and if an
+interactable has no ground within seven metres under it or beside it (the
+usual cause is a placement helper called with its height and depth the wrong
+way round: `_c(x, z, y)` takes the height last).
+
+The coplanar audit, `.bin/godot --headless --path . res://tools/coplanar.tscn
+-- --area=<id>`, lists every pair of faces in an area that lie in the same
+plane and overlap (the cause of z-fighting) with their size in square metres.
+Fights under a few hundredths of a square metre are edges touching and can be
+left; anything you would see from where the player stands should be fixed by
+moving one face a centimetre or two off the other. Run it on any area you
+touch. Textures regenerated one at a time (`textures.py --only`) merge into
+`assets/textures/manifest.json`, which is where the Kit learns a texture's
+size, surface and whether it has alpha.
 
 **A route the verifier cannot see does not exist.** If a way through only
 appears after something is counted, declare it:

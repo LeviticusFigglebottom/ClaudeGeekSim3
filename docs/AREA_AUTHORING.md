@@ -63,7 +63,7 @@ func build() -> void:
 | `Kit.ramp`, `Kit.arch`, `Kit.cylinder`, `Kit.terrain(parent, pos, size, res, height_fn, tex)` | more geometry |
 | `Kit.water(parent, pos, size, tex)` | animated water plane |
 | `Kit.sign(parent, tex, pos, yaw, size)` | a flat picture on a wall |
-| `Kit.label(parent, text, pos, yaw, size, color, kind)` | 3D text (kind: title / display / body) |
+| `Kit.label(parent, text, pos, yaw, size, color, kind)` | 3D text (kind: title / display / body). The text faces the way the yaw faces: yaw 0 faces north and is read by someone standing north of it looking south, so a label on a north wall read from the room south of it takes yaw 180, one on an east wall read from the west takes 90. `{"flat": true}` lays it on the ground. The title font is blackletter capitals and is hard to read at small sizes; use display or body for anything that must be read |
 | `Kit.light(parent, pos, color, energy, range)` / `Kit.sun` / `Kit.spot` | lights |
 | `Kit.particles(parent, pos, kind, extent, amount)` | motes, embers, rain, snow, ash, fog |
 | `Kit.blocker(parent, pos, size, layer)` | invisible collision |

@@ -156,9 +156,9 @@ func _paths() -> void:
 		for i in n + 1:
 			var p := a + dir * minf(i * 2.8, length)
 			var off := Vector2(-dir.y, dir.x) * rng.randf_range(-0.35, 0.35)
-			# neighbouring patches overlap; drawn at two alternating depths so they
-			# never flicker against each other, both above the clearings' rings
-			Kit.floor(self, Vector3(p.x + off.x, 0.03, p.y + off.y), Vector2(2.3 + rng.randf_range(-0.2, 0.5), 3.3), "ground/dirt", {"solid": false, "yaw": yaw + rng.randf_range(-7.0, 7.0), "thick": 0.04, "tile": 2.0, "cast_shadow": false, "depth_bias": 0.006 + 0.0006 * (k % 5)})
+			# neighbouring patches overlap; each is drawn a hair nearer the eye than
+			# the one before, so none flickers against another or the clearings' rings
+			Kit.floor(self, Vector3(p.x + off.x, 0.03, p.y + off.y), Vector2(2.3 + rng.randf_range(-0.2, 0.5), 3.3), "ground/dirt", {"solid": false, "yaw": yaw + rng.randf_range(-7.0, 7.0), "thick": 0.04, "tile": 2.0, "cast_shadow": false, "depth_bias": 0.006 + 0.0002 * k})
 			k += 1
 	Kit.ring(self, CROSS + Vector3(0, 0.025, 0), 0.0, 4.5, 12, "ground/dirt", {"solid": false})
 	Kit.ring(self, STONES + Vector3(0, 0.025, 0), 0.0, 8.0, 16, "ground/gravel", {"solid": false, "tile": 1.5})
@@ -464,7 +464,7 @@ func _fill_well() -> void:
 func _canopy() -> void:
 	var base := CANOPY
 	Kit.ring(self, base + Vector3(0, 0.03, 0), 0.0, 6.0, 14, "nature/roots", {"solid": false, "tile": 2.5})
-	Props.place(self, "tree_giant", base + Vector3(0, -0.2, 0), 35.0, 1.0, {"collision": "cylinder", "collision_scale": 0.16, "name": "CanopyTree"})
+	Props.place(self, "tree_canopy", base + Vector3(0, -0.2, 0), 35.0, 1.0, {"collision": "cylinder", "collision_scale": 0.16, "name": "CanopyTree"})
 	tree_spots.append(base)
 	var y := 1.0
 	var n := 8

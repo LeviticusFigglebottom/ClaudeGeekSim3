@@ -82,7 +82,7 @@ func build() -> void:
 	else:
 		lift_door.enabled = false
 		# set into the wall and standing a little proud of it
-		Kit.box(self, Vector3(lx, 1.2, W * 0.5 - 0.04), Vector3(1.8, 2.4, 0.12), "metal/plate", {"name": "LiftDoors"})
+		Kit.box(self, Vector3(lx, 1.2, W * 0.5 - 0.08), Vector3(1.8, 2.4, 0.12), "metal/plate", {"name": "LiftDoors"})
 	# graffiti, a window at the far end, and the loop
 	Kit.sign(self, "signs/graffiti_door", Vector3(29.0, 1.5, W * 0.5 - 0.02), 0.0, Vector2(1.6, 0.4))
 	Props.place(self, "window_night", Vector3(-3.88, 1.5, 0), -90.0, 1.0, {"collision": "none"})

@@ -50,10 +50,10 @@ func _shell() -> void:
 		var spd: float = g[2]
 		var sc: float = g[3]
 		var axis := Vector3(cos(deg_to_rad(ang)), 0, sin(deg_to_rad(ang)))
-		var cw := Clockwork.create(self, Kit.polar(R - 0.45, ang, y), {"mode": "rotate", "axis": axis, "speed_deg": spd, "name": "WallGear"})
-		var gear := Props.place(cw.body, "gear_big", Vector3.ZERO, 0.0, sc, {"collision": "none"})
-		gear.rotation_degrees = Vector3(90, 0, 0)
-		gear.rotation.y = deg_to_rad(Kit.yaw_to_center(ang))
+		# the gear is a disc drawn at 1.5 m up its own model: hung so the disc's
+		# centre is the axle, flat against the wall, facing the room
+		var cw := Clockwork.create(self, Kit.polar(R - 0.5, ang, y), {"mode": "rotate", "axis": axis, "speed_deg": spd, "name": "WallGear"})
+		Props.place(cw.body, "gear_big", Vector3(0, -1.5 * sc, 0), Kit.yaw_to_center(ang), sc, {"collision": "none"})
 		gears.append(cw)
 	Kit.particles(self, Vector3(0, 10, 0), "motes", Vector3(7.0, 9.0, 7.0), 60)
 
@@ -72,7 +72,8 @@ func _climb() -> void:
 			var gc := Kit.polar(5.4, a + 14.0, gear_top)
 			var cw := Clockwork.create(self, gc, {"mode": "rotate", "axis": Vector3.UP, "speed_deg": 8.0 if count == 8 else -6.5, "platform": true, "name": "RideGear%d" % count})
 			cw.add_shape(Vector3(5.6, 0.6, 5.6), Vector3(0, -0.3, 0))
-			var gear := Props.place(cw.body, "gear_big", Vector3(0, -0.55, 0), 0.0, 2.6, {"collision": "none"})
+			# laid flat: the disc's centre sits on the axle at the platform's top
+			Props.place(cw.body, "gear_big", Vector3(0, 0.0, 1.5 * 2.6), 0.0, 2.6, {"collision": "none", "rotation": Vector3(-90, 0, 0)})
 			gears.append(cw)
 			Kit.light(self, gc + Vector3(0, 2.5, 0), Color(1.0, 0.8, 0.5), 0.9, 8.0)
 			Readable.create(self, gc + Vector3(0, 0.4, 0), 0.0, "The great gear", ["Teeth the size of gravestones. It turns because the tower turns it; the tower turns because the clock does; the clock turns because of the gear.", "You are standing on the reason."], {"name": "GearRead%d" % count, "size": Vector3(3.0, 0.6, 3.0)})
@@ -142,21 +143,24 @@ func _top() -> void:
 	var glass_a := wrapf(top_angle + 205.0, 0.0, 360.0)
 	var bell_a := wrapf(top_angle + 255.0, 0.0, 360.0)
 	# the clock face, and the hands that move when you are not looking
-	var face_c := Kit.polar(R - 0.14, face_a, ty + 4.0)
+	# a seven-metre dial is flat and the wall is round: it stands 0.9 m proud
+	# of the wall on an iron drum, or the wall would cut all but a strip of it
+	var face_c := Kit.polar(R - 0.97, face_a, ty + 4.0)
+	Kit.cylinder(self, Kit.polar(R - 0.3, face_a, ty + 4.0) - Vector3(0, 0.6, 0), 3.55, 1.2, "metal/iron", {"rotation": Vector3(90, Kit.yaw_to_center(face_a), 0), "tint": Color(0.45, 0.42, 0.4), "segments": 24, "tile": 2.0})
 	Kit.sign(self, "metal/clock_face", face_c, Kit.yaw_to_center(face_a), Vector2(7.0, 7.0), {"unshaded": true})
-	Kit.light(self, Kit.polar(R - 2.5, face_a, ty + 4.0), Color(1.0, 0.9, 0.7), 1.3, 9.0)
-	var hc := Kit.polar(R - 0.4, face_a, ty + 4.0)
+	Kit.light(self, Kit.polar(R - 3.0, face_a, ty + 4.0), Color(1.0, 0.9, 0.7), 1.3, 9.0)
+	var hc := Kit.polar(R - 1.15, face_a, ty + 4.0)
 	var axis := Vector3(cos(deg_to_rad(face_a)), 0, sin(deg_to_rad(face_a)))
 	hour_cw = Clockwork.create(self, hc, {"mode": "rotate", "axis": axis, "speed_deg": 0.0 if visit_count >= 2 else 0.4, "name": "HourHand"})
 	var hh := Props.place(hour_cw.body, "clock_hand", Vector3.ZERO, 0.0, 1.6, {"collision": "none"})
-	hh.rotation.y = deg_to_rad(Kit.yaw_to_center(face_a) + 90.0)
+	hh.rotation.y = deg_to_rad(Kit.yaw_to_center(face_a))
 	hour_cw.body.rotate(axis, deg_to_rad(165.0 if visit_count < 2 else 60.0))
 	minute_cw = Clockwork.create(self, hc + Kit.polar(-0.05, face_a), {"mode": "rotate", "axis": axis, "speed_deg": 0.0 if visit_count >= 2 else 4.0, "name": "MinuteHand"})
 	var mh := Props.place(minute_cw.body, "clock_hand", Vector3.ZERO, 0.0, 2.3, {"collision": "none"})
-	mh.rotation.y = deg_to_rad(Kit.yaw_to_center(face_a) + 90.0)
+	mh.rotation.y = deg_to_rad(Kit.yaw_to_center(face_a))
 	minute_cw.body.rotate(axis, deg_to_rad(90.0))
 	LookAway.create(self, hc, _on_face_unseen, {"delay": 2.5, "radius": 16.0, "once": false, "require_seen_first": true, "name": "FaceWatch"})
-	Readable.create(self, Kit.polar(R - 1.0, face_a, ty + 1.6), Kit.yaw_to_center(face_a), "The clock", ["Half past five.", "You look away, and look back. Half past five, but the hands have moved to say it differently."], {"name": "ClockRead", "size": Vector3(3.0, 3.0, 1.2), "note_key": "clocktower_face", "note_title": "The clock face", "note_text": "The clock in the Clocktower says half past five, like every clock. Its hands move when you are not looking, and arrive back at half past five."})
+	Readable.create(self, Kit.polar(R - 1.7, face_a, ty + 1.6), Kit.yaw_to_center(face_a), "The clock", ["Half past five.", "You look away, and look back. Half past five, but the hands have moved to say it differently."], {"name": "ClockRead", "size": Vector3(3.0, 3.0, 1.2), "note_key": "clocktower_face", "note_title": "The clock face", "note_text": "The clock in the Clocktower says half past five, like every clock. Its hands move when you are not looking, and arrive back at half past five."})
 	# the hourglass on its lectern
 	var lp := Kit.polar(5.6, glass_a, ty)
 	Props.place(self, "lectern", lp, Kit.yaw_to_center(glass_a) + 180.0, 1.0)
@@ -204,7 +208,7 @@ func _ground() -> void:
 		var ang: float = g[0]
 		var sc: float = g[1]
 		var cw := Clockwork.create(self, Kit.polar(5.2, ang, 0.35), {"mode": "rotate", "axis": Vector3.UP, "speed_deg": 10.0 * (1.0 if int(ang) % 90 == 45 else -1.0), "name": "FloorGear"})
-		Props.place(cw.body, "gear_big", Vector3.ZERO, 0.0, sc * 0.5, {"collision": "none"})
+		Props.place(cw.body, "gear_big", Vector3(0, 0.0, 1.5 * sc * 0.5), 0.0, sc * 0.5, {"collision": "none", "rotation": Vector3(-90, 0, 0)})
 		gears.append(cw)
 	Props.place(self, "clock_grandfather", Kit.polar(R - 0.7, 315.0, 0.0), Kit.yaw_to_center(315.0), 1.1)
 	Readable.create(self, Kit.polar(R - 0.9, 315.0, 1.4), Kit.yaw_to_center(315.0), "A grandfather clock", ["Half past five. It ticks. Inside the case, instead of a pendulum, a very small tower with a very small clock in it, which says half past five."], {"name": "SmallClock", "size": Vector3(0.9, 2.0, 0.9)})

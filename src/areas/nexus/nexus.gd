@@ -162,7 +162,10 @@ func _door(d: Array) -> void:
 			m = Kit.mat("nature/water_sea", {"unshaded": true, "scroll": Vector2(0.02, 0.05), "emission": Color(0.4, 0.3, 0.5), "emission_energy": 0.5})
 		Kit.add_mesh(door, q, m, Vector3(0, 1.4, 0), {"solid": false, "rotation": Vector3(0, 180, 0)})
 	# carved name above the arch and a coloured light
-	Kit.label(self, World.area_name(id), Kit.polar(R - 1.35, angle, arch_h + 0.9), yaw, 40, Color(0.85, 0.8, 0.65), "display", {"pixel_size": 0.016})
+	# the pillars stand 15 degrees either side of the door: a long name is set
+	# smaller so its ends stay in front of the wall and not inside a pillar
+	var name_size := mini(40, int(40.0 * 12.0 / maxf(12.0, float(World.area_name(id).length()))))
+	Kit.label(self, World.area_name(id), Kit.polar(R - 1.35, angle, arch_h + 0.9), yaw, name_size, Color(0.85, 0.8, 0.65), "display", {"pixel_size": 0.016})
 	Kit.light(self, Kit.polar(R - 2.2, angle, 3.2), col, 0.9, 7.0)
 	# decorations per realm
 	var left := Kit.polar(R - 1.8, angle - 8.0)

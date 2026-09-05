@@ -389,6 +389,12 @@
   "surface": "wood",
   "w": 64
  },
+ "nature/stalk": {
+  "alpha": false,
+  "h": 64,
+  "surface": "grass",
+  "w": 64
+ },
  "nature/stone_rune": {
   "alpha": false,
   "h": 128,
@@ -423,6 +429,12 @@
   "alpha": false,
   "h": 64,
   "surface": "bone",
+  "w": 64
+ },
+ "organic/brain": {
+  "alpha": false,
+  "h": 64,
+  "surface": "flesh",
   "w": 64
  },
  "organic/eye": {
@@ -641,6 +653,12 @@
   "surface": "stone",
   "w": 128
  },
+ "signs/hospital_name": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 256
+ },
  "signs/kd_between": {
   "alpha": false,
   "h": 48,
@@ -674,6 +692,18 @@
  "signs/king_asleep": {
   "alpha": false,
   "h": 64,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/km_plate": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/km_shelf": {
+  "alpha": false,
+  "h": 96,
   "surface": "stone",
   "w": 128
  },
@@ -725,6 +755,12 @@
   "surface": "stone",
   "w": 128
  },
+ "signs/note_m": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 128
+ },
  "signs/note_offices": {
   "alpha": false,
   "h": 128,
@@ -743,6 +779,12 @@
   "surface": "stone",
   "w": 128
  },
+ "signs/off_air": {
+  "alpha": false,
+  "h": 96,
+  "surface": "stone",
+  "w": 256
+ },
  "signs/plaque_anteroom": {
   "alpha": false,
   "h": 64,
@@ -758,6 +800,48 @@
  "signs/take_a_number": {
   "alpha": false,
   "h": 64,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/test_card": {
+  "alpha": false,
+  "h": 192,
+  "surface": "stone",
+  "w": 256
+ },
+ "signs/ward_a": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/ward_b": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/ward_hours": {
+  "alpha": false,
+  "h": 48,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/ward_quiet": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 128
+ },
+ "signs/ward_room": {
+  "alpha": false,
+  "h": 64,
+  "surface": "stone",
+  "w": 64
+ },
+ "signs/ward_visiting": {
+  "alpha": false,
+  "h": 48,
   "surface": "stone",
   "w": 128
  },
@@ -810,6 +894,12 @@
   "w": 256
  },
  "sky/kings_dream": {
+  "alpha": false,
+  "h": 128,
+  "surface": "stone",
+  "w": 256
+ },
+ "sky/kings_mind": {
   "alpha": false,
   "h": 128,
   "surface": "stone",
@@ -1194,6 +1284,12 @@
   "w": 64
  },
  "wood/book_spines": {
+  "alpha": false,
+  "h": 64,
+  "surface": "wood",
+  "w": 64
+ },
+ "wood/book_wall": {
   "alpha": false,
   "h": 64,
   "surface": "wood",

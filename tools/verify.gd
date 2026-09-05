@@ -204,6 +204,31 @@ func _check_physics(id: String, area: AreaBase) -> void:
 	if blocked == 0:
 		ok("area %-12s %d doorways clear, %d spawns probed" % [id, MapBuilder.doorways.size(), area.spawns.size()])
 	_check_mouse_gaps(id, space)
+	_check_grounded(id, area, space)
+
+
+## Everything the player is meant to reach must have something to stand on
+## under it. An interactable hanging in the air is almost always a helper
+## called with its height and depth the wrong way round, so it is reported.
+func _check_grounded(id: String, area: AreaBase, space: PhysicsDirectSpaceState3D) -> void:
+	var floating: Array = []
+	for it in area.find_children("*", "Interactable", true, false):
+		var n := it as Node3D
+		if n == null or not n.is_inside_tree():
+			continue
+		var p := n.global_position
+		# a readable set into a wall has no floor cell under its centre, so the
+		# ground is looked for a step out on each side of it as well
+		var grounded := false
+		for off in [Vector3.ZERO, Vector3(0.7, 0, 0), Vector3(-0.7, 0, 0), Vector3(0, 0, 0.7), Vector3(0, 0, -0.7)]:
+			var ray := PhysicsRayQueryParameters3D.create(p + off + Vector3(0, 0.3, 0), p + off + Vector3(0, -7.0, 0), 1 | 16 | 256 | 512)
+			if not space.intersect_ray(ray).is_empty():
+				grounded = true
+				break
+		if not grounded:
+			floating.append("%s at %s" % [n.name, p])
+	if floating.size() > 0:
+		warn("area '%s': %d interactables with no ground within 7 m below them: %s" % [id, floating.size(), floating])
 
 
 ## A mouse-hole is only a hole if the small player fits through it and lands on

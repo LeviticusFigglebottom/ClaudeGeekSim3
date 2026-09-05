@@ -110,6 +110,25 @@ reg("tree_oak_1", lambda r: tree_oak(r, 1.0))
 reg("tree_oak_2", lambda r: tree_oak(r, 1.25))
 reg("tree_oak_3", lambda r: tree_oak(r, 0.85, "nature/leaves_purple"))
 reg("tree_giant", lambda r: tree_oak(r, 3.4))
+
+
+def tree_canopy(rng):
+    """The climbing tree of the Hollow Wood: a straight trunk tall enough that
+    the stair of branches round it (to 22 m) and the nest (24 m) stay in the
+    open, with the crown above all of it."""
+    m = MeshBuilder()
+    size = 3.4
+    _trunk(m, rng, 0.45 * size, 31.0, "nature/bark_oak", taper=0.45, lean=0.0)
+    _roots(m, rng, 0.45 * size, "nature/bark_oak", n=5)
+    for k, a in enumerate((0.7, 2.1, 3.4, 4.9)):
+        m.push(compose(mat_translate(0, 11.0 + 3.5 * (k % 2), 0), mat_rot_y(a + rng.random() * 0.4), mat_rot_z(-1.05)))
+        m.lathe([(0.16 * size, 0), (0.06 * size, 2.2 * size)], 5, "tex:nature/bark_oak", (1, 1, 1), uv_scale=(1.0, 0.6), cap_bottom=False)
+        m.pop()
+    _canopy(m, rng, np.array([0, 32.5, 0]), 6.2, "nature/leaves_dark", n=6)
+    return single("tree", m, {"collision": "cylinder"})
+
+
+reg("tree_canopy", tree_canopy)
 reg("tree_autumn", lambda r: tree_oak(r, 1.1, "nature/leaves_autumn"))
 
 
@@ -680,13 +699,14 @@ def tv_crt(rng):
     m = MeshBuilder()
     m.box((0, 0.3, 0), (0.7, 0.6, 0.6), "flat", (0.25, 0.24, 0.22))
     m.box((0, 0.3, -0.3), (0.62, 0.52, 0.02), "flat", (0.12, 0.12, 0.12))
-    m.box((0.26, 0.2, -0.31), (0.06, 0.06, 0.02), "flat", (0.6, 0.6, 0.6))
-    m.box((0.26, 0.32, -0.31), (0.06, 0.06, 0.02), "flat", (0.6, 0.6, 0.6))
+    m.box((0.29, 0.2, -0.32), (0.06, 0.06, 0.02), "flat", (0.6, 0.6, 0.6))
+    m.box((0.29, 0.32, -0.32), (0.06, 0.06, 0.02), "flat", (0.6, 0.6, 0.6))
     m.box((0.15, 0.68, 0.1), (0.02, 0.35, 0.02), "flat", (0.6, 0.6, 0.6))
     m.box((-0.15, 0.68, 0.1), (0.02, 0.35, 0.02), "flat", (0.6, 0.6, 0.6))
     g.add("Body", m, extras={"collision": "box"})
     s = MeshBuilder()
-    s.card((0, 0.31, -0.33), (0.5, 0.42), "tex:props/tv_static", (1, 1, 1), yaw=math.pi, double=False)
+    # the screen bulges a little proud of the bezel and the knobs, as a tube does
+    s.card((0, 0.31, -0.35), (0.5, 0.42), "tex:props/tv_static", (1, 1, 1), yaw=math.pi, double=False)
     g.add("Screen", s)
     return g
 
@@ -850,7 +870,7 @@ def picture(rng, tex, w=0.9, h=0.9, frame_col=(0.65, 0.5, 0.2)):
     f.box((0, 0, 0.0), (w + 2 * t, h + 2 * t, 0.04), "flat", frame_col)
     g.add("Frame", f, extras={"collision": "none"})
     p = MeshBuilder()
-    p.card((0, 0, -0.035), (w, h), "tex:" + tex, (1, 1, 1), yaw=math.pi, double=False)
+    p.card((0, 0, -0.05), (w, h), "tex:" + tex, (1, 1, 1), yaw=math.pi, double=False)
     g.add("Picture", p)
     return g
 
