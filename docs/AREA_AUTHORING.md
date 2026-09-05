@@ -59,7 +59,7 @@ func build() -> void:
 | `Kit.wall(parent, from, to, height, tex)` | a wall between two ground points |
 | `Kit.ring(parent, centre, r_in, r_out, segments, tex, {down})` | discs and rings |
 | `Kit.round_wall(parent, centre, radius, height, segments, tex, {gaps})` | circular rooms |
-| `Kit.stairs(parent, pos, yaw, width, steps, step_h, step_d, tex)` | flights (negative `step_h` descends) |
+| `Kit.stairs(parent, pos, yaw, width, steps, step_h, step_d, tex)` | flights (negative `step_h` descends); a flight no steeper than about 44° also gets an invisible ramp collider along its tread edges, so it is walked, not climbed |
 | `Kit.ramp`, `Kit.arch`, `Kit.cylinder`, `Kit.terrain(parent, pos, size, res, height_fn, tex)` | more geometry |
 | `Kit.water(parent, pos, size, tex)` | animated water plane |
 | `Kit.sign(parent, tex, pos, yaw, size)` | a flat picture on a wall |

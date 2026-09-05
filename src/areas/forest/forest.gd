@@ -533,7 +533,7 @@ func _road() -> void:
 	Props.place(self, "lantern_post_city", ROAD + Vector3(-3.2, 0, 2.4), 0.0, 0.9, {"collision": "cylinder"})
 	Kit.floor(self, ROAD + Vector3(-1.0, 0.04, 0), Vector2(3.6, 4.0), "stone/cobble_mossy", {"solid": false, "thick": 0.04, "yaw": 90.0})
 	Kit.floor(self, ROAD + Vector3(4.0, 0.03, 0), Vector2(3.0, 6.0), "stone/cobble_city", {"solid": false, "thick": 0.04, "yaw": 90.0})
-	Kit.blocker(self, ROAD + Vector3(4.6, 2.0, 0), Vector3(0.4, 4.0, 4.0))
+	Kit.blocker(self, ROAD + Vector3(4.6, 15.0, 0), Vector3(0.4, 30.0, 4.0))
 	Props.place(self, "tree_pine_1", ROAD + Vector3(3.0, -0.2, -3.6), 0.0, 1.1, {"collision": "cylinder", "collision_scale": 0.22})
 	Props.place(self, "tree_pine_1", ROAD + Vector3(3.4, -0.2, 3.8), 90.0, 1.0, {"collision": "cylinder", "collision_scale": 0.22})
 	Kit.sign(self, "signs/graffiti_wake", ROAD + Vector3(-1.05, 2.2, -1.5), 90.0, Vector2(1.2, 0.36))

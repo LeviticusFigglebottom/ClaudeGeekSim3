@@ -107,6 +107,17 @@ static func _avenue(_area: AreaBase, root: Node3D, state: Dictionary) -> void:
 			Kit.box(cw.body, Vector3(0, h * 0.5, z), size, TRUNK, {"tile": 3.0, "solid": false})
 			cw.add_shape(size, Vector3(0, h * 0.5, z))
 		state.breath.append(cw)
+	# trunks shoulder to shoulder either side of the avenue, and higher walls
+	# you cannot see, so the breathing rows are the only way in
+	for side in [-1.0, 1.0]:
+		var wall_c := Vector3(side * 4.2, 0, (AVENUE_Z0 - 3.0 + AVENUE_Z1 - 1.0) * 0.5)
+		var wall_len := (AVENUE_Z0 - 3.0) - (AVENUE_Z1 - 1.0)
+		var wn := int(wall_len / 1.3)
+		for i in wn:
+			var z := AVENUE_Z0 - 3.0 - (i + 0.5) * (wall_len / wn)
+			var h := 9.0 + (i % 3) * 1.2
+			Kit.box(root, Vector3(side * 4.2, h * 0.5, z), Vector3(1.3, h, 1.32), TRUNK, {"tile": 3.0})
+		Kit.blocker(root, wall_c + Vector3(0, 20.0, 0), Vector3(1.4, 40.0, wall_len))
 	# what the avenue says, on its first trunk, only in lantern light
 	var insc := Node3D.new()
 	insc.name = "Inscription"
@@ -124,6 +135,18 @@ static func _avenue(_area: AreaBase, root: Node3D, state: Dictionary) -> void:
 static func _clearing(area: AreaBase, root: Node3D, state: Dictionary, visit: int) -> void:
 	var c := CLEARING
 	Kit.ring(root, c + Vector3(0, 0.1, 0), 0.0, 9.0, 20, "nature/grass_dark", {"tint": Color(0.75, 0.8, 0.75), "solid": false, "tile": 3.0})
+	# a ring of trunks shoulder to shoulder round the clearing, open only where
+	# the avenue comes in (south) and the way on goes out (north)
+	var ring_n := 44
+	for i in ring_n:
+		var a := i * 360.0 / ring_n
+		if absf(wrapf(a - 90.0, -180.0, 180.0)) < 16.0 or absf(wrapf(a - 270.0, -180.0, 180.0)) < 14.0:
+			continue
+		var h := 8.5 + (i % 4) * 1.1
+		var tp2 := c + Kit.polar(10.6, a, h * 0.5)
+		Kit.box(root, tp2, Vector3(1.4, h, 1.4), TRUNK, {"tile": 3.0, "rotation": Vector3(0, -a, 0)})
+		var bl := Kit.blocker(root, c + Kit.polar(10.6, a, 20.0), Vector3(1.6, 40.0, 1.6))
+		bl.rotation.y = deg_to_rad(-a)
 	# the tree he sleeps under: a hallway wall that has decided to be a tree
 	var tp := c + Vector3(0, 0, -4.5)
 	Kit.box(root, tp + Vector3(0, 7.0, 0), Vector3(2.4, 14.0, 2.4), TRUNK, {"tile": 3.0})
@@ -136,28 +159,20 @@ static func _clearing(area: AreaBase, root: Node3D, state: Dictionary, visit: in
 	Kit.light(root, tp + Vector3(0, 13.0, 0), Color(0.75, 0.7, 0.95), 1.0, 18.0)
 	# the King, enormous, or the shape of him
 	var kp := c + Vector3(0, 0, -1.2)
-	var lines_king: Array
-	if visit < 3:
-		var king := Props.place(root, "king_sleeping", kp, 180.0, 4.2, {"collision": "box", "name": "RedKing", "tint": Color(1.0, 0.9, 0.9)})
-		state.king = king
-		Kit.light(root, kp + Vector3(0, 3.0, 1.5), WARM, 1.4, 12.0)
-		lines_king = [
-			"He is asleep. He is the size of a room. His crown has slipped over one eye and it is made of stone.",
-			"His breathing moves the trunks. In. Out. The gap you came through closes when he breathes in.",
-			"He is dreaming, and you can hear it, faintly, like a television in another flat. It sounds like a garden.",
-		]
-	else:
-		Kit.box(root, kp + Vector3(0, 0.05, 0), Vector3(6.0, 0.1, 2.6), "nature/grass_dark", {"tint": Color(0.45, 0.5, 0.45), "solid": false, "tile": 3.0})
-		Kit.box(root, kp + Vector3(-2.6, 0.08, 0), Vector3(1.4, 0.14, 1.4), "nature/grass_dark", {"tint": Color(0.4, 0.45, 0.4), "solid": false, "tile": 3.0})
-		lines_king = [
-			"The grass holds his shape. Head here, hand there. It is still warm, the way a chair is warm.",
-			"He has got up. Nobody saw him go. The trunks are still breathing, so somebody is still asleep somewhere.",
-		]
+	# he is there every time: the dream is the same dream each visit
+	var king := Props.place(root, "king_sleeping", kp, 180.0, 4.2, {"collision": "box", "name": "RedKing", "tint": Color(1.0, 0.9, 0.9)})
+	state.king = king
+	Kit.light(root, kp + Vector3(0, 3.0, 1.5), WARM, 1.4, 12.0)
+	var lines_king: Array = [
+		"He is asleep. He is the size of a room. His crown has slipped over one eye and it is made of stone.",
+		"His breathing moves the trunks. In. Out. The gap you came through closes when he breathes in.",
+		"He is dreaming, and you can hear it, faintly, like a television in another flat. It sounds like a garden.",
+	]
 	var kr := Readable.create(root, kp + Vector3(0, 0.6, 1.4), 0.0, "", lines_king, {"name": "KingLook", "size": Vector3(6.0, 2.0, 2.0), "sound": "sleep"})
 	kr.on_read = func(_r: Node) -> void:
 		if Game.active_is("crown") and World.hud:
 			await World.hud.say("", ["The crown on your head is paper. The one on his is stone. Neither of you is awake."])
-		area.call("defer_note", "dream_king", "The Red King", "He is asleep in the middle of the wood, enormous, under a tree. His breathing moves the trunks. He is dreaming, and it sounds like a garden." if visit < 3 else "The third time, the King was not under the tree. The grass held his shape. The trunks were still breathing.")
+		area.call("defer_note", "dream_king", "The Red King", "He is asleep in the middle of the wood, enormous, under a tree. His breathing moves the trunks. He is dreaming, and it sounds like a garden.")
 	state.interactables.append([kr, "The King"])
 	# the two who explain him
 	var tl := c + Vector3(-3.6, 0, 2.2)
@@ -292,7 +307,7 @@ static func _breathe(state: Dictionary, delta: float) -> void:
 		var cw: Clockwork = state.breath[0]
 		var root: Node3D = cw.get_parent()
 		var l := root.to_local(p.global_position)
-		if cw.body.position.x > 1.15 and absf(l.x) < 1.6 and l.z < AVENUE_Z0 - 0.5 and l.z > AVENUE_Z1 - 0.5:
+		if cw.body.position.x > 1.15 and absf(l.x) < 3.6 and l.z < AVENUE_Z0 - 0.5 and l.z > AVENUE_Z1 - 0.5:
 			p.global_position = root.to_global(Vector3(0, l.y, AVENUE_Z0 + 2.0))
 			p.velocity = Vector3.ZERO
 			Audio.sfx("whisper", p.global_position, -8.0)

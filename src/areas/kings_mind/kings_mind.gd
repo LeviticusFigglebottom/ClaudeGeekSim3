@@ -143,10 +143,10 @@ func _bridges() -> void:
 	_bridge(e, gate + Vector3(0, 0, 0.6), true)
 
 
-## A branch grown from one stalk to the next: a thick limb you walk along the
-## top of, its edges raised into a lip, leaves hanging off both sides, and a
-## wall you cannot see above the lip. It starts well inside one leaf and ends
-## well inside the next, so there is no seam to fall through.
+## A branch grown from one stalk to the next: a round limb with a flat top
+## you walk along, its edges raised into a lip, leaves hanging off both
+## sides, and a wall you cannot see above the lip. Its top meets each leaf
+## flush: it starts well inside one and ends well inside the next.
 func _bridge(a: Vector3, b: Vector3, to_gate: bool = false) -> void:
 	var flat := b - a
 	flat.y = 0.0
@@ -157,29 +157,35 @@ func _bridge(a: Vector3, b: Vector3, to_gate: bool = false) -> void:
 	var run := p1 - p0
 	run.y = 0.0
 	var length := run.length()
-	var rise := b.y - a.y
+	var rise := p1.y - p0.y
 	var yaw := Kit.dir_to_yaw(dir)
 	var pitch := rad_to_deg(atan2(rise, length))
 	var slope := Vector2(length, rise).length()
-	var thick := 1.0
-	var w := 3.2
-	# the limb: its top is the way; it sits a hair above the leaves it joins
-	var mid := (p0 + p1) * 0.5 + Vector3(0, rise * 0.5, 0)
-	Kit.box(self, mid + Vector3(0, 0.04 - thick * 0.5, 0), Vector3(w, thick, slope), "nature/stalk", {"rotation": Vector3(pitch, yaw, 0), "tint": Color(0.85, 1.0, 0.8), "tile": 1.5, "surface": "grass"})
+	var along := (p1 - p0).normalized()
+	var w := 3.0
+	# p0 and p1 carry their own heights: the middle of the way is their middle
+	var mid := (p0 + p1) * 0.5
+	# the limb: a round branch under the way, and the way itself, flat, its top on the line between the leaves
+	var limb := Kit.cylinder(self, Vector3.ZERO, 1.1, slope + 1.0, "nature/stalk", {"segments": 10, "tile": 3.0, "tint": Color(0.95, 1.0, 0.9), "solid": false})
+	limb.transform = Transform3D(Basis.looking_at(along, Vector3.UP) * Basis(Vector3.RIGHT, PI * 0.5), mid - Vector3(0, 0.75, 0))
+	Kit.box(self, mid + Vector3(0, -0.13, 0), Vector3(w, 0.3, slope), "nature/hedge", {"rotation": Vector3(pitch, yaw, 0), "tint": Color(0.8, 1.0, 0.75), "tile": 1.5, "surface": "grass"})
 	for sx in [-1.0, 1.0]:
 		Kit.box(self, mid + right * (sx * (w * 0.5 - 0.15)) + Vector3(0, 0.2, 0), Vector3(0.3, 0.4, slope), "nature/hedge", {"rotation": Vector3(pitch, yaw, 0), "tint": Color(0.7, 0.95, 0.65), "tile": 1.2})
 		var f := Kit.blocker(self, Vector3.ZERO, Vector3(0.2, 3.2, slope))
 		f.position = mid + right * (sx * (w * 0.5 + 0.05)) + Vector3(0, 1.6, 0)
 		f.rotation_degrees = Vector3(pitch, yaw, 0)
-	# leaves and tendrils along it, hanging out over the drop
-	var n := int(length / 4.0)
+	# leaves along the limb, drooping out over the drop, and a knot of them where it meets each leaf
+	var n := int(length / 3.0)
 	for i in n:
 		var t := (i + 0.5) / n
-		var p := p0.lerp(p1, t) + Vector3(0, rise * t, 0)
+		var p := p0.lerp(p1, t)
 		var sx := 1.0 if i % 2 == 0 else -1.0
-		Props.place(self, "beanstalk_leaf", p + right * (sx * (w * 0.5 - 0.2)) + Vector3(0, -0.1, 0), yaw + sx * 80.0 + (i * 13.0), 1.1 + (i % 3) * 0.15, {"collision": "none"})
-		if i % 2 == 1:
-			Kit.cylinder(self, p + right * (-sx * (w * 0.5 + 0.1)) + Vector3(0, -1.2, 0), 0.12, 1.3, "nature/stalk", {"segments": 6, "solid": false, "top_radius": 0.05})
+		var leaf := Props.place(self, "beanstalk_leaf", p + right * (sx * (w * 0.5 + 0.3)) + Vector3(0, -0.35, 0), yaw + sx * 90.0 + fmod(i * 11.0, 30.0), 1.2 + (i % 3) * 0.15, {"collision": "none"})
+		if leaf:
+			leaf.rotation.x += deg_to_rad(-25.0 * sx)
+	for e in [p0, p1]:
+		for k in 3:
+			Props.place(self, "beanstalk_leaf", e + Kit.polar(1.6, k * 120.0 + 40.0, -0.3), k * 120.0 + 40.0 + 90.0, 1.0, {"collision": "none"})
 	Kit.light(self, mid + Vector3(0, 2.5, 0), PINK, 0.6, 10.0)
 
 

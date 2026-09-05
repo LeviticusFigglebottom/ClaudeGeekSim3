@@ -88,6 +88,16 @@ That is the whole layout of this area.
 * **Some brooks run backwards.** Two of the eight lead to a square the player
   has already crossed, entered from a different edge, changed. Both are
   optional and both hold secrets.
+* **No square is walked through.** The gap in each square's north hedge is
+  grown shut, with a wall you cannot see above it, until that square's own
+  business is done (`GATE_FLAGS` in `kings_dream.gd`): the garden's maze
+  read from the air and walked, the King reached under the tree, the rush
+  that does not fade picked, the egg fallen, a seat taken at the table, the
+  sentence read. Come to the hedge without the flag and it says what is
+  missing; come with it and it parts. The carriage needs no gate: its brook
+  is only reached from the platform that sets its flag. The invisible walls
+  along the carriage strips, and every wall elsewhere that stands between
+  the player and something gated, are higher than the Wings can carry you.
 
 Squares are numbered by rank, as in the book: the player arrives on the second
 and reaches the banquet on the eighth.
@@ -152,6 +162,13 @@ This square is the thesis and should be built third or fourth, never last.
 
 Quotes: the Hallway, the Keep of Hours.
 
+The King is under the tree every visit (an earlier build took him away on
+the third; the dream is the same dream each time). The avenue is walled with
+trunks shoulder to shoulder on both sides and the clearing is ringed with
+them, open only where the avenue comes in and the way on goes out, so the
+breathing rows are the only way to him; the wood breathing in sends you back
+from anywhere in the avenue, and only the Hourglass holds it.
+
 ### Square 5 — The Shop and the River
 
 *Alice: the sheep's shop where the shelves are always empty wherever she
@@ -168,6 +185,11 @@ before you reach the shore. There is one that does not fade and it is at the
 far bank, which needs the **Wings**.
 
 Quotes: the Last Lamp, the Slow Sea, the Cistern.
+
+The deck behind the bar does not move until the shop has sold you
+something: hold the hour and read a label (`dream_label_read`), and it sets
+off. It stops at the island's shore, short of the rock. The way on, across
+the north brook from the quay, needs the rush that does not fade.
 
 ### Square 6 — The Wall
 

@@ -59,6 +59,17 @@ const ORDER := [0, 1, 2, 3, 4, 5, 6, 7]
 ## the brook on top of the wall in the sixth square, which the square builds itself.
 const BACKS := [[4, "WALL", 0, "E"], [7, "N", 2, "W"]]
 
+## The north brook of each square is hedged shut until that square's own
+## business is done: no square is walked through.
+const GATE_FLAGS := {
+	"garden": ["maze_walked", "The hedge is thick here and does not part. There is a word in this garden you have not read from the air, and walked."],
+	"wood": ["dream_king_reached", "The hedge does not part. You have not reached him, under the tree, where the trunks breathe."],
+	"river": ["dream_rush", "The hedge does not part. On the far bank grows one rush that does not fade, and you have not picked it."],
+	"wall": ["dream_egg_fell", "The hedge does not part. Nothing has fallen off the wall yet."],
+	"table": ["dream_seated", "The hedge does not part. Nobody has sat down at the table."],
+	"trial": ["dream_charge_read", "The hedge does not part. The sentence has not been read, and it is not read at this speed."],
+}
+
 var sq: Array = []            # per square index: {node, origin, def, anchors, fords}
 var order: Array = []
 var current := -1
@@ -161,6 +172,8 @@ func _build_square(i: int) -> void:
 		var fo := {"gate": bool(anchors.get("gates", {}).get(edge, true)), "other_gates": s.fords.keys()}
 		var anchor := KD.ford(node, edge, float(edge_y.get(edge, 0.0)), d, other, fo)
 		anchors[edge] = anchor
+		if edge == "N" and f.kind == "leave" and GATE_FLAGS.has(String(d.id)):
+			_gate_ford(node, float(edge_y.get(edge, 0.0)), d, GATE_FLAGS[String(d.id)])
 	# someone tall, further away in every square
 	var far: float = 18.0 + 6.0 * float(order.find(i))
 	if Game.count("usher_sightings") < 9 and not anchors.has("usher"):
@@ -168,6 +181,35 @@ func _build_square(i: int) -> void:
 	elif anchors.has("usher") and Game.count("usher_sightings") < 9:
 		Usher.spawn(node, anchors.usher, {"appear_delay": 2.0, "radius": 60.0})
 	node.visible = false
+
+
+## A hedge grown across the gap in a square's north gate, and a wall you
+## cannot see above it, until the square's flag is set; then, as you come to
+## it, it lets you through.
+func _gate_ford(node: Node3D, y: float, d: Dictionary, spec: Array) -> void:
+	var flag := String(spec[0])
+	var hint := String(spec[1])
+	if Game.has_flag(flag):
+		return
+	var gate := Node3D.new()
+	gate.name = "Gate_N"
+	node.add_child(gate)
+	var at := KD.at("N", KD.GATE, 0.0, y)
+	KD.hedge_block(gate, at + Vector3(0, KD.HEDGE_H * 0.5, 0), Vector3(KD.GATE_W + 1.0, KD.HEDGE_H, KD.HEDGE_T), {"tint": d.get("hedge", KD.HEDGE_TINT)})
+	Kit.blocker(gate, at + Vector3(0, 20.0, 0), Vector3(KD.GATE_W + 1.0, 40.0, KD.HEDGE_T))
+	var last := {"t": -100.0}
+	Kit.trigger(node, at + Vector3(0, 1.5, 0), Vector3(16.0, 3.0, 9.0), func(_p: Node) -> void:
+		if not is_instance_valid(gate):
+			return
+		if Game.has_flag(flag):
+			Audio.sfx("grow", gate.global_position, -6.0)
+			Game.toast.emit("The hedge parts.")
+			gate.queue_free()
+			return
+		var now := Time.get_ticks_msec() / 1000.0
+		if now - float(last.t) > 8.0:
+			last.t = now
+			Game.toast.emit(hint), {"name": "GateWatch_N", "continuous": true})
 
 
 # --- the brooks -----------------------------------------------------------------

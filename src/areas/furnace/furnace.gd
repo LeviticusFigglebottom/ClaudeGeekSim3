@@ -212,7 +212,7 @@ func _giant() -> void:
 		Readable.create(self, gp + Vector3(-1.0, 1.5, 0), 90.0, "The empty chains", ["The chains are here. The giant is not.", "The links are not broken. Whatever held it was never the chains."], {"name": "EmptyChains", "size": Vector3(2.0, 3.0, 4.0), "note_key": "furnace_giant_gone", "note_title": "The empty chains", "note_text": "The giant that gave you the knife is gone from the Furnace. Its chains are intact. Something else was holding it."})
 		return
 	giant = Props.place(self, "giant_chained", gp, 90.0, 0.85, {"collision": "none", "name": "Giant"})
-	Kit.blocker(self, gp + Vector3(0.6, 1.5, 0), Vector3(2.4, 3.0, 3.0))
+	Kit.blocker(self, gp + Vector3(0.6, 4.0, 0), Vector3(2.4, 8.0, 3.0))
 	var hand := Props.part(giant, "Hand")
 	var hand_pos: Vector3 = gp + Vector3(-2.6, 0.9, 0)
 	if hand:

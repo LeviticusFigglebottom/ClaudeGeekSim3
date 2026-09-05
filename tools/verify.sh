@@ -22,7 +22,7 @@ set -e
 if [ "$STATUS" -ne 0 ]; then exit "$STATUS"; fi
 echo "== brooks (walk every seam of the King's Dream) =="
 set +e
-timeout 240 "$GODOT" --headless --path . -- --area=kings_dream --spawn=from_king --give=wings,hourglass --brooks 2>&1 | filter | grep -E "brooks|SCRIPT ERROR|^\s+at:"
+timeout 240 "$GODOT" --headless --path . -- --area=kings_dream --spawn=from_king --give=wings,hourglass --flag=maze_walked,dream_king_reached,dream_rush,dream_egg_fell,dream_seated,dream_charge_read --brooks 2>&1 | filter | grep -E "brooks|SCRIPT ERROR|^\s+at:"
 STATUS=${PIPESTATUS[0]}
 set -e
 exit "$STATUS"

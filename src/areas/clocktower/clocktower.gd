@@ -28,7 +28,7 @@ func build() -> void:
 	_climb()
 	_top()
 	_ground()
-	Puzzle.declare(self, "clocktower_climb", "", [], "climb the spiral; ride the gears where the platforms stop (the Moth Wings make it easy)")
+	Puzzle.declare(self, "clocktower_climb", "", [], "walk the spiral; ride the gears where it stops")
 
 
 # --- the tower shell ---------------------------------------------------------------------------------
@@ -76,14 +76,19 @@ func _climb() -> void:
 			gears.append(cw)
 			Kit.light(self, gc + Vector3(0, 2.5, 0), Color(1.0, 0.8, 0.5), 0.9, 8.0)
 			Readable.create(self, gc + Vector3(0, 0.4, 0), 0.0, "The great gear", ["Teeth the size of gravestones. It turns because the tower turns it; the tower turns because the clock does; the clock turns because of the gear.", "You are standing on the reason."], {"name": "GearRead%d" % count, "size": Vector3(3.0, 0.6, 3.0)})
-			y = gear_top + 0.9
+			y = gear_top + 0.35
 			a += 52.0
 			count += 2
 			continue
 		var landing := (count % 7 == 6)
 		var length := 4.6 if landing else 3.2
-		var pos := Kit.polar(7.4, a, y - 0.15)
-		Kit.box(self, pos, Vector3(length, 0.3, 2.0), "wood/planks_dark", {"yaw": Kit.yaw_to_center(a), "tile": 1.0, "name": "Step%d" % count})
+		if landing:
+			Kit.box(self, Kit.polar(7.4, a, y - 0.15), Vector3(length, 0.3, 2.0), "wood/planks_dark", {"yaw": Kit.yaw_to_center(a), "tile": 1.0, "name": "Step%d" % count})
+		else:
+			# each step is a plank tilted along the way, its far end at the next step's height: a ramp you walk
+			var tilt := -rad_to_deg(atan2(0.95, length))
+			var pos := Kit.polar(7.4, a, y - 0.15 + 0.475)
+			Kit.box(self, pos, Vector3(Vector2(length, 0.95).length(), 0.3, 2.0), "wood/planks_dark", {"rotation": Vector3(0, Kit.yaw_to_center(a), tilt), "tile": 1.0, "name": "Step%d" % count})
 		# a brass bracket under each step
 		Kit.box(self, Kit.polar(8.3, a, y - 0.55), Vector3(0.3, 0.6, 0.3), "metal/brass", {"yaw": Kit.yaw_to_center(a), "solid": false})
 		if count % 4 == 0:

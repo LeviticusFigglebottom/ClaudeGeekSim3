@@ -380,7 +380,7 @@ func _west_gate() -> void:
 	# the wood closes in on both sides of the road past the gate
 	for sx in [-28.2, -19.8]:
 		Kit.box(self, Vector3(sx, 2.5, -27.8), Vector3(1.6, 5.0, 10.6), "nature/roots", {"tile": 1.5})
-		Kit.blocker(self, Vector3(sx, 3.0, -27.8), Vector3(1.8, 6.0, 10.8))
+		Kit.blocker(self, Vector3(sx, 20.0, -27.8), Vector3(1.8, 40.0, 10.8))
 	Kit.label(self, "THE HOLLOW WOOD", g + Vector3(0, 6.9, 0.85), 180.0, 34, Color(0.7, 0.85, 0.8), "display", {"pixel_size": 0.014})
 	Kit.floor(self, Vector3(-24.0, 0, -27.5), Vector2(7.0, 9.0), "ground/dirt", {"tile": 3.0, "surface": "grass"})
 	Kit.floor(self, Vector3(-24.0, -0.02, -34.0), Vector2(30.0, 12.0), "nature/grass_dark", {"tile": 3.0})
@@ -388,7 +388,7 @@ func _west_gate() -> void:
 	Props.place(self, "tree_dead_2", Vector3(-19.4, 0, -30.5), 200.0, 1.0, {"collision": "cylinder", "collision_scale": 0.3})
 	Props.place(self, "tree_pine_1", Vector3(-31.5, -0.2, -32.0), 80.0, 1.0, {"collision": "none"})
 	Kit.box(self, Vector3(-24.0, 3.5, -33.2), Vector3(16.0, 7.0, 1.4), "nature/roots", {"tile": 1.5})
-	Kit.blocker(self, Vector3(-24.0, 3.0, -31.6), Vector3(16.0, 6.0, 0.4))
+	Kit.blocker(self, Vector3(-24.0, 20.0, -31.6), Vector3(16.0, 40.0, 0.4))
 	Kit.particles(self, Vector3(-24.0, 2.0, -28.0), "motes", Vector3(4.0, 1.5, 4.0), 30)
 	_lantern(Vector3(-26.6, 0, -20.0), -90.0)
 	_lantern(Vector3(-21.4, 0, -9.0), 90.0)
@@ -635,7 +635,7 @@ func _palace() -> void:
 	Props.place(self, "throne", throne, 0.0, 1.0)
 	Pickup.create(self, throne + Vector3(0, 0.5, -0.1), {"item": "tower_key", "requires_keepsake": "crown", "name": "TowerKey"})
 	if not Game.has_keepsake("crown"):
-		Kit.blocker(self, Vector3(cx, 1.6, 20.2), Vector3(12.0, 3.2, 0.4))
+		Kit.blocker(self, Vector3(cx, 3.5, 20.2), Vector3(12.0, 7.0, 0.4))
 	Readable.create(self, Vector3(cx, 0.4, 20.75), 0.0, "Read the step", [
 		"Carved into the bottom step: THE CROWNED MAY PASS. THE REST MAY LOOK.",
 		"Under it, in chalk, much later: they cannot tell paper from gold. nobody here can. that is the whole trouble.",
@@ -754,13 +754,13 @@ func _lower_town() -> void:
 		var sp: Array = s
 		var bx := (float(sp[0]) + float(sp[1])) * 0.5
 		var bw := float(sp[1]) - float(sp[0])
-		Kit.blocker(self, Vector3(bx, 1.2, 20.55), Vector3(bw, 3.6, 0.3))
-		Kit.blocker(self, Vector3(bx, 1.2, 24.95), Vector3(bw, 3.6, 0.3))
+		Kit.blocker(self, Vector3(bx, 15.0, 20.55), Vector3(bw, 30.0, 0.3))
+		Kit.blocker(self, Vector3(bx, 15.0, 24.95), Vector3(bw, 30.0, 0.3))
 	if not second:
 		Kit.box(self, Vector3(20.0, LOW_Y - 0.05, 22.75), Vector3(3.0, 0.2, 4.3), "wood/planks_grey", {"tile": 1.0})
 		for sx in [-1.0, 1.0]:
 			Kit.box(self, Vector3(20.0 + sx * 1.42, LOW_Y + 0.45, 22.75), Vector3(0.1, 0.9, 4.3), "wood/planks_dark", {"tile": 1.0})
-			Kit.blocker(self, Vector3(20.0 + sx * 1.42, 1.2, 22.75), Vector3(0.2, 3.6, 4.3))
+			Kit.blocker(self, Vector3(20.0 + sx * 1.42, 15.0, 22.75), Vector3(0.2, 30.0, 4.3))
 	else:
 		Kit.box(self, Vector3(20.0, LOW_Y - 0.05, 21.1), Vector3(3.0, 0.2, 0.8), "wood/planks_grey", {"tile": 1.0})
 		Kit.box(self, Vector3(20.0, LOW_Y - 0.05, 24.4), Vector3(3.0, 0.2, 0.8), "wood/planks_grey", {"tile": 1.0})

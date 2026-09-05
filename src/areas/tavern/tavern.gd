@@ -502,9 +502,9 @@ func _outside() -> void:
 		{"name": "VacancySign", "size": Vector3(1.6, 3.2, 0.6), "offset": Vector3(0.6, 1.6, 0)})
 	Kit.particles(self, Vector3(1.0, 1.0, 13.0), "fog", Vector3(7.0, 0.4, 3.0), 10)
 	# the road ends here. beyond the porch is nothing at all.
-	Kit.blocker(self, Vector3(1.0, 2.0, 16.15), Vector3(12.4, 4.0, 0.3))
-	Kit.blocker(self, Vector3(-5.15, 2.0, 13.0), Vector3(0.3, 4.0, 6.4))
-	Kit.blocker(self, Vector3(7.15, 2.0, 13.0), Vector3(0.3, 4.0, 6.4))
+	Kit.blocker(self, Vector3(1.0, 10.0, 16.15), Vector3(12.4, 20.0, 0.3))
+	Kit.blocker(self, Vector3(-5.15, 10.0, 13.0), Vector3(0.3, 20.0, 6.4))
+	Kit.blocker(self, Vector3(7.15, 10.0, 13.0), Vector3(0.3, 20.0, 6.4))
 	Kit.label(self, "the road ends here", Vector3(1.0, 0.9, 15.7), 0.0, 30, Color(0.45, 0.4, 0.32), "body", {"pixel_size": 0.01})
 
 

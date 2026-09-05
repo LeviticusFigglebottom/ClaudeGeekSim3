@@ -201,14 +201,14 @@ static func _trackbed(area: AreaBase, root: Node3D, d: Dictionary) -> void:
 		var foot := Vector3(8.2, y, 36.0 * side - 5.6 * side)
 		Kit.stairs(root, foot, 180.0 if side > 0 else 0.0, 1.8, 12, -y / 12.0, 0.45, "wall/concrete", {"tile": 1.0, "name": "TrackStair%d" % int(side)})
 		Kit.light(root, Vector3(8.2, y + 3.0, 33.0 * side), LAMP, 0.9, 8.0)
-		# invisible walls the height of a man above the hedges and along the
-		# stair's sides, so the only ways off a strip are the gangway and the steps
+		# invisible walls higher than the Wings can carry you above the hedges and
+		# along the stair's sides, so the only ways off a strip are the gangway and the steps
 		for seg in [[-KD.HALF - 1.2, -3.2], [3.2, 7.3], [9.1, KD.HALF + 1.2]]:
 			var x0: float = seg[0]
 			var x1: float = seg[1]
-			Kit.blocker(root, Vector3((x0 + x1) * 0.5, 2.5, hz), Vector3(x1 - x0, 5.0, 0.8))
+			Kit.blocker(root, Vector3((x0 + x1) * 0.5, 30.0, hz), Vector3(x1 - x0, 60.0, 0.8))
 		for sx in [7.25, 9.15]:
-			Kit.blocker(root, Vector3(sx, 0.5, 33.5 * side), Vector3(0.1, 7.0, 6.2))
+			Kit.blocker(root, Vector3(sx, 27.0, 33.5 * side), Vector3(0.1, 60.0, 6.2))
 	# rails either side of the gangway and across its ends beside the coachwork,
 	# so the way into the carriage is a way and not an edge
 	for sx in [-1.0, 1.0]:

@@ -27,7 +27,8 @@ The route is declared on the sprout (`dream_beanstalk`, route
 ## The place
 
 * **A forest of beanstalks** standing in a sea of cloud with nothing under it.
-  Five have tops you can walk on, joined by leaves you walk along; the rest
+  Five have tops you can walk on, joined by limbs you walk along (a round
+  branch with a flat leafy top whose ends meet each stalk's top flush); the rest
   are scenery. Every top and every leaf has an invisible wall along its
   edges, so the only way off is the way on. Falling anyway lands in the
   Static (`FALL_LIMIT`).

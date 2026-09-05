@@ -495,6 +495,27 @@ static func stairs(parent: Node, pos: Vector3, yaw_deg: float, width: float, ste
 		var o := opts.duplicate()
 		o.erase("name")
 		box(root, c, Vector3(width, hgt, step_d), tex_name, o)
+	# a ramp you cannot see lying along the front edges of the treads, so a
+	# flight is walked and not climbed: from the floor one tread before the
+	# foot to the top of the last tread. Flights too steep to walk keep their
+	# steps alone (the player's step-up takes those).
+	if bool(opts.get("solid", true)) and steps > 1 and absf(step_h / maxf(step_d, 0.01)) <= 0.95:
+		var foot := Vector3(0, 0.0, step_d)
+		var head := Vector3(0, step_h * steps, -(steps - 1) * step_d)
+		var run := head - foot
+		var body := StaticBody3D.new()
+		body.name = "Ramp"
+		body.collision_layer = int(opts.get("collision_layer", L_WORLD))
+		body.collision_mask = 0
+		body.set_meta("surface", String(opts.get("surface", surface_of(tex_name))))
+		var cs := CollisionShape3D.new()
+		var bs := BoxShape3D.new()
+		bs.size = Vector3(width, 0.2, run.length())
+		cs.shape = bs
+		var ang := atan2(step_h, step_d)
+		cs.transform = Transform3D(Basis(Vector3.RIGHT, ang), (foot + head) * 0.5 - Vector3(0, 0.1, 0) + Vector3(0, 0.02, 0))
+		body.add_child(cs)
+		root.add_child(body)
 	return root
 
 

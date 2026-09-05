@@ -19,7 +19,7 @@ const BANK_Z := 12.0          # the near bank ends here
 const QUAY_Z := -16.0         # the far bank begins here
 const QUAY_Y := 2.5
 const BED_Y := -1.2
-const ISLAND := Vector3(2.0, 0, -1.0)
+const ISLAND := Vector3(2.0, 0, -8.0)
 const ISLAND_TOP := 7.0
 const WATER := Color(0.45, 0.3, 0.85, 0.92)
 const CANDLE := Color(1.0, 0.85, 0.6)
@@ -45,6 +45,7 @@ static func build(area: AreaBase, root: Node3D, ctx: Dictionary) -> Dictionary:
 	var out := {}
 	out["edge_y"] = {"N": QUAY_Y}
 	out["on_process"] = func(delta: float) -> void:
+		_drift_check(state)
 		state.t += delta
 		if not Game.time_frozen and state.t - float(state.get("gull", 0.0)) > 24.0:
 			state["gull"] = state.t
@@ -136,6 +137,17 @@ static func _shop(area: AreaBase, root: Node3D, state: Dictionary) -> void:
 	Readable.create(root, c + Vector3(hw - 0.3, 2.2, 6.0), 90.0, "The clock", ["Half past five. The shop is open. The shop is always open at half past five."], {"name": "ShopClock", "size": Vector3(0.2, 0.7, 0.7)})
 
 
+## Once a label has been read, the deck behind the bar sets off.
+static func _drift_check(state: Dictionary) -> void:
+	var cw: Clockwork = state.boat
+	if cw == null or not is_instance_valid(cw) or cw.speed_deg > 0.0:
+		return
+	if Game.has_flag("dream_label_read"):
+		cw.speed_deg = 6.0
+		Audio.sfx("creak", cw.global_position, -8.0)
+		Game.toast.emit("Behind the bar, the floor begins to move.")
+
+
 static func _freeze(state: Dictionary, frozen: bool) -> void:
 	var area: Node = state.get("area")
 	if area != null and area.has_meta("river_face"):
@@ -153,7 +165,7 @@ static func _freeze(state: Dictionary, frozen: bool) -> void:
 static func _boat(_area: AreaBase, root: Node3D, state: Dictionary) -> void:
 	# the boat rides a hand above the water, so its deck is never in the water's plane
 	var start := SHOP + Vector3(0, 0.12, -SHOP_D * 0.5 - 5.0)
-	var cw := Clockwork.create(root, start, {"mode": "path", "points": [Vector3.ZERO, Vector3(0, 0, -13.0)], "speed_deg": 6.0, "platform": true, "name": "Boat"})
+	var cw := Clockwork.create(root, start, {"mode": "path", "points": [Vector3.ZERO, Vector3(0, 0, -6.5)], "speed_deg": 6.0 if Game.has_flag("dream_label_read") else 0.0, "platform": true, "name": "Boat"})
 	state.boat = cw
 	var deck := cw.body
 	var L := 10.0
@@ -175,15 +187,18 @@ static func _boat(_area: AreaBase, root: Node3D, state: Dictionary) -> void:
 		"The floorboards of the shop go on under your feet and at some point they are a deck. There was no step. There was no door.",
 		"The river is the colour of the Slow Sea and, when you put a hand in, the temperature of the Cistern. It is going somewhere. So are you.",
 	], {"name": "DeckLook", "size": Vector3(3.0, 1.0, 3.0), "note_key": "dream_boat", "note_title": "The shop that is a boat", "note_text": "Behind the bar of the shop that sells nothing, the floorboards keep going and become a deck, and the deck drifts out on a purple river toward an island. You did not notice the moment it stopped being a room."})
-	Puzzle.declare(_area, "dream_boat", "", [], "ride the deck of the shop out to the island")
+	Kit.trigger(root, start + Vector3(0, 1.0, 0), Vector3(6.0, 3.0, 9.0), func(_p: Node) -> void:
+		if not Game.has_flag("dream_label_read") and Game.bump("dream_deck_still") % 6 == 1:
+			Game.toast.emit("The deck does not move. The shop has not sold you anything yet: hold the hour and read a label."), {"name": "DeckStill", "continuous": true})
+	Puzzle.declare(_area, "dream_boat", "", ["flag:dream_label_read"], "read a label with the hour held, and the deck of the shop drifts out to the island")
 
 
 # --- the island and the glide ------------------------------------------------------------
 
 static func _island(area: AreaBase, root: Node3D) -> void:
 	var c := ISLAND
-	Kit.cylinder(root, c + Vector3(0, BED_Y, 0), 7.0, 1.3, "ground/sand", {"tint": Color(0.95, 0.9, 0.85), "segments": 14, "tile": 2.0})
-	Kit.cylinder(root, c + Vector3(0, BED_Y + 0.2, 0), 6.2, 1.3, "ground/sand", {"tint": Color(0.95, 0.9, 0.85), "segments": 14, "tile": 2.0})
+	Kit.cylinder(root, c + Vector3(0, BED_Y, 0), 6.0, 1.3, "ground/sand", {"tint": Color(0.95, 0.9, 0.85), "segments": 14, "tile": 2.0})
+	Kit.cylinder(root, c + Vector3(0, BED_Y + 0.2, 0), 5.3, 1.3, "ground/sand", {"tint": Color(0.95, 0.9, 0.85), "segments": 14, "tile": 2.0})
 	# the rock: a Slow Sea stack with a stair round it to a landing seven metres up
 	Kit.cylinder(root, c + Vector3(0, 0.3, 0), 2.4, ISLAND_TOP - 0.3, "stone/blocks_sea", {"tint": Color(0.95, 0.85, 0.95), "segments": 10, "tile": 3.0})
 	var flights := 4
