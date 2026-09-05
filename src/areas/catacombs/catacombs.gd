@@ -580,22 +580,21 @@ func _pool_chamber() -> void:
 # --- guidance you can only read by lantern light -----------------------------------------
 
 ## A word on the face of a wall cell, toward the floor cell on `face` ("n","s","e","w").
+## A chalk mark at the `face` edge of floor cell (col, row). Where the next
+## cell is a passage it hangs a hand's width past the edge facing on along the
+## passage; where the next cell is a wall it sits a hand's width in front of
+## that wall, facing back into the cell, so it is on the wall and not in it.
 func _mark(col: int, row: int, face: String, text: String) -> void:
 	var p := _c(col, row) + Vector3(0, 2.15, 0)
-	var yaw := 0.0
-	match face:
-		"s":
-			p += Vector3(0, 0, CELL * 0.5 + 0.04)
-			yaw = 180.0
-		"n":
-			p += Vector3(0, 0, -CELL * 0.5 - 0.04)
-			yaw = 0.0
-		"e":
-			p += Vector3(CELL * 0.5 + 0.04, 0, 0)
-			yaw = -90.0
-		"w":
-			p += Vector3(-CELL * 0.5 - 0.04, 0, 0)
-			yaw = 90.0
+	var d := {"s": Vector2i(0, 1), "n": Vector2i(0, -1), "e": Vector2i(1, 0), "w": Vector2i(-1, 0)}[face] as Vector2i
+	var beyond := "#"
+	if row + d.y >= 0 and row + d.y < ROWS.size() and col + d.x >= 0 and col + d.x < String(ROWS[row + d.y]).length():
+		beyond = String(ROWS[row + d.y])[col + d.x]
+	var into_wall := beyond == "#" or beyond == " "
+	var out := Vector3(d.x, 0, d.y) * (CELL * 0.5 + (-0.04 if into_wall else 0.04))
+	p += out
+	# facing on along the passage, or back into the cell off the wall
+	var yaw := Kit.dir_to_yaw(Vector3(d.x, 0, d.y) * (-1.0 if into_wall else 1.0))
 	var l := Kit.label(self, text, p, yaw, 44, Color(0.6, 1.0, 0.85), "display", {"pixel_size": 0.012})
 	Kit.lantern_only(l)
 
@@ -608,7 +607,7 @@ func _guidance() -> void:
 	_mark(27, 11, "s", "↑")
 	_mark(25, 2, "e", "→")
 	_mark(27, 1, "s", "→ the pool")
-	_mark(30, 11, "n", "not this way")
+	_mark(30, 11, "s", "not this way")
 	_mark(3, 13, "n", "no")
 	_mark(9, 11, "s", "↓ the pool is south, then east")
 	# bone piles that glow only for the lantern

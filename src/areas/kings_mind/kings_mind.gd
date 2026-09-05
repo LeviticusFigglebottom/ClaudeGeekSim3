@@ -278,8 +278,8 @@ func _keep() -> void:
 		var a := k * 45.0
 		Kit.box(self, roof_c + Vector3(0, 0.7, 0) + Kit.polar(11.0 + (k % 2) * 4.0, a), Vector3(3.0, 1.2 + (k % 3) * 0.6, 3.0), "organic/brain", {"tile": 2.0, "solid": false})
 	var gate := Vector3(0, KEEP_Y, -76.0)
-	Kit.sign(self, "signs/km_plate", gate + Vector3(-2.2, 2.4, 0.1), 180.0, Vector2(1.6, 0.8))
-	Readable.create(self, gate + Vector3(-2.2, 2.4, 0.2), 180.0, "Read the plate by the gate", [
+	Kit.sign(self, "signs/km_plate", gate + Vector3(-2.2, 2.4, 1.06), 180.0, Vector2(1.6, 0.8))
+	Readable.create(self, gate + Vector3(-2.2, 2.4, 1.2), 180.0, "Read the plate by the gate", [
 		"HIS MAJESTY IS NOT RECEIVING.",
 		"Under it, in a different hand, scratched: he never was.",
 	], {"name": "GatePlate", "size": Vector3(1.8, 1.0, 0.5)})

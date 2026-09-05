@@ -365,7 +365,10 @@ static func _mat_opts(opts: Dictionary) -> Dictionary:
 static func floor(parent: Node, pos: Vector3, size: Vector2, tex_name: String, opts: Dictionary = {}) -> MeshInstance3D:
 	var thick := float(opts.get("thick", 0.2))
 	var o := opts.duplicate()
-	o["faces"] = ["py"] if not opts.get("all_faces", false) else []
+	# a real slab (not a rug or a patch laid over something) also draws its
+	# underside: a platform, a bridge, a landing or a roof is walked under too
+	var faces := ["py", "ny"] if thick >= 0.1 and not opts.get("overlay", false) else ["py"]
+	o["faces"] = faces if not opts.get("all_faces", false) else []
 	# a floor lies over whatever else was built to its height (the top of a
 	# wall, a terrain cell): drawn a hair nearer the eye, it is the one seen
 	if not o.has("depth_bias") and not o.has("overlay"):
@@ -438,7 +441,9 @@ static func sign(parent: Node, tex_name: String, pos: Vector3, yaw_deg: float, s
 	if not mo.has("double"):
 		mo["double"] = true
 	var material: Material = opts.get("mat", mat(tex_name, mo))
-	return add_mesh(parent, pm, material, pos, o)
+	var mi := add_mesh(parent, pm, material, pos, o)
+	mi.set_meta("kit_sign", tex_name)
+	return mi
 
 
 ## Vertical cylinder (pillars, trunks, wells).

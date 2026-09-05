@@ -318,7 +318,7 @@ func _street_things() -> void:
 		"Somebody has added, with a nail: the palace keeps the other thing. ask the knights. they will not answer.",
 	], {"name": "TowerPlate", "size": Vector3(1.4, 0.6, 0.4), "offset": Vector3.ZERO, "note_key": "city_tower_plate", "note_title": "The tower door", "note_text": "The clocktower's door on the long street has a keyhole shaped like a clock hand. The plate beside it says the palace keeps the other thing."})
 	add_spawn("from_tower", Vector3(28.0, 0.1, -2.6), 180.0)
-	Kit.sign(self, "signs/graffiti_wake", Vector3(-4.05, 1.4, 7.0), 90.0, Vector2(1.5, 0.45))
+	Kit.sign(self, "signs/graffiti_wake", Vector3(-4.05, 1.4, 7.0), -90.0, Vector2(1.5, 0.45))
 
 
 # --- the gate street and the city gate ---------------------------------------------

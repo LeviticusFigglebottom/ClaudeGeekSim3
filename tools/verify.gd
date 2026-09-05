@@ -229,6 +229,38 @@ func _check_grounded(id: String, area: AreaBase, space: PhysicsDirectSpaceState3
 			floating.append("%s at %s" % [n.name, p])
 	if floating.size() > 0:
 		warn("area '%s': %d interactables with no ground within 7 m below them: %s" % [id, floating.size(), floating])
+	_check_text_buried(id, area, space)
+
+
+## A label or a sign whose readable side faces into a solid (a wall, a beam,
+## a lintel, a prop) cannot be read: the point a hand's width in front of its
+## face is inside something. Text lying on a wall or a prop and facing out
+## passes, whatever collision box it sits on.
+func _check_text_buried(id: String, area: AreaBase, space: PhysicsDirectSpaceState3D) -> void:
+	var buried: Array = []
+	var q := PhysicsPointQueryParameters3D.new()
+	q.collision_mask = 1
+	for n in area.find_children("*", "Node3D", true, false):
+		var what := ""
+		if n is Label3D:
+			what = "label '%s'" % (n as Label3D).text.left(24)
+		elif n.has_meta("kit_sign"):
+			what = "sign '%s'" % String(n.get_meta("kit_sign"))
+		else:
+			continue
+		var n3 := n as Node3D
+		if not n3.is_inside_tree() or not n3.visible:
+			continue
+		# both Label3D and the sign's QuadMesh show their text on local +Z
+		q.position = n3.global_position + n3.global_transform.basis.z.normalized() * 0.12
+		var hits := space.intersect_point(q, 4)
+		for h in hits:
+			var body: Node = h.collider
+			if body is StaticBody3D:
+				buried.append("%s at %s faces into %s" % [what, n3.global_position, _describe(body)])
+				break
+	if buried.size() > 0:
+		warn("area '%s': %d labels or signs face into solid geometry: %s" % [id, buried.size(), buried])
 
 
 ## A mouse-hole is only a hole if the small player fits through it and lands on

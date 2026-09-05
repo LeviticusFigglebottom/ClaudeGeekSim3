@@ -42,7 +42,11 @@ Cistern carried on:
 * **The tower.** Inside the block: two loops of stair, each 5 m of rise,
   a flight along the north wall going east, a landing, a flight along the
   south wall going west, a landing, 1.7 m wide at 0.25 m a step (the Kit's
-  ramp collider, so they are walked); a seam at the foot of the second loop
+  ramp collider, so they are walked). Each landing reaches the wall on the
+  side its flight arrives from and has a sliver behind the next flight's
+  foot, so the flights meet with no slot to see down through; the top
+  platform stops short of the last flight, which climbs under where it
+  would otherwise be. A seam at the foot of the second loop
   back to the foot of the first (`pipes_stair_loops`); after three rounds it
   ends. At the top, a platform, a black pedestal with the **Dark Glass**
   (item `dark_glass`, key `picked_dark_glass`), and the hatch.
@@ -51,14 +55,17 @@ Cistern carried on:
 
 `_process` keeps the angle of the player round the block's centre and adds
 up only the clockwise part of it (`_progress`, degrees; walking back the
-other way is not counted and does not undo anything). At a quarter turn the
-way you came in is a wall: `entrance_seal`, a tiled box in the doorway from
-the junction hall, becomes visible and solid, a grind, and a toast says so.
-Toasts again at the first and second full laps. At three laps
-(`LAPS_NEEDED`) the block gives up: a doorway opens in whichever of its
-east or west faces the player is nearer (`door_face`), `pipes_opened` is
-set, and the tower is open from then on (also at build if the flag is set:
-the east face). The entrance stays sealed; the only way on is up.
+other way is not counted and does not undo anything, and after half a turn
+the wrong way a toast says so once). After the first full lap the way you
+came in is a wall: `entrance_seal`, a tiled box in the doorway from the
+junction hall, becomes visible and solid, a grind, and the toast says so.
+Toasts again at the second and third laps. At four laps (`LAPS_NEEDED`)
+the block gives up: a doorway opens in whichever of its east or west faces
+the player is nearer (`door_face`), `pipes_opened` is set, and the tower is
+open from then on (also at build if the flag is set: the east face). The
+entrance stays sealed; the only way on is up. `tools/verify.sh` does not
+walk it; the probe in the session notes did, and it seals at 360° and opens
+at 1440°.
 
 Seals are tiled boxes whose mesh and collision are toggled (`_set_solid`):
 one in each of the block's east and west faces, one in the room's entrance.

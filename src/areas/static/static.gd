@@ -47,7 +47,7 @@ func build() -> void:
 	Kit.box(self, lift + Vector3(1.0, 1.3, 0), Vector3(0.1, 2.6, 2.0), "metal/plate")
 	Kit.box(self, lift + Vector3(0, 2.6, 0), Vector3(2.0, 0.1, 2.0), "metal/plate")
 	Kit.floor(self, lift, Vector2(2.0, 2.0), "wall/carpet_house")
-	Kit.sign(self, "signs/now_serving", lift + Vector3(0, 2.2, -0.9), 0.0, Vector2(0.8, 0.4), {"unshaded": true})
+	Kit.sign(self, "signs/now_serving", lift + Vector3(0, 2.2, -0.9), 180.0, Vector2(0.8, 0.4), {"unshaded": true})
 	Kit.light(self, lift + Vector3(0, 2.3, 0), Color(0.9, 1.0, 0.9), 0.8, 4.0)
 	add_spawn("lift", lift + Vector3(0, 0.1, 0.2), 180.0)
 	Readable.create(self, lift + Vector3(0, 1.0, -0.7), 0.0, "The lift buttons", ["There is one button. It says 3. You are on 3.", "You have always been on 3."], {"name": "LiftButtons", "size": Vector3(0.4, 0.6, 0.3), "note_key": "lift_buttons", "note_title": "The lift", "note_text": "One button. It says 3."})

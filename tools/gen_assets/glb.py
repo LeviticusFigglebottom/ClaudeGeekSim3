@@ -341,8 +341,9 @@ class GLB:
             m["alphaMode"] = "MASK"
             m["alphaCutoff"] = 0.5
             m["doubleSided"] = True
-        if name.endswith(":double"):
-            m["doubleSided"] = True
+        # every prop is double-sided: a roof seen from under it, the inside of a
+        # hollow thing, the back of a card, all draw instead of vanishing
+        m["doubleSided"] = True
         self.materials[name] = idx
         self.mat_list.append(m)
         return idx

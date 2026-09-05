@@ -95,10 +95,13 @@ autoloads exist. It will fail your build if:
 * an area or a keepsake is unreachable from the first sleep by any route
 * a `Puzzle` declares a `grants_route` that is not `area:spawn`
 
-and it warns if an item can be gained but nothing ever asks for it, and if an
+and it warns if an item can be gained but nothing ever asks for it, if an
 interactable has no ground within seven metres under it or beside it (the
 usual cause is a placement helper called with its height and depth the wrong
-way round: `_c(x, z, y)` takes the height last).
+way round: `_c(x, z, y)` takes the height last), and if a `Kit.label` or
+`Kit.sign` faces into solid geometry (the point a hand's width in front of
+its readable side is inside a wall, a beam or a prop): that is text drawn
+inside something, or a sign with its yaw turned the wrong way.
 
 The coplanar audit, `.bin/godot --headless --path . res://tools/coplanar.tscn
 -- --area=<id>`, lists every pair of faces in an area that lie in the same

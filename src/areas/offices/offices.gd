@@ -182,7 +182,7 @@ func _archive() -> void:
 			Props.place(self, "filing_cabinet", _c(x, z), yaw, 1.0)
 	# the drawer with your number on it
 	var drawer := _c(3.2, 17.0)
-	Kit.sign(self, "signs/five_half", drawer + Vector3(0, 1.05, 0.34), 0.0, Vector2(0.18, 0.18))
+	Kit.sign(self, "signs/five_half", drawer + Vector3(0, 1.05, 0.34), 180.0, Vector2(0.18, 0.18))
 	Interactable.make(self, drawer + Vector3(0, 0.9, 0.2), Vector3(0.7, 1.2, 0.6), "Open the drawer marked 5½", _on_drawer, {"name": "PhotoDrawer"})
 	Kit.light(self, drawer + Vector3(0.6, 1.4, 0.9), Color(1.0, 0.9, 0.7), 0.5, 3.0)
 	# labels on the rows, in a filing system nobody explained

@@ -183,6 +183,14 @@ static func build(parent: Node, rows: Array, opts: Dictionary = {}) -> Dictionar
 				continue
 			if not pit.contains(ch):
 				add_quad.call("floor:" + ft, ft, "floor", _face(Vector3(x0, fy, z0), Vector3(x1, fy, z0), Vector3(x1, fy, z1), Vector3(x0, fy, z1), Vector2(x0 / tile, z0 / tile), Vector2(x1 / tile, z0 / tile), Vector2(x1 / tile, z1 / tile), Vector2(x0 / tile, z1 / tile), Vector3.UP))
+			if ch == "~":
+				# a dropped cell is a trench: its sides go up to the floor level of
+				# whatever is beside it, or the map shows its underside through the gap
+				var side_tex: String = room_tex.call(ch, "wall", wall_tex)
+				for d in dirs:
+					if get.call(c + d.x, r + d.y) != "~":
+						var sq := _wall_face(x0 + d.x * cell, x1 + d.x * cell, z0 + d.y * cell, z1 + d.y * cell, fy, y0, -d, tile)
+						add_quad.call("wall:" + side_tex, side_tex, "wall", sq)
 			if ct != "" and not open_above:
 				add_quad.call("ceil:" + ct, ct, "ceil", _face(Vector3(x0, y0 + height, z1), Vector3(x1, y0 + height, z1), Vector3(x1, y0 + height, z0), Vector3(x0, y0 + height, z0), Vector2(x0 / tile, z1 / tile), Vector2(x1 / tile, z1 / tile), Vector2(x1 / tile, z0 / tile), Vector2(x0 / tile, z0 / tile), Vector3.DOWN))
 			if ch == "D" or ch == "O":

@@ -591,6 +591,9 @@ func _dead_grove() -> void:
 	for i in 10:
 		var a := i * 36.0 + rng.randf_range(-12.0, 12.0)
 		var p := DEAD_GROVE + Kit.polar(rng.randf_range(3.0, 8.5), a)
+		# the seed differs from run to run: no tree where the player arrives
+		if p.distance_to(DEAD_GROVE + Vector3(-7.0, 0, 6.0)) < 2.4:
+			p = DEAD_GROVE + Kit.polar(5.0, a)
 		Props.place(self, "tree_dead_1" if i % 3 != 0 else "tree_dead_2", _ground(p.x, p.z) - Vector3(0, 0.1, 0), rng.randf_range(0.0, 360.0), rng.randf_range(0.85, 1.2), {"collision": "cylinder", "collision_scale": 0.3})
 		tree_spots.append(p)
 	var fpos := DEAD_GROVE + Vector3(1.5, 0, -2.0)

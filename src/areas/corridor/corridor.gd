@@ -31,17 +31,17 @@ func build() -> void:
 		var pos := Vector3(x, 0, z)
 		if str(n) == "5½":
 			Door.create(self, pos, yaw, "apartment", "front", {"kind": "wood", "label": "Flat 5½ — home", "name": "Flat5Half", "on_open": func(_d: Node) -> void: Game.set_flag("in_flat_seven", false)})
-			Kit.sign(self, "signs/five_half", pos + Vector3(0, 1.95, -0.08 if north else 0.08), yaw, Vector2(0.32, 0.32))
+			Kit.sign(self, "signs/five_half", pos + Vector3(0, 1.95, 0.09 if north else -0.09), yaw, Vector2(0.32, 0.32))
 			add_spawn("flat_door", pos + Vector3(0, 0.1, 0.9 if north else -0.9), yaw + 180.0)
 			add_spawn("default", pos + Vector3(0, 0.1, 0.9 if north else -0.9), yaw + 180.0)
 		elif n == 7:
 			Door.create(self, pos, yaw, "apartment", "front", {"kind": "wood", "label": "Flat 7", "name": "Flat7", "on_open": func(_d: Node) -> void: Game.set_flag("in_flat_seven", true)})
-			Kit.label(self, "7", pos + Vector3(0, 1.95, -0.06 if north else 0.06), yaw, 40, Color(0.85, 0.8, 0.7), "display", {"pixel_size": 0.01})
+			Kit.label(self, "7", pos + Vector3(0, 1.95, 0.09 if north else -0.09), yaw, 40, Color(0.85, 0.8, 0.7), "display", {"pixel_size": 0.01})
 		else:
 			var it := Interactable.make(self, pos, Vector3(1.2, 2.3, 0.5), "Knock on flat %s" % str(n), _on_knock, {"name": "Flat%s" % str(n), "yaw": yaw, "model": "door_wood", "collision": "none"})
 			it.set_meta("number", n)
 			Kit.blocker(self, pos + Vector3(0, 1.1, 0), Vector3(1.0, 2.2, 0.12))
-			Kit.label(self, str(n), pos + Vector3(0, 1.95, -0.06 if north else 0.06), yaw, 40, Color(0.85, 0.8, 0.7), "display", {"pixel_size": 0.01})
+			Kit.label(self, str(n), pos + Vector3(0, 1.95, 0.09 if north else -0.09), yaw, 40, Color(0.85, 0.8, 0.7), "display", {"pixel_size": 0.01})
 	# lights
 	for i in 8:
 		var x := 1.0 + i * 6.0
@@ -87,6 +87,19 @@ func build() -> void:
 	Kit.sign(self, "signs/graffiti_door", Vector3(29.0, 1.5, W * 0.5 - 0.02), 0.0, Vector2(1.6, 0.4))
 	Props.place(self, "window_night", Vector3(-3.88, 1.5, 0), -90.0, 1.0, {"collision": "none"})
 	Props.place(self, "plant_pot", Vector3(-3.4, 0, -1.0), 0.0, 1.0, {"collision": "none"})
+	# what a landing has: a radiator under the window, mats at the doors of the
+	# two flats that are yours, somebody's boxes outside a flat that is not,
+	# pictures nobody chose, a phone by the lift that has one number in it
+	Props.place(self, "radiator", Vector3(-3.7, 0, 0.9), -90.0, 1.0)
+	Props.place(self, "rug_house", Vector3(2.0 + 5 * 3.2, 0.01, W * 0.5 - 0.75), 0.0, 0.35, {"collision": "none"})
+	Props.place(self, "rug_house", Vector3(2.0 + 7 * 3.2, 0.01, W * 0.5 - 0.75), 0.0, 0.35, {"collision": "none"})
+	Props.place(self, "boxes_moving", Vector3(2.0 + 10 * 3.2 + 1.3, 0, -W * 0.5 + 0.7), 15.0, 0.9)
+	Props.place(self, "shoe_pile", Vector3(2.0 + 2 * 3.2 + 0.9, 0, -W * 0.5 + 0.4), 40.0, 0.8, {"collision": "none"})
+	Props.place(self, "painting_landscape", Vector3(2.0 + 1.5 * 3.2, 1.6, -W * 0.5 + 0.05), 180.0, 0.8, {"collision": "none"})
+	Props.place(self, "photo_3", Vector3(2.0 + 6.5 * 3.2, 1.55, W * 0.5 - 0.05), 0.0, 1.0, {"collision": "none"})
+	Props.place(self, "painting_portrait", Vector3(2.0 + 9.5 * 3.2, 1.6, -W * 0.5 + 0.05), 180.0, 0.8, {"collision": "none"})
+	Props.place(self, "phone_wall", Vector3(lx + 1.7, 1.35, W * 0.5 - 0.06), 0.0, 1.0, {"collision": "none"})
+	Props.place(self, "potted_plant_fake", Vector3(LOOP + 3.2, 0, 1.0), 0.0, 1.0)
 	SeamlessTeleport.link(self, Vector3(LOOP + 2.0, 0, 0), -90.0, Vector3(-2.0, 0, 0), -90.0, Vector3(W, 3.0, 0.6), {"name": "Loop", "count_flag": "corridor_loops", "on_teleport": _on_loop})
 	Kit.blocker(self, Vector3(-4.1, H * 0.5, 0), Vector3(0.2, H, W))
 	Kit.blocker(self, Vector3(LOOP + 4.1, H * 0.5, 0), Vector3(0.2, H, W))

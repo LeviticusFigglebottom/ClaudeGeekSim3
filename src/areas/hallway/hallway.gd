@@ -63,6 +63,12 @@ func build() -> void:
 		prev_h = h
 		z = z1
 	var end_z := z
+	# what a hallway has before it stops being one: a runner, shoes by the
+	# closet, a calendar that does not say which month, a picture of the house
+	Props.place(self, "rug_house", Vector3(0, 0.01, -3.5), 0.0, 0.5, {"collision": "none"})
+	Props.place(self, "shoe_pile", Vector3(0.4, 0, 0.5), 200.0, 0.7, {"collision": "none"})
+	Props.place(self, "frame_calendar", Vector3(-0.64, 1.5, -2.2), -90.0, 1.0, {"collision": "none"})
+	Props.place(self, "painting_house", Vector3(0.79, 1.6, -8.5), 90.0, 0.7, {"collision": "none"})
 	# measuring point, before it grows
 	Interactable.make(self, Vector3(0.55, 1.0, -6.0), Vector3(0.3, 1.5, 1.2), "Measure the hallway", _on_measure, {"name": "MeasurePoint"})
 	Kit.label(self, "|", Vector3(0.66, 1.2, -6.0), 90.0, 40, Color(0.6, 0.6, 0.6), "body", {"pixel_size": 0.01})
@@ -71,7 +77,7 @@ func build() -> void:
 	var insc := Node3D.new()
 	insc.name = "Inscriptions"
 	add_child(insc)
-	Kit.label(insc, "THIS IS NOT FOR YOU", Vector3(-1.4, 1.6, -30.0), -90.0, 48, Color(0.8, 0.1, 0.1), "display", {"pixel_size": 0.012})
+	Kit.label(insc, "THIS IS NOT FOR YOU", Vector3(-1.4, 1.6, -32.0), -90.0, 48, Color(0.8, 0.1, 0.1), "display", {"pixel_size": 0.012})
 	Kit.label(insc, "5 ½", Vector3(2.2, 2.0, -60.0), 90.0, 90, Color(0.8, 0.75, 0.6), "title", {"pixel_size": 0.014})
 	Kit.label(insc, "the house is six feet wrong", Vector3(-2.7, 3.5, -82.0), -90.0, 40, Color(0.6, 0.6, 0.7), "body", {"pixel_size": 0.012})
 	Kit.lantern_only(insc)
@@ -104,7 +110,7 @@ func build() -> void:
 	Kit.light(self, Vector3(0, 4.0, landing_z - 4.0), Color(0.5, 0.55, 0.9), 1.5, 14.0)
 	Kit.light(self, Vector3(-5.0, 2.5, landing_z - 2.0), Color(0.7, 0.65, 0.5), 1.2, 9.0)
 	add_spawn("end", Vector3(0, 0.1, landing_z - 4.0), 180.0)
-	Kit.label(self, "you are late", Vector3(0, 5.2, landing_z - 5.8), 0.0, 44, Color(0.5, 0.5, 0.6), "display", {"pixel_size": 0.012})
+	Kit.label(self, "you are late", Vector3(0, 5.2, landing_z - 5.8), 180.0, 44, Color(0.5, 0.5, 0.6), "display", {"pixel_size": 0.012})
 	# the stair that goes down forever (three times)
 	_build_stair(Vector3(-5.0, 0, landing_z), wall_tex, floor_tex)
 	Kit.particles(self, Vector3(0, 3, -40), "motes", Vector3(3, 3, 40), 40)

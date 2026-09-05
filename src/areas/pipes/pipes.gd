@@ -19,7 +19,7 @@ const W := 64
 const D := 54
 const BLOCK := Vector3(9.0, 0.0, 41.0)    # plan metres: the turning room's block centre
 const TOWER_H := 13.5
-const LAPS_NEEDED := 3
+const LAPS_NEEDED := 4
 const LOOPS_NEEDED := 3
 const CYAN := Color(0.6, 0.95, 0.95)
 const TILE := "wall/tile_white"
@@ -35,6 +35,8 @@ var _last_angle := 0.0
 var _have_angle := false
 var _progress := 0.0            # degrees walked round the block, the water's way
 var _laps_told := 0
+var _backwards := 0.0          # degrees walked the wrong way, for one hint
+var _told_backwards := false
 
 
 func build() -> void:
@@ -127,6 +129,21 @@ func _shaft_room() -> void:
 	Kit.light(self, c + Vector3(0, 6.0, 0), CYAN, 1.2, 12.0)
 	_lamp(5.0, 5.0)
 	_lamp(11.0, 11.0)
+	# smaller pipes along two walls on brackets, rusted where they drip, and
+	# drains in the floor for what comes off them
+	var rust := Color(0.55, 0.42, 0.35)
+	# (a cylinder is centred half its height above the position it is given,
+	# and turned about that centre, so a horizontal one is given y minus that)
+	Kit.cylinder(self, _m(8.0, 4.35, 3.3 - 3.8), 0.18, 7.6, PLATE, {"rotation": Vector3(0, 0, -90), "segments": 10, "solid": false, "tint": Color(0.75, 0.78, 0.78)})
+	Kit.cylinder(self, _m(4.35, 8.0, 2.7 - 3.8), 0.14, 7.6, PLATE, {"rotation": Vector3(90, 0, 0), "segments": 10, "solid": false, "tint": rust})
+	for x in [5.5, 8.0, 10.5]:
+		Kit.box(self, _m(x, 4.2, 3.3), Vector3(0.12, 0.5, 0.3), "metal/iron", {"solid": false})
+	for z in [5.5, 8.0, 10.5]:
+		Kit.box(self, _m(4.2, z, 2.7), Vector3(0.3, 0.42, 0.12), "metal/iron", {"solid": false})
+	Kit.box(self, _m(4.35, 8.0, 1.35), Vector3(0.14, 2.7, 0.14), PLATE, {"solid": false, "tint": rust})
+	Props.place(self, "drain_grate", _m(4.7, 8.0, 0.01), 0.0, 0.8, {"collision": "none"})
+	Props.place(self, "drain_grate", _m(11.2, 4.8, 0.01), 0.0, 0.8, {"collision": "none"})
+	Kit.particles(self, _m(4.4, 8.0, 2.6), "rain", Vector3(0.2, 0.2, 0.2), 6)
 	Readable.create(self, c + Vector3(0, 1.6, -1.8), 0.0, "Look up the pipe", [
 		"The pipe you came down, going up further than the light goes. Water is still coming down it, thinly, the last of what was in the bath.",
 		"You are not going back up it. Down is the same as down, and this is where down went.",
@@ -280,14 +297,22 @@ func _tower() -> void:
 		var y0 := loop_h * k
 		# along the north wall going east, up 2.5; along the south wall going west, up 2.5
 		Kit.stairs(self, c + Vector3(-2.5, y0, -1.95), -90.0, 1.7, 10, 0.25, 0.4, TILE, {"name": "FlightA%d" % k, "tile": 1.0})
-		Kit.floor(self, c + Vector3(2.15, y0 + 2.5, -0.1), Vector2(1.3, 3.5), TILE, {"tile": 1.0})
+		# the east landing: the north strip up to the wall, and a sliver along
+		# the east wall behind the second flight's foot, so there is no slot to
+		# see down through where the flights meet
+		Kit.floor(self, c + Vector3(2.15, y0 + 2.5, -0.8), Vector2(1.3, 3.8), TILE, {"tile": 1.0})
+		Kit.floor(self, c + Vector3(2.65, y0 + 2.5, 1.9), Vector2(0.3, 1.6), TILE, {"tile": 1.0})
 		Kit.stairs(self, c + Vector3(2.5, y0 + 2.5, 1.95), 90.0, 1.7, 10, 0.25, 0.4, TILE, {"name": "FlightB%d" % k, "tile": 1.0})
 		if k == 0:
-			Kit.floor(self, c + Vector3(-2.15, y0 + 5.0, 0.1), Vector2(1.3, 3.5), TILE, {"tile": 1.0})
+			# a hair below the flight's top tread and lapping under it, so the seam has no width
+			Kit.floor(self, c + Vector3(-2.1, y0 + 4.99, 0.8), Vector2(1.4, 3.8), TILE, {"tile": 1.0})
+			Kit.floor(self, c + Vector3(-2.65, y0 + 5.0, -1.9), Vector2(0.3, 1.6), TILE, {"tile": 1.0})
 		Kit.light(self, c + Vector3(0, y0 + 2.2, 0), CYAN, 0.9, 7.0)
 		Kit.light(self, c + Vector3(0, y0 + 4.6, 0), CYAN, 0.9, 7.0)
-	# the top: a platform over the north half, the pedestal, the hatch
-	Kit.floor(self, c + Vector3(0, 10.0, -0.5), Vector2(5.4, 4.0), TILE, {"tile": 1.0})
+	# the top: a platform over everything but the last flight (which climbs
+	# under where it would be), the pedestal, the hatch
+	Kit.floor(self, c + Vector3(0, 10.0, -0.8), Vector2(5.4, 3.8), TILE, {"tile": 1.0})
+	Kit.floor(self, c + Vector3(-2.05, 9.99, 1.9), Vector2(1.3, 1.6), TILE, {"tile": 1.0})
 	Kit.light(self, c + Vector3(0, 12.5, -0.5), Color(0.9, 0.95, 1.0), 1.2, 8.0)
 	Kit.box(self, c + Vector3(0, 10.5, -1.5), Vector3(0.6, 1.0, 0.6), "stone/marble_black", {"tile": 1.0})
 	Pickup.create(self, c + Vector3(0, 11.15, -1.5), {"item": "dark_glass", "key": "picked_dark_glass", "model": "item_shard", "prompt": "Take the dark glass", "name": "DarkGlass"})
@@ -337,9 +362,10 @@ func _set_bodies(node: Node, on: bool) -> void:
 		_set_bodies(ch, on)
 
 
-## Going round the block the way the water goes. A quarter of the way round,
-## the doorway you came in by is a wall. Three times round, the block gives
-## up a doorway on the face you are nearest, and the stair is inside it.
+## Going round the block the way the water goes. Once round, the doorway
+## you came in by is a wall. Four times round, the block gives up a doorway
+## on the face you are nearest, and the stair is inside it. Only the
+## clockwise part of the walk counts; going back the other way does nothing.
 func _process(_delta: float) -> void:
 	if opened:
 		return
@@ -358,16 +384,22 @@ func _process(_delta: float) -> void:
 		return
 	var delta := wrapf(a - _last_angle, -180.0, 180.0)
 	_last_angle = a
-	_progress = maxf(0.0, _progress + delta)
-	if not entrance_sealed and _progress >= 90.0:
+	if delta > 0.0:
+		_progress += delta
+	else:
+		# against the water: nothing counts, and after half a turn it says so once
+		_backwards += -delta
+		if not _told_backwards and _backwards >= 180.0 and _progress < 90.0:
+			_told_backwards = true
+			Game.toast.emit("Against the water, nothing happens. The water goes the other way round.")
+	var laps := int(_progress / 360.0)
+	if not entrance_sealed and laps >= 1:
 		entrance_sealed = true
 		_set_solid(entrance_seal, true)
 		Audio.sfx("stone_grind", c, -6.0)
-		Game.toast.emit("Behind you, the way you came in is a wall.")
-	var laps := int(_progress / 360.0)
 	if laps > _laps_told and laps < LAPS_NEEDED:
 		_laps_told = laps
-		Game.toast.emit(["", "Once round. The block has nothing on it.", "Twice round. It is not a block. It is a thing that is waiting."][laps])
+		Game.toast.emit(["", "Once round. Behind you, the way you came in is a wall.", "Twice round. The block has nothing on it.", "Three times. It is not a block. It is a thing that is waiting."][laps])
 	if _progress >= 360.0 * LAPS_NEEDED:
 		door_face = 1 if d.x >= 0.0 else -1
 		_open(c)

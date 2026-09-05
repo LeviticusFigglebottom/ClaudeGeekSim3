@@ -55,14 +55,14 @@ func build() -> void:
 | call | what |
 |---|---|
 | `Kit.box(parent, centre, size, tex, opts)` | textured solid box; `faces` subset, `tile` size, `solid`, `tint`, `unshaded`, `emission` |
-| `Kit.floor / Kit.ceiling(parent, centre, Vector2 size, tex)` | thin slabs |
+| `Kit.floor / Kit.ceiling(parent, centre, Vector2 size, tex)` | thin slabs; a floor 0.1 m or thicker draws its underside too, so a platform, bridge or roof is walked under (`overlay` for a rug or a patch that only needs a top) |
 | `Kit.wall(parent, from, to, height, tex)` | a wall between two ground points |
 | `Kit.ring(parent, centre, r_in, r_out, segments, tex, {down})` | discs and rings |
 | `Kit.round_wall(parent, centre, radius, height, segments, tex, {gaps})` | circular rooms |
 | `Kit.stairs(parent, pos, yaw, width, steps, step_h, step_d, tex)` | flights (negative `step_h` descends); a flight no steeper than about 44° also gets an invisible ramp collider along its tread edges, so it is walked, not climbed |
 | `Kit.ramp`, `Kit.arch`, `Kit.cylinder`, `Kit.terrain(parent, pos, size, res, height_fn, tex)` | more geometry |
 | `Kit.water(parent, pos, size, tex)` | animated water plane |
-| `Kit.sign(parent, tex, pos, yaw, size)` | a flat picture on a wall |
+| `Kit.sign(parent, tex, pos, yaw, size)` | a flat picture on a wall; the yaw is the way the picture faces, like a label: yaw 0 faces north and is read from the north, 180 from the south, 90 from the west. Put it a few centimetres off the wall on the reader's side; the verifier warns if it faces into the wall |
 | `Kit.label(parent, text, pos, yaw, size, color, kind)` | 3D text (kind: title / display / body). The text faces the way the yaw faces: yaw 0 faces north and is read by someone standing north of it looking south, so a label on a north wall read from the room south of it takes yaw 180, one on an east wall read from the west takes 90. `{"flat": true}` lays it on the ground. The title font is blackletter capitals and is hard to read at small sizes; use display or body for anything that must be read |
 | `Kit.light(parent, pos, color, energy, range)` / `Kit.sun` / `Kit.spot` | lights |
 | `Kit.particles(parent, pos, kind, extent, amount)` | motes, embers, rain, snow, ash, fog |
