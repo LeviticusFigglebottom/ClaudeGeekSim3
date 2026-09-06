@@ -99,9 +99,10 @@ it, three roses in the vase, a set showing static. "The one in the bed"
 who has been walking, one person, and that lying down is the two halves
 agreeing, which from the outside is called waking up. Then it asks "Lie
 down. (the ending: waking up)", "No" first, asks again, and plays the
-`whole` ending (`ending_whole`) through the stub in `src/core/ending.gd`:
-the set finds a channel, the tone from the machine changes, somebody sits
-down in the chair and says your name, and you open your eyes. Declared as
+`whole` ending (`ending_whole`): the scene in `docs/areas/ENDING.md`, from
+the bed, in which the tall one comes to the bed and is not there, the set
+finds a channel, somebody sits down in the chair and says your name, and
+you open your eyes. Declared as
 `hospital_whole`, needs `memories_all`. This is the fourth road: regaining
 consciousness. `docs/ENDINGS.md`.
 

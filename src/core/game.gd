@@ -111,6 +111,10 @@ var mirror_sight := false: set = set_mirror_sight
 var small := false: set = set_small
 
 
+## The ending whose scene the ending area builds next; set by Ending.play.
+var ending_kind := "whole"
+
+
 func _ready() -> void:
 	migrate_legacy_save()
 	InputSetup.ensure()

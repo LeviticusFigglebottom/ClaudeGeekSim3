@@ -211,7 +211,7 @@ func _pool_hall() -> void:
 
 ## The bottom of the great bath with the water gone: what it was keeping, and
 ## the drain the size of a door that was under all of it. The way down through
-## it is the fourth road, and its end is not made yet.
+## it is the fourth road, which ends in room 5½.
 func _dry_bottom(bx0: float, bx1: float, bz0: float, bz1: float) -> void:
 	var cx := (bx0 + bx1) * 0.5
 	var cz := (bz0 + bz1) * 0.5

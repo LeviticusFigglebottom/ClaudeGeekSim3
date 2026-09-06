@@ -6,9 +6,9 @@ overridden to a near-black void with almost no fog and no sky; ambience
 `static`.
 
 This is where conceding at the board goes. It is one of the four ends of
-the game, and its ending scene is not made yet: `Ending.play("unplugged",
-...)` sets `ending_unplugged`, fades to white, and for now wakes the player
-in the flat.
+the game: `Ending.play("unplugged", ...)` sets `ending_unplugged`, fades to
+white, and plays the scene in `docs/areas/ENDING.md`, the plug in your hand
+and every screen going to a dot.
 
 ## Getting there
 

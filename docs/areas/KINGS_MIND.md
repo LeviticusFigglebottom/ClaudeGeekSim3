@@ -60,8 +60,8 @@ visitor's)", "No" first, then asks again, and plays the `m` ending
 (`ending_m`), told from the chair: you are M, you have read to him and
 brought the roses one at a time, his breathing does not change and you
 come anyway, you sign the book with one letter, go home, and come back
-tomorrow. It is the same room from the visitor's point of view. Finished as
-a choice; its scene is not made yet (`docs/ENDINGS.md`).
+tomorrow. It is the same room from the visitor's point of view; the scene,
+from the chair, is in `docs/areas/ENDING.md`.
 Declared as `kings_mind_m`, requires `flag:roses_all_placed`.
 
 ## Hints

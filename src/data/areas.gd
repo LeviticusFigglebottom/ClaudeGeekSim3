@@ -88,6 +88,11 @@ const AREAS := {
 		"name": "The Static", "subtitle": "between channels",
 		"realm": "static", "ambience": "static",
 	},
+	"ending": {
+		"scene": "res://src/areas/ending/ending.tscn",
+		"name": "", "subtitle": "",
+		"realm": "hospital", "ambience": "", "hidden": true,
+	},
 	"workshop": {
 		"scene": "res://src/areas/workshop/workshop.tscn",
 		"name": "The Workshop", "subtitle": "where the props are kept",

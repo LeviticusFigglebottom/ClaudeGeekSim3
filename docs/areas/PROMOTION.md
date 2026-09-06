@@ -5,9 +5,10 @@ gets there is whatever it is told"*. Built in
 `src/areas/promotion/promotion.gd`. Realm preset `promotion` (a bruised
 violet sky, the King's Mind sky texture, thin fog).
 
-This is where accepting the promotion goes. It is one of the three ends of
-the game, and its ending scene is not made yet: `Ending.play("limbo", ...)`
-sets `ending_limbo`, fades, and for now wakes the player in the flat.
+This is where accepting the promotion goes. It is one of the four ends of
+the game: `Ending.play("limbo", ...)` sets `ending_limbo`, fades, and plays
+the scene in `docs/areas/ENDING.md`, the pieces turning and the ward coming
+up round the board.
 
 ## Getting there
 

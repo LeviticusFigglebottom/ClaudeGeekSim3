@@ -225,7 +225,7 @@ func _door(d: Array) -> void:
 
 ## The well keeps count of the keepsakes. With all nine held over it at once
 ## it lets go of something at the bottom, and the Cistern begins to drain:
-## the start of the fourth road, whose end is not made yet.
+## the start of the fourth road, which ends in room 5½.
 func _on_well(_r: Node) -> void:
 	var n := Game.keepsakes.size()
 	var lines: Array = []

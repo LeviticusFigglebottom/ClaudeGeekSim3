@@ -60,6 +60,13 @@ var yaw := 0.0
 var pitch := 0.0
 var frozen := false
 var input_locked := false
+## A scripted scene: no walking, no actions, the look kept within an arc
+## about `scene_yaw`, and the head where the scene put it (lying, sitting).
+var scene_lock := false
+var scene_yaw := 0.0
+var scene_yaw_range := PI
+var scene_pitch_min := -1.45
+var scene_pitch_max := 1.45
 ## Set when a conversation closes, so the key that closed it does not open the next one.
 var interact_cooldown := 0.0
 var focus: Node = null
@@ -130,8 +137,36 @@ func _in_play() -> bool:
 func rotate_look(dyaw: float, dpitch: float) -> void:
 	yaw = wrapf(yaw + dyaw, -PI, PI)
 	pitch = clampf(pitch + dpitch, -1.45, 1.45)
+	if scene_lock:
+		var off := clampf(wrapf(yaw - scene_yaw, -PI, PI), -scene_yaw_range, scene_yaw_range)
+		yaw = wrapf(scene_yaw + off, -PI, PI)
+		pitch = clampf(pitch, scene_pitch_min, scene_pitch_max)
 	rotation.y = yaw
 	head.rotation.x = pitch
+
+
+## Hold the player still for a scripted scene, looking `look_yaw`/`look_pitch`,
+## free to look about within `yaw_range` either side and between the pitches,
+## with the eyes at `head_y` (a negative value keeps the standing height).
+## Off again restores the body.
+func set_scene_lock(on: bool, look_yaw: float = 0.0, look_pitch: float = 0.0, yaw_range: float = PI, pitch_min: float = -1.45, pitch_max: float = 1.45, head_y: float = -1.0) -> void:
+	scene_lock = on
+	if on:
+		scene_yaw = look_yaw
+		scene_yaw_range = yaw_range
+		scene_pitch_min = pitch_min
+		scene_pitch_max = pitch_max
+		velocity = Vector3.ZERO
+		gliding = false
+		set_look(look_yaw, clampf(look_pitch, pitch_min, pitch_max))
+		if head_y > 0.0:
+			head.position.y = head_y
+		focus = null
+		focus_changed.emit(null)
+	else:
+		_apply_body()
+	if World.hud and World.hud.crosshair:
+		World.hud.crosshair.visible = not on
 
 
 func set_look(new_yaw: float, new_pitch: float = 0.0) -> void:
@@ -187,7 +222,7 @@ func eye_position() -> Vector3:
 # --- movement -----------------------------------------------------------
 
 func _physics_process(delta: float) -> void:
-	if frozen:
+	if frozen or scene_lock:
 		return
 	_update_focus()
 	_poll_actions()

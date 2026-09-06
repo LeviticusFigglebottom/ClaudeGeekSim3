@@ -145,7 +145,7 @@ assets/models           generated GLBs, one per prop
 tools/gen_assets/       the Python generators for all of the above
 tools/verify.gd         the headless verifier
 docs/                   DESIGN, WORLD, AREA_AUTHORING, DEPLOY, ENDINGS,
-                        areas/KINGS_DREAM, KINGS_MIND, PROMOTION, STATIC_END, PIPES, HOSPITAL
+                        areas/KINGS_DREAM, KINGS_MIND, PROMOTION, STATIC_END, PIPES, HOSPITAL, ENDING
 ```
 
 An area is registered in `src/data/areas.gd` with a scene path, name,
@@ -296,8 +296,8 @@ Render screenshots at every step and look at them.
 * **Endings are not yours to design.** `docs/ENDINGS.md` records the four
   roads: concede and checkmate at the board, M at the King's bed, and the
   fourth that runs from the well through the Waterworks and the hospital to
-  the bed in room 5½. Do not invent endings. The ending scenes themselves
-  are the next job and are stubbed in `src/core/ending.gd`.
+  the bed in room 5½. Do not invent endings. Their scenes are built in
+  `src/areas/ending/ending.gd` and described in `docs/areas/ENDING.md`.
 * There is no roadmap and no backlog. Known imperfections that are not worth
   your time: some faces on the Slow Sea are flat sprites, round moving
   platforms use box collision, the Drowned City's main street does not flood

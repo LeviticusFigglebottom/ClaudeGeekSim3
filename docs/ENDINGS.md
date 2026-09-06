@@ -1,7 +1,7 @@
 # Endings
 
-**Status: four roads, each with its choice in the game. No ending scene is
-made yet.**
+**Status: four roads, each with its choice in the game and its scene, in
+`docs/areas/ENDING.md`.**
 
 ## Who is who
 
@@ -23,7 +23,7 @@ one. Are you sure?", "No" first). Nothing is chosen by accident.
 |---|---|---|---|---|
 | **Concede** (unplugged): killing yourself | the board in the rotunda at the eighth square, once the banquet has begun | "Concede. Lay the king down, and pull the plug on yourself." | `plug_pulled`, then `ending_unplugged` at the socket | Off Air, `docs/areas/STATIC_END.md`: the station shutting down, the same life on eight stages being struck, the lights going out behind you; the one on the bed at the end under the last light is you, on the machine, and the plug is warm. The text says it plainly: pulling it is not a picture of anything, it is you killing yourself, and it was always going to be your hand. |
 | **Checkmate** (limbo): coming to terms | the same board | "Checkmate. Trap the king where he lies, and come to terms with it." | `promotion_taken`, then `ending_limbo` on the last square | The Last Rank, `docs/areas/PROMOTION.md`: eight squares from BORN to a square with nothing on it. Mating the king leaves him exactly where he is, for good: the king is you, as the ward and M see you, and the pawn that mated him is promoted into him. Standing on the last square is agreeing to the bed, the ward, the visitor, the years, and no more walking. The board keeps you and the bed keeps you and somebody comes in the afternoons. |
-| **M**: the visitor's point of view | the King in his bed in the King's Mind, after the third rose (`roses_all_placed`) | "Sit in M's chair. (an ending: the visitor's)" | `ending_m` | Nowhere yet. The chair's shape is M's; sitting in it, you are not him any more but the one who visits every afternoon, reads, folds roses, signs the book with one letter and goes home, and comes back tomorrow. His breathing does not change; the ending is the coming anyway. It is the same room seen from the chair instead of the bed. Its scene is next. |
+| **M**: the visitor's point of view | the King in his bed in the King's Mind, after the third rose (`roses_all_placed`) | "Sit in M's chair. (an ending: the visitor's)" | `ending_m` | The chair, in `docs/areas/ENDING.md`. The chair's shape is M's; sitting in it, you are not him any more but the one who visits every afternoon, reads, folds roses, signs the book with one letter and goes home, and comes back tomorrow. His breathing does not change; the ending is the coming anyway. It is the same room seen from the chair instead of the bed. |
 | **Whole**: regaining consciousness | the well in the Anteroom with all nine keepsakes, then down: the drained Cistern's drain, the Waterworks and its turning room, the Dark Glass, the Keep's mirror, the Other Anteroom with its roof off, the hospital and its six memory fragments, room 5½ | "Lie down. (the ending: waking up)" | `cistern_drained` → `pipes_opened` → `picked_dark_glass` → `mirror_open` → `memories_all` → `ending_whole` | The bed with the one in it half under the sheet with the King's face and half in the coat with yours: the body as the ward sees it and the one who has been walking, one person. Lying down is the two halves agreeing, and from the outside that is called waking up: the set finds a channel, the tone from the machine changes, somebody says your name, and you open your eyes. `docs/areas/PIPES.md`, `docs/areas/HOSPITAL.md`. |
 
 The board's third option, "Do nothing. Leave the board as it is.", is the
@@ -47,14 +47,16 @@ chessboard on its table, a game nearly over (your pawn on the seventh, the
 red king in the corner), your chair pulled out on the south side. Once the
 banquet has begun the Usher comes and stands across the board.
 
-## What plays now
+## What plays
 
 `src/core/ending.gd`, `Ending.play(kind, title, lines, color)`: sets
-`ending_<kind>`, bumps `endings`, says the lines, fades to the colour,
-writes a journal note saying the scene is not made yet, and wakes the player
-in the flat with a toast saying so. **The ending scenes are the next thing to
-make** and should replace the tail of that function. `Game.stats` (doors,
-wakes, falls, distance and playtime) survives a save and is there for them.
+`ending_<kind>`, bumps `endings`, says the last words at the place of
+choosing, writes the journal note, and travels to the `ending` area, which
+builds the scene for that kind and plays it: the player held in a scripted
+scene, lines clicked through, beats between them, and at the end a card
+with the ending's name and its last line, the save left in the flat, and
+the title screen. The four scenes, beat by beat, are in
+`docs/areas/ENDING.md`. `whole` also sets `game_finished`.
 
 ## Hints
 
@@ -66,12 +68,10 @@ and offers another afterwards.
 
 ## Open
 
-* **The fourth road's scene**: the choice is in the bed in room 5½ and its
-  lines say what it is (waking); what the scene shows is open, like the
-  other three.
 * **The well's other text states** still say "something is still missing";
   the nine-keepsake state now leads somewhere.
 * **The Paper Crown** has no use in the dream since the crowning was removed.
-* **Which ending counts as finishing the game**, and whether the others stay
-  reachable afterwards (all currently return the player to the flat with
-  their flag set).
+* **Finishing the game** is `whole` (`game_finished`). Every ending leaves
+  the save in the flat with its flag set, so the others stay reachable
+  afterwards; nothing yet reads `game_finished` (a title-screen change, a
+  different flat, are open).
